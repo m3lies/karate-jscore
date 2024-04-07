@@ -10,4 +10,8 @@ module ch.sku.karatescore {
 
     opens ch.sku.karatescore to javafx.fxml;
     exports ch.sku.karatescore;
+    exports ch.sku.karatescore.commons;
+    exports ch.sku.karatescore.components;
+    exports ch.sku.karatescore.model;
+    opens ch.sku.karatescore.components to javafx.fxml;
 }
