@@ -11,6 +11,20 @@ public class MatchData {
     private final Map<ParticipantType, IntegerProperty> wazaAriScores = new EnumMap<>(ParticipantType.class);
     private final Map<ParticipantType, IntegerProperty> ipponScores = new EnumMap<>(ParticipantType.class);
     private final Map<ParticipantType, ReadOnlyIntegerWrapper> totalScores = new EnumMap<>(ParticipantType.class);
+    // Penalties for AKA
+    private final BooleanProperty chui1GivenAka = new SimpleBooleanProperty(false);
+    private final BooleanProperty chui2GivenAka = new SimpleBooleanProperty(false);
+    private final BooleanProperty chui3GivenAka = new SimpleBooleanProperty(false);
+    private final BooleanProperty hansokuChuiGivenAka = new SimpleBooleanProperty(false);
+    private final BooleanProperty hansokuGivenAka = new SimpleBooleanProperty(false);
+
+    // Penalties for AO
+    private final BooleanProperty chui1GivenAo = new SimpleBooleanProperty(false);
+    private final BooleanProperty chui2GivenAo = new SimpleBooleanProperty(false);
+    private final BooleanProperty chui3GivenAo = new SimpleBooleanProperty(false);
+    private final BooleanProperty hansokuChuiGivenAo = new SimpleBooleanProperty(false);
+    private final BooleanProperty hansokuGivenAo = new SimpleBooleanProperty(false);
+
 
     private final IntegerProperty penalties = new SimpleIntegerProperty(0);
     private final StringProperty timer = new SimpleStringProperty("00:00");
@@ -71,5 +85,45 @@ public class MatchData {
         return timer;
     }
 
+    // Getters for BooleanProperty objects
+    public BooleanProperty chui1GivenProperty() {
+        return chui1Given;
+    }
 
+    public BooleanProperty chui2GivenProperty() {
+        return chui2Given;
+    }
+
+    public BooleanProperty chui3GivenProperty() {
+        return chui3Given;
+    }
+    // Existing methods...
+
+    public void toggleChui1Given() {
+        chui1Given.set(!chui1Given.get());
+    }
+
+    public void toggleChui2Given() {
+        chui2Given.set(!chui2Given.get());
+    }
+
+    public void toggleChui3Given() {
+        chui3Given.set(!chui3Given.get());
+    }
+
+    public BooleanProperty hansokuChuiGivenProperty() {
+        return hansokuChuiGiven;
+    }
+
+    public BooleanProperty hansokuGivenProperty() {
+        return hansokuGiven;
+    }
+
+    public void toggleHansokuChuiGiven() {
+        hansokuChuiGiven.set(!hansokuChuiGiven.get());
+    }
+
+    public void toggleHansokuGiven() {
+        hansokuGiven.set(!hansokuGiven.get());
+    }
 }

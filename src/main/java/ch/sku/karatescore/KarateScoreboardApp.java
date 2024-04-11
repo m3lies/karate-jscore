@@ -6,6 +6,7 @@ import ch.sku.karatescore.components.ScoreComponent;
 import ch.sku.karatescore.components.TimerComponent;
 import ch.sku.karatescore.model.MatchData;
 import ch.sku.karatescore.view.MatchDataView;
+import ch.sku.karatescore.view.PromoKumiteView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -21,6 +22,7 @@ public class KarateScoreboardApp extends Application {
 
         primaryStage.setTitle("Karate Scoreboard");
         MatchDataView matchDataView =new MatchDataView();
+        PromoKumiteView promoKumiteView = new PromoKumiteView();
         MatchData matchData = new MatchData();
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20, 50, 20, 50)); // Adjust padding as needed
@@ -36,12 +38,13 @@ public class KarateScoreboardApp extends Application {
         HBox mainLayout = new HBox(20);
         mainLayout.getChildren().addAll(
                 aoScoreComponent.getComponent(),
-                penaltyComponent.getComponent(),
                 timerComponent.getComponent(),
-                akaScoreComponent.getComponent()
+                akaScoreComponent.getComponent(),
+                penaltyComponent.getComponent()
         );
         root.setCenter(mainLayout);
         matchDataView.showMatchDataView(matchData);
+        promoKumiteView.showPromoKumiteView(matchData);
         Scene scene = new Scene(root, 600, 400);
         scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
         primaryStage.setScene(scene);
