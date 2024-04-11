@@ -1,7 +1,10 @@
 package ch.sku.karatescore.model;
 
 import ch.sku.karatescore.commons.ParticipantType;
+import ch.sku.karatescore.commons.PenaltyType;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -11,30 +14,50 @@ public class MatchData {
     private final Map<ParticipantType, IntegerProperty> wazaAriScores = new EnumMap<>(ParticipantType.class);
     private final Map<ParticipantType, IntegerProperty> ipponScores = new EnumMap<>(ParticipantType.class);
     private final Map<ParticipantType, ReadOnlyIntegerWrapper> totalScores = new EnumMap<>(ParticipantType.class);
+
+    private final ObservableMap<ParticipantType, ObservableMap<PenaltyType, BooleanProperty>> penalties = FXCollections.observableHashMap();
     // Penalties for AKA
-    private final BooleanProperty chui1GivenAka = new SimpleBooleanProperty(false);
-    private final BooleanProperty chui2GivenAka = new SimpleBooleanProperty(false);
-    private final BooleanProperty chui3GivenAka = new SimpleBooleanProperty(false);
-    private final BooleanProperty hansokuChuiGivenAka = new SimpleBooleanProperty(false);
-    private final BooleanProperty hansokuGivenAka = new SimpleBooleanProperty(false);
 
-    // Penalties for AO
-    private final BooleanProperty chui1GivenAo = new SimpleBooleanProperty(false);
-    private final BooleanProperty chui2GivenAo = new SimpleBooleanProperty(false);
-    private final BooleanProperty chui3GivenAo = new SimpleBooleanProperty(false);
-    private final BooleanProperty hansokuChuiGivenAo = new SimpleBooleanProperty(false);
-    private final BooleanProperty hansokuGivenAo = new SimpleBooleanProperty(false);
-
-
-    private final IntegerProperty penalties = new SimpleIntegerProperty(0);
     private final StringProperty timer = new SimpleStringProperty("00:00");
 
     public MatchData() {
-        for (ParticipantType type : ParticipantType.values()) {
-            yukoScores.put(type, new SimpleIntegerProperty(0));
-            wazaAriScores.put(type, new SimpleIntegerProperty(0));
-            ipponScores.put(type, new SimpleIntegerProperty(0));
-            totalScores.put(type, new ReadOnlyIntegerWrapper());
+        for (ParticipantType participant : ParticipantType.values()) {
+            yukoScores.put(participant, new SimpleIntegerProperty(0));
+            wazaAriScores.put(participant, new SimpleIntegerProperty(0));
+            ipponScores.put(participant, new SimpleIntegerProperty(0));
+            totalScores.put(participant, new ReadOnlyIntegerWrapper());
+            ObservableMap<PenaltyType, BooleanProperty> participantPenalties = FXCollections.observableHashMap();
+            for (PenaltyType penalty : PenaltyType.values()) {
+                participantPenalties.put(penalty, new SimpleBooleanProperty(false));
+            }
+            penalties.put(participant, participantPenalties);
+        }
+    }
+    public BooleanProperty penaltyProperty(ParticipantType participant, PenaltyType penalty) {
+        return penalties.get(participant).get(penalty);
+    }
+
+    public void togglePenalty(ParticipantType participant, PenaltyType penalty) {
+        switch (penalty) {
+            case CHUI3:
+                // When toggling Chui 3, ensure Chui 1 and Chui 2 are set to true
+                penaltyProperty(participant, PenaltyType.CHUI1).set(true);
+                penaltyProperty(participant, PenaltyType.CHUI2).set(true);
+                penaltyProperty(participant, PenaltyType.CHUI3).set(true);
+                break;
+            case CHUI2:
+                // Ensure Chui 1 is set when Chui 2 is toggled
+                penaltyProperty(participant, PenaltyType.CHUI1).set(true);
+                penaltyProperty(participant, PenaltyType.CHUI2).set(true);
+                break;
+            case CHUI1:
+                penaltyProperty(participant, PenaltyType.CHUI1).set(true);
+                break;
+            // Handle other penalties without specific cascading logic
+            default:
+                BooleanProperty penaltyProp = penaltyProperty(participant, penalty);
+                penaltyProp.set(!penaltyProp.get());
+                break;
         }
     }
 
@@ -77,53 +100,9 @@ public class MatchData {
         totalScores.get(type).set(total);
     }
 
-    public IntegerProperty penaltiesProperty() {
-        return penalties;
-    }
-
     public StringProperty timerProperty() {
         return timer;
     }
 
-    // Getters for BooleanProperty objects
-    public BooleanProperty chui1GivenProperty() {
-        return chui1Given;
-    }
 
-    public BooleanProperty chui2GivenProperty() {
-        return chui2Given;
-    }
-
-    public BooleanProperty chui3GivenProperty() {
-        return chui3Given;
-    }
-    // Existing methods...
-
-    public void toggleChui1Given() {
-        chui1Given.set(!chui1Given.get());
-    }
-
-    public void toggleChui2Given() {
-        chui2Given.set(!chui2Given.get());
-    }
-
-    public void toggleChui3Given() {
-        chui3Given.set(!chui3Given.get());
-    }
-
-    public BooleanProperty hansokuChuiGivenProperty() {
-        return hansokuChuiGiven;
-    }
-
-    public BooleanProperty hansokuGivenProperty() {
-        return hansokuGiven;
-    }
-
-    public void toggleHansokuChuiGiven() {
-        hansokuChuiGiven.set(!hansokuChuiGiven.get());
-    }
-
-    public void toggleHansokuGiven() {
-        hansokuGiven.set(!hansokuGiven.get());
-    }
 }

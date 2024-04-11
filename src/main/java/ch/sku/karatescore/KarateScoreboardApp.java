@@ -31,7 +31,8 @@ public class KarateScoreboardApp extends Application {
         ScoreComponent akaScoreComponent = new ScoreComponent(matchData, ParticipantType.AKA);
         ScoreComponent aoScoreComponent = new ScoreComponent(matchData, ParticipantType.AO);
         TimerComponent timerComponent = new TimerComponent(matchData);
-        PenaltyComponent penaltyComponent = new PenaltyComponent(matchData);
+        PenaltyComponent akaPenaltyComponent = new PenaltyComponent(matchData, ParticipantType.AKA);
+        PenaltyComponent aoPenaltyComponent = new PenaltyComponent(matchData, ParticipantType.AO);
 
         // Place components in the pane
         // Layout for placing the components
@@ -40,7 +41,8 @@ public class KarateScoreboardApp extends Application {
                 aoScoreComponent.getComponent(),
                 timerComponent.getComponent(),
                 akaScoreComponent.getComponent(),
-                penaltyComponent.getComponent()
+                akaPenaltyComponent.getComponent(),
+                aoPenaltyComponent.getComponent()
         );
         root.setCenter(mainLayout);
         matchDataView.showMatchDataView(matchData);

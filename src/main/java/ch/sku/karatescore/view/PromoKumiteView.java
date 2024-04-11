@@ -1,7 +1,9 @@
 package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
+import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.model.MatchData;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -48,16 +50,25 @@ public class PromoKumiteView {
 
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(matchData.totalScoreProperty(type).asString().concat("Total"));
-        Label penaltyLabel = new Label();
-        penaltyLabel.textProperty().bind(matchData.penaltiesProperty().asString().concat(" Penalties"));
+        addPenaltyLabels(matchData, type, dataLayout);
+
 
 
         // Add all labels to the VBox
-        dataLayout.getChildren().addAll(participantLabel, yukoLabel, wazaAriLabel, penaltyLabel, totalScoreLabel);
+        dataLayout.getChildren().addAll(participantLabel, yukoLabel, wazaAriLabel, totalScoreLabel);
 
         return dataLayout;
 
 
+    }
+    private void addPenaltyLabels(MatchData matchData, ParticipantType participantType, VBox parent) {
+        for (PenaltyType penaltyType : PenaltyType.values()) {
+            Label penaltyLabel = new Label();
+            penaltyLabel.textProperty().bind(Bindings.when(matchData.penaltyProperty(participantType, penaltyType))
+                    .then(penaltyType.toString() + ": Given")
+                    .otherwise(penaltyType.toString() + ": Not Given"));
+            parent.getChildren().add(penaltyLabel);
+        }
     }
 
 }
