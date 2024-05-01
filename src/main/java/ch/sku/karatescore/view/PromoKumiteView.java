@@ -13,24 +13,28 @@ import javafx.stage.Stage;
 
 public class PromoKumiteView {
     private final VBox component = new VBox();
+    private Stage dataStage = null;
 
     public void showPromoKumiteView(MatchData matchData) {
-        Stage dataStage = new Stage();
-        dataStage.setTitle("Match Data");
+        if(dataStage == null ){
+            Stage dataStage = new Stage();
+            dataStage.setTitle("Promo Kumite");
 
-        BorderPane borderPane = new BorderPane();
+            BorderPane borderPane = new BorderPane();
 
-        // Timer Label
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(matchData.timerProperty());
-        VBox dataLayoutAka = createParticipantScoreLayout(matchData, ParticipantType.AKA);
-        VBox dataLayoutAo = createParticipantScoreLayout(matchData, ParticipantType.AO);
-        borderPane.setLeft(dataLayoutAka);
-        borderPane.setRight(dataLayoutAo);
+            // Timer Label
+            Label timerLabel = new Label();
+            timerLabel.textProperty().bind(matchData.timerProperty());
+            VBox dataLayoutAka = createParticipantScoreLayout(matchData, ParticipantType.AKA);
+            VBox dataLayoutAo = createParticipantScoreLayout(matchData, ParticipantType.AO);
+            borderPane.setLeft(dataLayoutAka);
+            borderPane.setRight(dataLayoutAo);
 
-        Scene dataScene = new Scene(borderPane, 200, 300);
-        dataStage.setScene(dataScene);
-        dataStage.show();
+            Scene dataScene = new Scene(borderPane, 200, 300);
+            dataStage.setScene(dataScene);
+            dataStage.show();
+        }
+
     }
 
 

@@ -11,25 +11,31 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class MatchDataView {
+public class WKFView {
+    private Stage dataStage = null;
+
     public void showMatchDataView(MatchData matchData) {
-        Stage dataStage = new Stage();
-        dataStage.setTitle("Match Data");
+        if(dataStage== null){
+            dataStage = new Stage();
+            dataStage.setTitle("Match Data");
 
-        BorderPane borderPane = new BorderPane();
+            BorderPane borderPane = new BorderPane();
 
-        // Timer Label
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(matchData.timerProperty());
-        VBox dataLayoutAka = createParticipantScoreLayout(matchData, ParticipantType.AKA);
-        VBox dataLayoutAo = createParticipantScoreLayout(matchData, ParticipantType.AO);
-        borderPane.setLeft(dataLayoutAka);
-        borderPane.setRight(dataLayoutAo);
+            // Timer Label
+            Label timerLabel = new Label();
+            timerLabel.textProperty().bind(matchData.timerProperty());
+            VBox dataLayoutAka = createParticipantScoreLayout(matchData, ParticipantType.AKA);
+            VBox dataLayoutAo = createParticipantScoreLayout(matchData, ParticipantType.AO);
+            borderPane.setLeft(dataLayoutAka);
+            borderPane.setRight(dataLayoutAo);
 
-        Scene dataScene = new Scene(borderPane, 200, 300);
-        dataStage.setScene(dataScene);
-        dataStage.show();
+            Scene dataScene = new Scene(borderPane, 200, 300);
+            dataStage.setScene(dataScene);
+            dataStage.show();
+        }
+
     }
+
     private VBox createParticipantScoreLayout(MatchData matchData, ParticipantType type) {
         VBox dataLayout = new VBox(10);
         dataLayout.setPadding(new Insets(15));
@@ -58,6 +64,7 @@ public class MatchDataView {
         return dataLayout;
 
     }
+
     private void addPenaltyLabels(MatchData matchData, ParticipantType participantType, VBox parent) {
         for (PenaltyType penaltyType : PenaltyType.values()) {
             Label penaltyLabel = new Label();

@@ -26,6 +26,7 @@ public class TimerComponent {
         // Style the component with CSS or JavaFX setters
     }
 
+    
     public VBox getComponent() {
         return component;
     }
