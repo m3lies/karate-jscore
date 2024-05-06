@@ -5,12 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="added views">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ScoreType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ParticipantType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ParticipantType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/ScoreComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/ScoreComponent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/TimerComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/TimerComponent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/MatchDataView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/WKFView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +28,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="FxmlFile" />
+        <option value="Interface" />
         <option value="Enum" />
         <option value="Class" />
       </list>
@@ -45,27 +53,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.KarateScorboardApp.executor&quot;: &quot;Run&quot;,
-    &quot;Application.KarateScoreboardApp.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ScoreApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.HelloApplication.executor": "Run",
+    "Application.KarateScorboardApp.executor": "Run",
+    "Application.KarateScoreboardApp.executor": "Run",
+    "Application.ScoreApplication.executor": "Run",
+    "Application.Unnamed.executor": "Run",
+    "Maven.karate-score [clean].executor": "Run",
+    "Maven.karate-score [compile].executor": "Run",
+    "Maven.karate-score [deploy].executor": "Run",
+    "Maven.karate-score [install].executor": "Run",
+    "Maven.karate-score [validate].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settings.deploy.options",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ch.sku.karatescore" />
@@ -83,7 +99,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="jdk-15.0.2-corretto-15.0.2-f644763e9732-61b2c15e" />
+        <option value="jdk-17.0.9-jbr-17.0.9-f644763e9732-e10f1064" />
+        <option value="jdk-22-openjdk-22-f644763e9732-8c5c9ae5" />
       </set>
     </attachedChunks>
   </component>
@@ -105,7 +122,12 @@
       <workItem from="1714210827645" duration="5784000" />
       <workItem from="1714253852924" duration="3154000" />
       <workItem from="1714502973189" duration="3566000" />
-      <workItem from="1714593664523" duration="626000" />
+      <workItem from="1714593664523" duration="5882000" />
+      <workItem from="1714980512537" duration="11233000" />
+      <workItem from="1715009595370" duration="57000" />
+      <workItem from="1715009665870" duration="297000" />
+      <workItem from="1715009972253" duration="213000" />
+      <workItem from="1715010194256" duration="10959000" />
     </task>
     <task id="LOCAL-00001" summary="creating the new score app">
       <option name="closed" value="true" />
@@ -179,7 +201,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712816663814</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="added views">
+      <option name="closed" value="true" />
+      <created>1714594563447</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1714594563447</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

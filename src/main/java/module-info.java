@@ -7,6 +7,7 @@ module ch.sku.karatescore {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
+    requires static lombok;
 
     opens ch.sku.karatescore to javafx.fxml;
     exports ch.sku.karatescore;

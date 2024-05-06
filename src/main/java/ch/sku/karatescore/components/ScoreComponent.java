@@ -2,7 +2,6 @@ package ch.sku.karatescore.components;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.model.MatchData;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

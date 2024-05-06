@@ -16,10 +16,8 @@ public class FourFifteenView {
     public void showFourFifteenView(MatchData matchData) {
         if (dataStage== null){
             dataStage = new Stage();
-            dataStage.setTitle("Promo Kumite");
+            dataStage.setTitle("4x15 Kumite");
         }
-
-
 
         BorderPane borderPane = new BorderPane();
 
@@ -31,7 +29,7 @@ public class FourFifteenView {
         borderPane.setLeft(dataLayoutAka);
         borderPane.setRight(dataLayoutAo);
 
-        Scene dataScene = new Scene(borderPane, 200, 300);
+        Scene dataScene = new Scene(borderPane, 1900, 1000);
         dataStage.setScene(dataScene);
         dataStage.show();
     }
