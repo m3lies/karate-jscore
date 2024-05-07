@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="New logic">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
+    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="changed logic again.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,35 +43,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.HelloApplication.executor": "Run",
-    "Application.KarateScorboardApp.executor": "Run",
-    "Application.KarateScoreboardApp.executor": "Run",
-    "Application.ScoreApplication.executor": "Run",
-    "Application.Unnamed.executor": "Run",
-    "Maven.karate-score [clean].executor": "Run",
-    "Maven.karate-score [compile].executor": "Run",
-    "Maven.karate-score [deploy].executor": "Run",
-    "Maven.karate-score [install].executor": "Run",
-    "Maven.karate-score [validate].executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settings.deploy.options",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.KarateScorboardApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.KarateScoreboardApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ScoreApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.karate-score [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.karate-score [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.karate-score [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.karate-score [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.karate-score [validate].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.deploy.options&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ch.sku.karatescore" />
@@ -124,7 +120,8 @@
       <workItem from="1715009595370" duration="57000" />
       <workItem from="1715009665870" duration="297000" />
       <workItem from="1715009972253" duration="213000" />
-      <workItem from="1715010194256" duration="21760000" />
+      <workItem from="1715010194256" duration="21983000" />
+      <workItem from="1715041590151" duration="345000" />
     </task>
     <task id="LOCAL-00001" summary="creating the new score app">
       <option name="closed" value="true" />
@@ -214,7 +211,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715023134424</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="changed logic again.">
+      <option name="closed" value="true" />
+      <created>1715041416609</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1715041416609</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,7 +259,8 @@
     <MESSAGE value="Fixed PenaltyComponent" />
     <MESSAGE value="added views" />
     <MESSAGE value="New logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="New logic" />
+    <MESSAGE value="changed logic again." />
+    <option name="LAST_COMMIT_MESSAGE" value="changed logic again." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

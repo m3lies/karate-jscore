@@ -87,3 +87,30 @@
     -fx-padding: 10;
     -fx-spacing: 10;
 }
+.root {
+    -fx-background-color: #f0f0f0;
+}
+
+.participant-panel {
+    -fx-background-color: #ffffff;
+    -fx-padding: 20;  // Increased padding
+-fx-border-style: solid;
+    -fx-border-width: 3;  // Thicker borders for better visibility
+-fx-border-color: black;
+    -fx-spacing: 20;  // Larger spacing between components
+}
+
+.header {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;  // Larger font size
+-fx-padding: 15;  // More padding
+}
+
+.button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+    -fx-padding: 10 30;  // Larger buttons
+-fx-font-size: 18px;  // Larger text in buttons
+}

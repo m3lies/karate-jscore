@@ -44,7 +44,7 @@ public class KarateScoreboardApp extends Application {
         mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
-        Scene scene = new Scene(root, 1024, 768);
+        Scene scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
         primaryStage.show();
@@ -58,6 +58,12 @@ public class KarateScoreboardApp extends Application {
 
         Label header = new Label(participantName + " - Total Points: " + participant.calculateTotalScore());
         header.getStyleClass().add("header");
+        // Setting header background color based on participant type
+        if (participant.getParticipantType() == ParticipantType.AKA) {
+            header.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+        } else if (participant.getParticipantType() == ParticipantType.AO) {
+            header.setStyle("-fx-background-color: blue; -fx-text-fill: white;");
+        }
 
         updateHeaderWithScore(header, participant);
 
