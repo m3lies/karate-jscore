@@ -3,6 +3,8 @@ package ch.sku.karatescore.model;
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.commons.ScoreType;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.Map;
 public class Participant {
     private ParticipantType participantType;
     private Map<ScoreType, Integer> scores;  // Using EnumMap for type safety and efficiency
-    private Map<PenaltyType, Boolean> penalties;  // Using EnumMap here too
+    private Map<PenaltyType, BooleanProperty> penalties;  // Using EnumMap here too
 
     public Participant(ParticipantType participantType) {
         this.participantType = participantType;
@@ -26,8 +28,11 @@ public class Participant {
 
     private void initializePenalties() {
         for (PenaltyType penaltyType : PenaltyType.values()) {
-            penalties.put(penaltyType, false);  // Initializing all penalties to false
+            penalties.put(penaltyType, new SimpleBooleanProperty(false));
         }
+    }
+    public BooleanProperty getPenaltyProperty(PenaltyType penaltyType) {
+        return penalties.get(penaltyType);
     }
 
     private void initializeScores() {

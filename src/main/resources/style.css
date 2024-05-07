@@ -1,0 +1,89 @@
+.timer-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: black;
+    -fx-background-color: white;
+    -fx-padding: 10px;
+    -fx-alignment: center;
+}
+
+.scoreboard {
+    -fx-background-radius: 5;
+    -fx-padding: 20px;
+}
+
+.button {
+    -fx-background-radius: 5;
+    -fx-padding: 10px 20px;
+}
+
+.card {
+    -fx-padding: 10;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-insets: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: grey;
+}
+
+.card-header {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 14pt;
+}
+
+.btn-success {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.btn-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+
+.btn-warning {
+    -fx-background-color: #ffc107;
+    -fx-text-fill: black;
+}
+
+.timer-column {
+    -fx-background-color: #f0f0f0;
+    -fx-padding: 20;
+}
+
+.timer {
+    -fx-font-size: 16pt;
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+}
+
+.penalty-button {
+    -fx-padding: 8 15;
+    -fx-border-style: solid;
+    -fx-border-width: 2;
+    -fx-border-color: black;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+.button:hover {
+    -fx-background-color: lightgray;
+}
+
+.button.clicked {
+    -fx-background-color: darkgray;
+    -fx-text-fill: white;
+}
+
+.penalty-status {
+    -fx-padding: 5;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-color: black;
+    -fx-font-size: 14px;
+}
+
+.penalties-container {
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}

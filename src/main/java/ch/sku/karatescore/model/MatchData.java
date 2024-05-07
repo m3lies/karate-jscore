@@ -38,21 +38,7 @@ public class MatchData {
         return penalties.get(participant).get(penalty);
     }
 
-    public void togglePenalty(Participant participant, PenaltyType penalty) {
-        // Implement the logic to toggle the penalty for the specified participant
-        // This logic could involve updating the state of the penalty in the match data
-        // For example:
-        // 1. Retrieve the participant's current penalties state
-        Map<PenaltyType, Boolean> participantPenalties = participant.getPenalties();
-
-        // 2. Toggle the specified penalty
-        boolean currentPenaltyState = participantPenalties.getOrDefault(penalty, false);
-        participantPenalties.put(penalty, !currentPenaltyState);
-
-        // 3. Update the participant's penalties state in the match data
-    }
-
-    // Getters and setters for properties
+     // Getters and setters for properties
     public IntegerProperty yukoProperty(ParticipantType type) {
         return yukoScores.get(type);
     }

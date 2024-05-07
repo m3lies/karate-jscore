@@ -4,20 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="added views">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ScoreType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="New logic">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/KarateScoreboardApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ParticipantType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/commons/ParticipantType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/PenaltyComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/ScoreComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/ScoreComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/TimerComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/components/TimerComponent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/MatchData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/model/Participant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/style.css" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +80,9 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ch.sku.karatescore" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\Vanhi\Documents\Programmation\karate-jscore\src\main\resources" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="KarateScoreboardApp" type="Application" factoryName="Application" nameIsGenerated="true">
@@ -127,7 +124,7 @@
       <workItem from="1715009595370" duration="57000" />
       <workItem from="1715009665870" duration="297000" />
       <workItem from="1715009972253" duration="213000" />
-      <workItem from="1715010194256" duration="10959000" />
+      <workItem from="1715010194256" duration="21760000" />
     </task>
     <task id="LOCAL-00001" summary="creating the new score app">
       <option name="closed" value="true" />
@@ -209,7 +206,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714594563447</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="New logic">
+      <option name="closed" value="true" />
+      <created>1715023134424</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1715023134424</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,7 +253,8 @@
     <MESSAGE value="workspace.xml" />
     <MESSAGE value="Fixed PenaltyComponent" />
     <MESSAGE value="added views" />
-    <option name="LAST_COMMIT_MESSAGE" value="added views" />
+    <MESSAGE value="New logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="New logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

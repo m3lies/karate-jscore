@@ -2,9 +2,12 @@ package ch.sku.karatescore;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
-import ch.sku.karatescore.components.TimerComponent;
+import ch.sku.karatescore.components.PenaltyComponent;
+import ch.sku.karatescore.model.MatchData;
 import ch.sku.karatescore.model.Participant;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,16 +16,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 
 public class KarateScoreboardApp extends Application {
+    private final BorderPane root = new BorderPane();
     private final Participant aka = new Participant(ParticipantType.AKA);
     private final Participant ao = new Participant(ParticipantType.AO);
-    private final BorderPane root = new BorderPane();
-
-    private final Label scoreDisplayAKA = new Label();
-    private final Label scoreDisplayAO = new Label();
-    private final Label penaltyDisplayAKA = new Label();
-    private final Label penaltyDisplayAO = new Label();
+    private final MatchData matchData = new MatchData();
 
     public static void main(String[] args) {
         launch(args);
@@ -30,114 +30,85 @@ public class KarateScoreboardApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Buttons to switch views
-        Button btnFullView = new Button("WKF mode");
-        Button btnNoIpponView = new Button("Promo Kumite mode");
-        Button btnNoPointsView = new Button("4 x 15 mode");
+        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
-        btnFullView.setOnAction(e -> switchView(createWKFView()));
-        btnNoIpponView.setOnAction(e -> switchView(createPromoKumiteView()));
-        btnNoPointsView.setOnAction(e -> switchView(createFourFifteenView()));
+        HBox mainLayout = new HBox(10);
+        mainLayout.setAlignment(Pos.CENTER);
 
-        HBox menu = new HBox(10, btnFullView, btnNoIpponView, btnNoPointsView);
-        root.setTop(menu);
+        // Create panels for AO (left), Timer (center), and AKA (right)
+        VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
+        VBox timerPanel = createTimerPanel();
+        VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
-        // Start with the full view
-        switchView(createWKFView());
+        // Add to main layout with AO on the left, AKA on the right
+        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
+        root.setCenter(mainLayout);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1024, 768);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Karate Match");
+        primaryStage.setTitle("Karate Match Scoreboard");
         primaryStage.show();
     }
 
-    private void switchView(VBox newView) {
-        root.setCenter(newView);  // Replace the center of BorderPane with the new view
+    private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
+
+        VBox panel = new VBox(10);
+        panel.setPadding(new Insets(15));
+        panel.getStyleClass().add("participant-panel");
+
+        Label header = new Label(participantName + " - Total Points: " + participant.calculateTotalScore());
+        header.getStyleClass().add("header");
+
+        updateHeaderWithScore(header, participant);
+
+        Label scoreYuko = new Label("Yuko: " + participant.getScores().getOrDefault(ScoreType.YUKO, 0));
+        Label scoreWazaAri = new Label("Waza-ari: " + participant.getScores().getOrDefault(ScoreType.WAZARI, 0));
+        Label scoreIppon = new Label("Ippon: " + participant.getScores().getOrDefault(ScoreType.IPPON, 0));
+
+        panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
+
+        addButtonControls(panel, participant, scoreYuko, ScoreType.YUKO);
+        addButtonControls(panel, participant, scoreWazaAri, ScoreType.WAZARI);
+        addButtonControls(panel, participant, scoreIppon, ScoreType.IPPON);
+
+        PenaltyComponent penaltyComponent = new PenaltyComponent(participant);
+        panel.getChildren().add(penaltyComponent.getComponent());
+        return panel;
     }
 
-    private VBox createWKFView() {
-        // Main layout VBox
-        VBox layout = new VBox(10);
+    private void addButtonControls(VBox panel, Participant participant, Label scoreLabel, ScoreType scoreType) {
+        Button btnAdd = new Button("+ " + scoreType.name());
+        Button btnRemove = new Button("- " + scoreType.name());
 
-        // HBox to hold AKA and AO info
-        HBox infoHBox = new HBox(10);
+        btnAdd.setOnAction(e -> {
+            participant.addScore(scoreType);
+            scoreLabel.setText(scoreType.name() + ": " + participant.getScores().getOrDefault(scoreType, 0));
+            updateHeaderWithScore((Label) panel.getChildren().get(0), participant);
+        });
+        btnRemove.setOnAction(e -> {
+            participant.subtractScore(scoreType);
+            scoreLabel.setText(scoreType.name() + ": " + participant.getScores().getOrDefault(scoreType, 0));
+            updateHeaderWithScore((Label) panel.getChildren().get(0), participant);
+        });
 
-        // VBox for AKA info and controls
-        VBox akaBox = new VBox(10);
-        VBox akaInfo = new VBox(5, new Label("Participant AKA"), scoreDisplayAKA, penaltyDisplayAKA);
-        HBox akaControls = new HBox(10);
-        addScoreControls(akaControls, aka, "AKA", ScoreType.YUKO, ScoreType.WAZARI, ScoreType.IPPON);
-        akaBox.getChildren().addAll(akaInfo, akaControls);
-
-        // VBox for AO info and controls
-        VBox aoBox = new VBox(10);
-        VBox aoInfo = new VBox(5, new Label("Participant AO"), scoreDisplayAO, penaltyDisplayAO);
-        HBox aoControls = new HBox(10);
-        addScoreControls(aoControls, ao, "AO", ScoreType.YUKO, ScoreType.WAZARI, ScoreType.IPPON);
-        aoBox.getChildren().addAll(aoInfo, aoControls);
-
-        // Add AKA and AO VBox containers to the HBox
-        infoHBox.getChildren().addAll(akaBox, aoBox);
-
-        // Create TimerComponent instance
-        TimerComponent timerComponent = new TimerComponent();
-        VBox timerBox = new VBox(timerComponent);  // Add TimerComponent to a VBox
-
-        // Add infoHBox and timerBox to layout
-        layout.getChildren().addAll(infoHBox, timerBox);
-
-        // Update displays to show initial values
-        updateDisplays();
-
-        return layout;
+        HBox scoreControls = new HBox(5, btnAdd, btnRemove);
+        panel.getChildren().add(scoreControls);
     }
 
-    private VBox createPromoKumiteView() {
-        VBox layout = new VBox(10);
-        return layout;
+    private void updateHeaderWithScore(Label header, Participant participant) {
+        int totalScore = participant.calculateTotalScore();
+        header.setText(participant.getParticipantType() + " - Total Points: " + totalScore);
     }
 
-    private VBox createFourFifteenView() {
-        VBox layout = new VBox(10);
-        // Possibly add penalty controls or other relevant components
-        return layout;
-    }
+    private VBox createTimerPanel() {
+        VBox timerPanel = new VBox(10);
+        timerPanel.setPadding(new Insets(20));
+        timerPanel.getStyleClass().add("timer-panel");
 
-    private void addScoreControls(HBox hbox, Participant participant, String labelPrefix, ScoreType... scoreTypes) {
-        for (ScoreType scoreType : scoreTypes) {
-            Button btnAddScore = new Button("Add " + scoreType + " " + labelPrefix);
-            btnAddScore.setOnAction(e -> {
-                participant.addScore(scoreType);
-                updateDisplays(); // Update displays immediately after score adjustment
-            });
+        Label timerLabel = new Label("Timer: 00:00");
+        Button resetTimerButton = new Button("Reset Timer");
+        timerPanel.getChildren().addAll(timerLabel, resetTimerButton);
 
-            Button btnSubtractScore = new Button("Subtract " + scoreType + " " + labelPrefix);
-            btnSubtractScore.setOnAction(e -> {
-                participant.subtractScore(scoreType);
-                updateDisplays(); // Update displays immediately after score adjustment
-            });
-
-            hbox.getChildren().addAll(btnAddScore, btnSubtractScore);
-        }
-    }
-
-    private void updateDisplays() {
-        // Calculate total score and count of each score type for AKA
-        int totalScoreAKA = aka.calculateTotalScore();
-        int yukoCountAKA = aka.getScores().getOrDefault(ScoreType.YUKO, 0);
-        int wazaAriCountAKA = aka.getScores().getOrDefault(ScoreType.WAZARI, 0);
-        int ipponCountAKA = aka.getScores().getOrDefault(ScoreType.IPPON, 0);
-
-        // Calculate total score and count of each score type for AO
-        int totalScoreAO = ao.calculateTotalScore();
-        int yukoCountAO = ao.getScores().getOrDefault(ScoreType.YUKO, 0);
-        int wazaAriCountAO = ao.getScores().getOrDefault(ScoreType.WAZARI, 0);
-        int ipponCountAO = ao.getScores().getOrDefault(ScoreType.IPPON, 0);
-
-        // Update labels with the calculated values
-        scoreDisplayAKA.setText(String.format("Scores AKA: %d (Yuko: %d, Waza-ari: %d, Ippon: %d)", totalScoreAKA, yukoCountAKA, wazaAriCountAKA, ipponCountAKA));
-        scoreDisplayAO.setText(String.format("Scores AO: %d (Yuko: %d, Waza-ari: %d, Ippon: %d)", totalScoreAO, yukoCountAO, wazaAriCountAO, ipponCountAO));
-        penaltyDisplayAKA.setText("Penalties AKA: " + aka.getPenalties().toString());
-        penaltyDisplayAO.setText("Penalties AO: " + ao.getPenalties().toString());
+        return timerPanel;
     }
 }
