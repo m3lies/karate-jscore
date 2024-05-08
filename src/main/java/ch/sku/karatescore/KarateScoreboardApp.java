@@ -5,16 +5,17 @@ import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.components.TimerComponent;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.view.WKFView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -28,9 +29,35 @@ public class KarateScoreboardApp extends Application {
         launch(args);
     }
 
+    private static Button getButton(TextField minutesInput, TextField secondsInput, TimerComponent timerComponent) {
+        Button setTimeButton = new Button("Set Timer");
+
+        setTimeButton.setOnAction(e -> {
+            try {
+                int mins = Integer.parseInt(minutesInput.getText());
+                int secs = Integer.parseInt(secondsInput.getText());
+                timerComponent.setUpTimer(mins, secs);
+            } catch (NumberFormatException ex) {
+                minutesInput.setText("");
+                secondsInput.setText("");
+                minutesInput.setPromptText("Invalid input! Enter a number.");
+                secondsInput.setPromptText("Invalid input! Enter a number.");
+            }
+        });
+        return setTimeButton;
+    }
+
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
+        Button btnOpenScoreboard = new Button("Open Scoreboard on TV");
+        btnOpenScoreboard.setOnAction(e -> {
+            WKFView wkfView = new WKFView();
+            wkfView.show();
+        });
+
+        StackPane rootPane = new StackPane(btnOpenScoreboard);
+
 
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
@@ -41,13 +68,53 @@ public class KarateScoreboardApp extends Application {
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
         // Add to main layout with AO on the left, AKA on the right
-        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(rootPane,participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
         Scene scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
         primaryStage.show();
+    }
+
+    private void openScoreboardWindow() {
+        Stage scoreboardStage = new Stage();
+        HBox scoreboardRoot = createScoreboardLayout();  // This will create the layout for the scoreboard
+        Scene scoreboardScene = new Scene(scoreboardRoot);
+
+        // Set to full screen on the secondary monitor if it exists
+        Screen screen = Screen.getScreens().size() > 1 ? Screen.getScreens().get(1) : Screen.getPrimary();
+        Rectangle2D bounds = screen.getBounds();
+        scoreboardStage.setX(bounds.getMinX());
+        scoreboardStage.setY(bounds.getMinY());
+        scoreboardStage.setWidth(bounds.getWidth());
+        scoreboardStage.setHeight(bounds.getHeight());
+
+        scoreboardStage.setScene(scoreboardScene);
+        scoreboardStage.setFullScreen(true);
+        scoreboardStage.show();
+    }
+
+    private HBox createScoreboardLayout() {
+        HBox root = new HBox();
+
+        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
+        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
+        StackPane middlePanel = new StackPane(createTimerDisplay());
+
+        HBox.setHgrow(akaPanel, Priority.ALWAYS);
+        HBox.setHgrow(aoPanel, Priority.ALWAYS);
+        akaPanel.setMaxWidth(Double.MAX_VALUE);
+        aoPanel.setMaxWidth(Double.MAX_VALUE);
+
+        root.getChildren().addAll(akaPanel, middlePanel, aoPanel);
+        return root;
+    }
+
+    private Label createTimerDisplay() {
+        Label timerLabel = new Label("1:30");
+        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+        return timerLabel;
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
@@ -80,6 +147,7 @@ public class KarateScoreboardApp extends Application {
         panel.getChildren().add(penaltyComponent.getComponent());
         return panel;
     }
+
     private void addButtonControls(VBox panel, Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
         // Set up control for each score type with its respective label
         setupScoreControl(panel, participant, ScoreType.YUKO, header, scoreYuko, scoreWazaAri, scoreIppon);
@@ -148,24 +216,6 @@ public class KarateScoreboardApp extends Application {
         timerPanel.getChildren().addAll(timerComponent, labelMinutes, minutesInput, labelSeconds, secondsInput, setTimeButton, startTimerButton, stopTimerButton, resetTimerButton);
 
         return timerPanel;
-    }
-
-    private static Button getButton(TextField minutesInput, TextField secondsInput, TimerComponent timerComponent) {
-        Button setTimeButton = new Button("Set Timer");
-
-        setTimeButton.setOnAction(e -> {
-            try {
-                int mins = Integer.parseInt(minutesInput.getText());
-                int secs = Integer.parseInt(secondsInput.getText());
-                timerComponent.setUpTimer(mins, secs);
-            } catch (NumberFormatException ex) {
-                minutesInput.setText("");
-                secondsInput.setText("");
-                minutesInput.setPromptText("Invalid input! Enter a number.");
-                secondsInput.setPromptText("Invalid input! Enter a number.");
-            }
-        });
-        return setTimeButton;
     }
 
 
