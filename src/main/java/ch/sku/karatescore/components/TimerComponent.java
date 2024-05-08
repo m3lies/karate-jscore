@@ -2,77 +2,71 @@ package ch.sku.karatescore.components;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
-
 public class TimerComponent extends HBox {
-    private final IntegerProperty seconds = new SimpleIntegerProperty();
-    private final IntegerProperty minutes = new SimpleIntegerProperty();
+    private final IntegerProperty seconds = new SimpleIntegerProperty(0);
+    private final IntegerProperty minutes = new SimpleIntegerProperty(0);
     private final Timeline timeline;
+    private final Label timeLabel = new Label();
+    private int lastSetTimeInSeconds = 0;
 
     public TimerComponent() {
-        // Initialize time label
-        Label timeLabel = new Label();
-        timeLabel.setStyle("-fx-font-size: 20px;");
+        this.setStyle("-fx-background-color: lightblue; -fx-padding: 10px; -fx-border-color: black; -fx-border-width: 2px;");
+        timeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // Initialize timeline for countdown
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (seconds.get() == 0 && minutes.get() == 0) {
-                    stop();
-                } else if (seconds.get() == 0) {
-                    seconds.set(59);
-                    minutes.set(minutes.get() - 1);
-                } else {
-                    seconds.set(seconds.get() - 1);
-                }
-            }
-        }));
+        timeLabel.textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("%02d:%02d", minutes.get(), seconds.get()),
+                minutes, seconds));
+
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e-> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-        StringProperty timeText = new SimpleStringProperty();
-        timeLabel.textProperty().bind(timeText);
+        this.setAlignment(Pos.CENTER);
+        this.getChildren().add(timeLabel);
 
-        // Set alignment and add time label to the TimerComponent
-        setAlignment(Pos.CENTER);
-        getChildren().add(timeLabel);
+        reset();
     }
 
-    // Start the timer
+    private void decrementTime() {
+        if (seconds.get() == 0 && minutes.get() == 0) {
+            stop();
+        } else if (seconds.get() == 0) {
+            minutes.set(minutes.get() - 1);
+            seconds.set(59);
+        } else {
+            seconds.set(seconds.get() - 1);
+        }
+    }
+    // Other methods remain the same
+
+
     public void start() {
         timeline.play();
     }
 
-    // Stop the timer
     public void stop() {
         timeline.stop();
     }
 
-    // Pause the timer
-    public void pause() {
-        timeline.pause();
+    public void reset() {
+        setTimer(lastSetTimeInSeconds);
     }
 
-    // Reset the timer to a specific time (in seconds)
-    public void reset(int totalSeconds) {
+    public void setTimer(int totalSeconds) {
+        lastSetTimeInSeconds = totalSeconds;
         minutes.set(totalSeconds / 60);
         seconds.set(totalSeconds % 60);
     }
 
-    // Set up the timer with a specific time (in seconds)
-    public void setUpTimer(int totalSeconds) {
-        reset(totalSeconds);
+    public void setUpTimer(int mins, int secs) {
+        setTimer(mins * 60 + secs);
     }
 
 }
-

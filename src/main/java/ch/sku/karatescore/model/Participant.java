@@ -6,8 +6,8 @@ import ch.sku.karatescore.commons.ScoreType;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import lombok.Data;
+import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -15,13 +15,17 @@ import java.util.Map;
 @Data
 public class Participant {
     private ParticipantType participantType;
-    private Map<ScoreType, Integer> scores;  // Using EnumMap for type safety and efficiency
-    private Map<PenaltyType, BooleanProperty> penalties;  // Using EnumMap here too
+    @Getter
+    private Map<ScoreType, Integer> scores; // Points
+    @Getter
+    private Map<ScoreType, Integer> scoreCounts; // Counts
+    private Map<PenaltyType, BooleanProperty> penalties;
 
     public Participant(ParticipantType participantType) {
         this.participantType = participantType;
-        this.scores = new EnumMap<>(ScoreType.class);  // Initialize with ScoreType enum
-        this.penalties = new EnumMap<>(PenaltyType.class);  // Initialize with PenaltyType enum
+        this.scores = new EnumMap<>(ScoreType.class);
+        this.scoreCounts = new EnumMap<>(ScoreType.class);
+        this.penalties = new EnumMap<>(PenaltyType.class);
         initializePenalties();
         initializeScores();
     }
@@ -38,6 +42,7 @@ public class Participant {
     private void initializeScores() {
         for (ScoreType scoreType : ScoreType.values()) {
             scores.put(scoreType, 0);  // Initializing all scores to 0
+            scoreCounts.put(scoreType, 0);  // Initialize counts to 0
         }
     }
 
@@ -45,34 +50,32 @@ public class Participant {
     public int calculateTotalScore() {
         int totalScore = 0;
         totalScore += scores.get(ScoreType.YUKO);  // Direct access using enum keys
-        totalScore += 2 * scores.get(ScoreType.WAZARI);  // Direct access using enum keys
-        totalScore += 3 * scores.get(ScoreType.IPPON);  // Direct access using enum keys
+        totalScore +=  scores.get(ScoreType.WAZARI);  // Direct access using enum keys
+        totalScore +=  scores.get(ScoreType.IPPON);  // Direct access using enum keys
         return totalScore;
     }
 
     public void addScore(ScoreType scoreType) {
-        int scoreValue = getScoreValue(scoreType);
-        this.scores.put(scoreType, this.scores.get(scoreType) + scoreValue);
+        int currentScore = scores.getOrDefault(scoreType, 0);
+        int currentCount = scoreCounts.getOrDefault(scoreType, 0);
+        scores.put(scoreType, currentScore + getScoreValue(scoreType));
+        scoreCounts.put(scoreType, currentCount + 1);
     }
 
     public void subtractScore(ScoreType scoreType) {
-        int currentScore = this.scores.get(scoreType);
-        int scoreValue = getScoreValue(scoreType);
-        if (currentScore >= scoreValue) {
-            this.scores.put(scoreType, currentScore - scoreValue);
+        if (scoreCounts.get(scoreType) > 0) {
+            scores.put(scoreType, scores.get(scoreType) - getScoreValue(scoreType));
+            scoreCounts.put(scoreType, scoreCounts.get(scoreType) - 1);
         }
     }
 
     private int getScoreValue(ScoreType scoreType) {
-        switch (scoreType) {
-            case YUKO:
-                return 1;
-            case WAZARI:
-                return 2;
-            case IPPON:
-                return 3;
-            default:
-                return 0;
-        }
+        return switch (scoreType) {
+            case YUKO -> 1;
+            case WAZARI -> 2;
+            case IPPON -> 3;
+
+        };
     }
+
 }

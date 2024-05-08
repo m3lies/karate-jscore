@@ -87,30 +87,49 @@
     -fx-padding: 10;
     -fx-spacing: 10;
 }
+
 .root {
     -fx-background-color: #f0f0f0;
 }
 
 .participant-panel {
     -fx-background-color: #ffffff;
-    -fx-padding: 20;  // Increased padding
--fx-border-style: solid;
-    -fx-border-width: 3;  // Thicker borders for better visibility
--fx-border-color: black;
-    -fx-spacing: 20;  // Larger spacing between components
+    -fx-padding: 20;
+/* Increased padding -fx-border-style: solid;*/
+    -fx-border-width: 3;
+ /*Thicker borders for better visibility -fx-border-color: black;*/
+    -fx-spacing: 20;
+ /*Larger spacing between components*/
 }
 
 .header {
     -fx-background-color: #007bff;
     -fx-text-fill: white;
-    -fx-font-size: 24px;  // Larger font size
--fx-padding: 15;  // More padding
+    -fx-font-size: 24px;
+ /*Larger font size -fx-padding: 15;*/
+ /*More padding*/
 }
 
 .button {
+    -fx-border-radius: 4px;
     -fx-background-color: #ffffff;
     -fx-text-fill: black;
     -fx-border-color: black;
-    -fx-padding: 10 30;  // Larger buttons
--fx-font-size: 18px;  // Larger text in buttons
+    -fx-padding: 10 30;
+ /*Larger buttons -fx-font-size: 18 px;*/
+ /*Larger text in buttons*/
+}
+
+.penalty-label-container, .penalty-button-container {
+    -fx-spacing: 10;  // Spacing between elements in the horizontal box
+-fx-alignment: center-left;
+}
+
+.penalty-status-label, .penalty-button {
+    -fx-padding: 5;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-border-color: gray;
+    -fx-min-width: 80px;  // Ensuring buttons and labels have minimum width for better alignment
 }

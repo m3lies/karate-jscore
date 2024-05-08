@@ -12,49 +12,67 @@ import lombok.Getter;
 
 @Getter
 public class PenaltyComponent {
-    private final VBox component = new VBox(10);  // Spacing between elements
+    private final VBox component = new VBox(10);  // Main container with spacing
 
     public PenaltyComponent(Participant participant) {
-        this.component.getStyleClass().add("penalties-container");
+        HBox labelContainer = new HBox(10);  // Container for labels
+        HBox buttonContainer = new HBox(10);  // Container for buttons
+
         for (PenaltyType penalty : PenaltyType.values()) {
+            Label penaltyStatusLabel = new Label(penalty.name());
+            penaltyStatusLabel.visibleProperty().bind(participant.getPenaltyProperty(penalty));  // Visibility bound to the penalty's BooleanProperty
+            penaltyStatusLabel.managedProperty().set(true);  // Always managed, to maintain spacing
+
             Button penaltyButton = new Button(penalty.name());
-            penaltyButton.getStyleClass().add("penalty-button");
-
-            // Binding the button style class to the penalty property
-            penaltyButton.styleProperty().bind(Bindings
-                    .when(participant.getPenaltyProperty(penalty))
-                    .then("-fx-background-color: darkgray; -fx-text-fill: white;")
-                    .otherwise("-fx-background-color: white; -fx-text-fill: black;"));
-
+            penaltyButton.styleProperty().bind(
+                    Bindings.when(participant.getPenaltyProperty(penalty))
+                            .then("-fx-background-color: darkgray; -fx-text-fill: white;")
+                            .otherwise("-fx-background-color: white; -fx-text-fill: black;")
+            );
             penaltyButton.setOnAction(e -> togglePenalty(participant, penalty));
 
-            // Optional: Displaying penalty status (if you want to show/hide text dynamically)
-            Label penaltyStatusLabel = new Label(penalty.name());
-            penaltyStatusLabel.visibleProperty().bind(participant.getPenaltyProperty(penalty));
-            penaltyStatusLabel.getStyleClass().add("penalty-status");
-
-            this.component.getChildren().addAll(penaltyButton, penaltyStatusLabel);
+            labelContainer.getChildren().add(penaltyStatusLabel);  // Add each label to the label container
+            buttonContainer.getChildren().add(penaltyButton);  // Add each button to the button container
         }
+
+        this.component.getChildren().addAll(labelContainer, buttonContainer);  // Add both containers to the main component
     }
 
     private void togglePenalty(Participant participant, PenaltyType penalty) {
         BooleanProperty currentPenaltyProperty = participant.getPenaltyProperty(penalty);
-        boolean currentStatus = currentPenaltyProperty.get();
-        currentPenaltyProperty.set(!currentStatus);
+        boolean isCurrentlyActive = currentPenaltyProperty.get();
 
-        if (currentPenaltyProperty.get()) {
-            // Setting all lower-level penalties based on the hierarchy
-            if (penalty == PenaltyType.HANSOKU) {
-                participant.getPenaltyProperty(PenaltyType.HANSOKU_CHUI).set(true);
+        // If activating a penalty that is currently inactive:
+        if (!isCurrentlyActive) {
+            // First deactivate all penalties
+            deactivateHigherPenalties(participant);
+
+            // Then activate this penalty and all lesser penalties
+            activateLowerPenalties(participant, penalty);
+        } else {
+            // If the penalty is already active and clicked again, only deactivate higher penalties
+            deactivateHigherPenaltiesExcludingCurrent(participant, penalty);
+        }
+    }
+
+    private void deactivateHigherPenalties(Participant participant) {
+        for (PenaltyType pt : PenaltyType.values()) {
+            participant.getPenaltyProperty(pt).set(false);
+        }
+    }
+
+    private void activateLowerPenalties(Participant participant, PenaltyType penalty) {
+        for (PenaltyType pt : PenaltyType.values()) {
+            if (pt.ordinal() <= penalty.ordinal()) {
+                participant.getPenaltyProperty(pt).set(true);
             }
-            if (penalty.ordinal() >= PenaltyType.HANSOKU_CHUI.ordinal()) {
-                participant.getPenaltyProperty(PenaltyType.CHUI3).set(true);
-            }
-            if (penalty.ordinal() >= PenaltyType.CHUI3.ordinal()) {
-                participant.getPenaltyProperty(PenaltyType.CHUI2).set(true);
-            }
-            if (penalty.ordinal() >= PenaltyType.CHUI2.ordinal()) {
-                participant.getPenaltyProperty(PenaltyType.CHUI1).set(true);
+        }
+    }
+
+    private void deactivateHigherPenaltiesExcludingCurrent(Participant participant, PenaltyType penalty) {
+        for (PenaltyType pt : PenaltyType.values()) {
+            if (pt.ordinal() > penalty.ordinal()) {
+                participant.getPenaltyProperty(pt).set(false);
             }
         }
     }

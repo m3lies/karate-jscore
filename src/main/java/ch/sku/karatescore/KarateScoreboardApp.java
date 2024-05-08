@@ -3,7 +3,7 @@ package ch.sku.karatescore;
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
-import ch.sku.karatescore.model.MatchData;
+import ch.sku.karatescore.components.TimerComponent;
 import ch.sku.karatescore.model.Participant;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,7 +23,6 @@ public class KarateScoreboardApp extends Application {
     private final BorderPane root = new BorderPane();
     private final Participant aka = new Participant(ParticipantType.AKA);
     private final Participant ao = new Participant(ParticipantType.AO);
-    private final MatchData matchData = new MatchData();
 
     public static void main(String[] args) {
         launch(args);
@@ -73,32 +73,42 @@ public class KarateScoreboardApp extends Application {
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
 
-        addButtonControls(panel, participant, scoreYuko, ScoreType.YUKO);
-        addButtonControls(panel, participant, scoreWazaAri, ScoreType.WAZARI);
-        addButtonControls(panel, participant, scoreIppon, ScoreType.IPPON);
+        addButtonControls(panel, participant, scoreYuko, scoreWazaAri, scoreIppon, header);
+
 
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant);
         panel.getChildren().add(penaltyComponent.getComponent());
         return panel;
     }
+    private void addButtonControls(VBox panel, Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
+        // Set up control for each score type with its respective label
+        setupScoreControl(panel, participant, ScoreType.YUKO, header, scoreYuko, scoreWazaAri, scoreIppon);
+        setupScoreControl(panel, participant, ScoreType.WAZARI, header, scoreYuko, scoreWazaAri, scoreIppon);
+        setupScoreControl(panel, participant, ScoreType.IPPON, header, scoreYuko, scoreWazaAri, scoreIppon);
+    }
 
-    private void addButtonControls(VBox panel, Participant participant, Label scoreLabel, ScoreType scoreType) {
+    private void setupScoreControl(VBox panel, Participant participant, ScoreType scoreType, Label header, Label scoreYuko, Label scoreWazaAri, Label scoreIppon) {
         Button btnAdd = new Button("+ " + scoreType.name());
         Button btnRemove = new Button("- " + scoreType.name());
 
         btnAdd.setOnAction(e -> {
             participant.addScore(scoreType);
-            scoreLabel.setText(scoreType.name() + ": " + participant.getScores().getOrDefault(scoreType, 0));
-            updateHeaderWithScore((Label) panel.getChildren().get(0), participant);
+            updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
         });
         btnRemove.setOnAction(e -> {
             participant.subtractScore(scoreType);
-            scoreLabel.setText(scoreType.name() + ": " + participant.getScores().getOrDefault(scoreType, 0));
-            updateHeaderWithScore((Label) panel.getChildren().get(0), participant);
+            updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
         });
 
         HBox scoreControls = new HBox(5, btnAdd, btnRemove);
         panel.getChildren().add(scoreControls);
+    }
+
+    private void updateScoresAndUI(Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
+        scoreYuko.setText("Yuko: " + participant.getScoreCounts().getOrDefault(ScoreType.YUKO, 0));
+        scoreWazaAri.setText("Waza-ari: " + participant.getScoreCounts().getOrDefault(ScoreType.WAZARI, 0));
+        scoreIppon.setText("Ippon: " + participant.getScoreCounts().getOrDefault(ScoreType.IPPON, 0));
+        updateHeaderWithScore(header, participant);
     }
 
     private void updateHeaderWithScore(Label header, Participant participant) {
@@ -111,10 +121,52 @@ public class KarateScoreboardApp extends Application {
         timerPanel.setPadding(new Insets(20));
         timerPanel.getStyleClass().add("timer-panel");
 
-        Label timerLabel = new Label("Timer: 00:00");
+
+        // Create the timer component and set it up
+        TimerComponent timerComponent = new TimerComponent();
+        HBox inputRow = new HBox(10); // Horizontal box with spacing
+        Label labelMinutes = new Label("Minutes:");
+        TextField minutesInput = new TextField();
+        minutesInput.setPromptText("Enter minutes");
+        Label labelSeconds = new Label("Seconds:");
+        TextField secondsInput = new TextField();
+        secondsInput.setPromptText("Enter seconds");
+        inputRow.getChildren().addAll(labelMinutes, minutesInput, labelSeconds, secondsInput);
+
+
+        Button setTimeButton = getButton(minutesInput, secondsInput, timerComponent);
+
+        Button startTimerButton = new Button("Start Timer");
+        startTimerButton.setOnAction(e -> timerComponent.start());
+
+        Button stopTimerButton = new Button("Stop Timer");
+        stopTimerButton.setOnAction(e -> timerComponent.stop());
+
         Button resetTimerButton = new Button("Reset Timer");
-        timerPanel.getChildren().addAll(timerLabel, resetTimerButton);
+        resetTimerButton.setOnAction(e -> timerComponent.reset());
+
+        timerPanel.getChildren().addAll(timerComponent, labelMinutes, minutesInput, labelSeconds, secondsInput, setTimeButton, startTimerButton, stopTimerButton, resetTimerButton);
 
         return timerPanel;
     }
+
+    private static Button getButton(TextField minutesInput, TextField secondsInput, TimerComponent timerComponent) {
+        Button setTimeButton = new Button("Set Timer");
+
+        setTimeButton.setOnAction(e -> {
+            try {
+                int mins = Integer.parseInt(minutesInput.getText());
+                int secs = Integer.parseInt(secondsInput.getText());
+                timerComponent.setUpTimer(mins, secs);
+            } catch (NumberFormatException ex) {
+                minutesInput.setText("");
+                secondsInput.setText("");
+                minutesInput.setPromptText("Invalid input! Enter a number.");
+                secondsInput.setPromptText("Invalid input! Enter a number.");
+            }
+        });
+        return setTimeButton;
+    }
+
+
 }
