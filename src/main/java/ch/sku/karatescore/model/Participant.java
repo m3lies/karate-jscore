@@ -4,7 +4,9 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.commons.ScoreType;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import lombok.Data;
 import lombok.Getter;
 
@@ -20,7 +22,21 @@ public class Participant {
     @Getter
     private Map<ScoreType, Integer> scoreCounts; // Counts
     private Map<PenaltyType, BooleanProperty> penalties;
+    private final IntegerProperty yukoScore = new SimpleIntegerProperty(this, "yukoScore", 0);
+    private final IntegerProperty wazaAriScore = new SimpleIntegerProperty(this, "wazaAriScore", 0);
+    private final IntegerProperty ipponScore = new SimpleIntegerProperty(this, "ipponScore", 0);
 
+    public IntegerProperty yukoScoreProperty() {
+        return yukoScore;
+    }
+
+    public IntegerProperty wazaAriScoreProperty() {
+        return wazaAriScore;
+    }
+
+    public IntegerProperty ipponScoreProperty() {
+        return ipponScore;
+    }
     public Participant(ParticipantType participantType) {
         this.participantType = participantType;
         this.scores = new EnumMap<>(ScoreType.class);

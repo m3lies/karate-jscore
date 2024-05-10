@@ -2,125 +2,94 @@ package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
-import ch.sku.karatescore.model.MatchData;
+import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class WKFView {
     private final Stage stage;
+    private final Participant aka;
+    private final Participant ao;
+    private final TimerService timerService;
 
-    public WKFView() {
+    public WKFView(Participant aka, Participant ao, TimerService timerService) {
+        this.aka = aka;
+        this.ao = ao;
+        this.timerService = timerService;
         this.stage = new Stage();
         initializeUI();
     }
+
     private void initializeUI() {
-        // Create the layout
         HBox root = new HBox();
 
-        VBox akaPanel = createParticipantPanel("AKA", Color.RED);
-        VBox aoPanel = createParticipantPanel("AO", Color.BLUE);
-        StackPane middlePanel = new StackPane();
-        middlePanel.getChildren().add(createTimerDisplay());
+        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
+        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
+        StackPane middlePanel = new StackPane(createTimerDisplay());
 
-        // Assigning the full width for responsive layout
         HBox.setHgrow(akaPanel, Priority.ALWAYS);
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
 
         root.getChildren().addAll(akaPanel, middlePanel, aoPanel);
-
-        // Adjust stage for full screen
-        stage.setTitle("Karate Match Scoreboard");
-        stage.setScene(new javafx.scene.Scene(root, 800, 600));
+        Scene scene = new Scene(root, 1920, 1080);
+        stage.setScene(scene);
         setFullScreen();
-    }
-    private Label createTimerDisplay() {
-        Label timerLabel = new Label("1:30");
-        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-        return timerLabel;
+        stage.setTitle("Karate Match Scoreboard");
     }
 
-    private VBox createParticipantPanel(String name, Color color) {
-        VBox panel = new VBox();
-        panel.setStyle("-fx-background-color: " + toRgbString(color) + ";");
-        Label nameLabel = new Label(name + " Data Here");
-        nameLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
-        panel.getChildren().add(nameLabel);
+    private VBox createParticipantPanel(Participant participant, ParticipantType type) {
+        VBox panel = new VBox(10);
+        panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+
+        Label scoreLabel = new Label();
+        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d, Ippon: %d", type, participant.yukoScoreProperty(), participant.wazaAriScoreProperty(), participant.ipponScoreProperty()));
+        addPenaltyLabels(participant, type, panel);
+        panel.getChildren().add(scoreLabel);
         return panel;
     }
-    private String toRgbString(Color c) {
-        return String.format("rgb(%d,%d,%d)",
-                (int) (c.getRed() * 255),
-                (int) (c.getGreen() * 255),
-                (int) (c.getBlue() * 255));
+
+    private StackPane createTimerDisplay() {
+        StackPane timerDisplay = new StackPane();
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+        timerDisplay.getChildren().add(timerLabel);
+        return timerDisplay;
     }
+
+
+    private void addPenaltyLabels(Participant participant, ParticipantType type, VBox panel) {
+        for (PenaltyType penaltyType : PenaltyType.values()) {
+            Label penaltyLabel = new Label();
+            penaltyLabel.textProperty().bind(Bindings.when(participant.getPenaltyProperty(penaltyType)).then(penaltyType.toString() + ": Given").otherwise(penaltyType + ": Not Given"));
+            panel.getChildren().add(penaltyLabel);
+        }
+    }
+
 
     public void show() {
         stage.show();
     }
 
-    public void close() {
-        stage.close();
-    }
-
     private void setFullScreen() {
-        Screen screen = Screen.getScreens().size() > 1 ? Screen.getScreens().get(1) : Screen.getPrimary();
-        stage.setX(screen.getBounds().getMinX());
-        stage.setY(screen.getBounds().getMinY());
-        stage.setWidth(screen.getBounds().getWidth());
-        stage.setHeight(screen.getBounds().getHeight());
+        Screen screen = Screen.getPrimary();  // Adjust this if multi-screen setup
+        stage.setX(screen.getVisualBounds().getMinX());
+        stage.setY(screen.getVisualBounds().getMinY());
+        stage.setWidth(screen.getVisualBounds().getWidth());
+        stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
-
-
-
-    private VBox createParticipantScoreLayout(MatchData matchData, ParticipantType type) {
-        VBox dataLayout = new VBox(10);
-        dataLayout.setPadding(new Insets(15));
-
-        // Participant Label
-        Label participantLabel = new Label(type.name());
-
-        // Labels for scores and penalties
-        Label yukoLabel = new Label();
-        yukoLabel.textProperty().bind(matchData.yukoProperty(type).asString().concat(" Yuko"));
-
-        Label wazaAriLabel = new Label();
-        wazaAriLabel.textProperty().bind(matchData.wazaAriProperty(type).asString().concat(" Waza-ari"));
-
-        Label ipponLabel = new Label();
-        ipponLabel.textProperty().bind(matchData.ipponProperty(type).asString().concat(" Ippon"));
-
-        Label totalScoreLabel = new Label();
-        totalScoreLabel.textProperty().bind(matchData.totalScoreProperty(type).asString().concat("Total"));
-
-        addPenaltyLabels(matchData, type, dataLayout);
-
-        // Add all labels to the VBox
-        dataLayout.getChildren().addAll(participantLabel, yukoLabel, wazaAriLabel, ipponLabel, totalScoreLabel);
-
-        return dataLayout;
-
-    }
-
-    private void addPenaltyLabels(MatchData matchData, ParticipantType participantType, VBox parent) {
-        for (PenaltyType penaltyType : PenaltyType.values()) {
-            Label penaltyLabel = new Label();
-            penaltyLabel.textProperty().bind(Bindings.when(matchData.penaltyProperty(participantType, penaltyType))
-                    .then(penaltyType.toString() + ": Given")
-                    .otherwise(penaltyType + ": Not Given"));
-            parent.getChildren().add(penaltyLabel);
-        }
-    }
-
 
 }

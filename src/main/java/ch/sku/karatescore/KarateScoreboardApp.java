@@ -3,19 +3,21 @@ package ch.sku.karatescore;
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
-import ch.sku.karatescore.components.TimerComponent;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.TimerService;
 import ch.sku.karatescore.view.WKFView;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
-import javafx.stage.Screen;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -25,18 +27,21 @@ public class KarateScoreboardApp extends Application {
     private final Participant aka = new Participant(ParticipantType.AKA);
     private final Participant ao = new Participant(ParticipantType.AO);
 
+    private final TimerService timerService = new TimerService();
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    private static Button getButton(TextField minutesInput, TextField secondsInput, TimerComponent timerComponent) {
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
         Button setTimeButton = new Button("Set Timer");
 
         setTimeButton.setOnAction(e -> {
             try {
-                int mins = Integer.parseInt(minutesInput.getText());
-                int secs = Integer.parseInt(secondsInput.getText());
-                timerComponent.setUpTimer(mins, secs);
+                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+
+                timerService.setUpTimer(mins, secs);
             } catch (NumberFormatException ex) {
                 minutesInput.setText("");
                 secondsInput.setText("");
@@ -44,6 +49,7 @@ public class KarateScoreboardApp extends Application {
                 secondsInput.setPromptText("Invalid input! Enter a number.");
             }
         });
+
         return setTimeButton;
     }
 
@@ -52,7 +58,7 @@ public class KarateScoreboardApp extends Application {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
         Button btnOpenScoreboard = new Button("Open Scoreboard on TV");
         btnOpenScoreboard.setOnAction(e -> {
-            WKFView wkfView = new WKFView();
+            WKFView wkfView = new WKFView(aka, ao, timerService);
             wkfView.show();
         });
 
@@ -68,53 +74,13 @@ public class KarateScoreboardApp extends Application {
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
         // Add to main layout with AO on the left, AKA on the right
-        mainLayout.getChildren().addAll(rootPane,participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(rootPane, participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
         Scene scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
         primaryStage.show();
-    }
-
-    private void openScoreboardWindow() {
-        Stage scoreboardStage = new Stage();
-        HBox scoreboardRoot = createScoreboardLayout();  // This will create the layout for the scoreboard
-        Scene scoreboardScene = new Scene(scoreboardRoot);
-
-        // Set to full screen on the secondary monitor if it exists
-        Screen screen = Screen.getScreens().size() > 1 ? Screen.getScreens().get(1) : Screen.getPrimary();
-        Rectangle2D bounds = screen.getBounds();
-        scoreboardStage.setX(bounds.getMinX());
-        scoreboardStage.setY(bounds.getMinY());
-        scoreboardStage.setWidth(bounds.getWidth());
-        scoreboardStage.setHeight(bounds.getHeight());
-
-        scoreboardStage.setScene(scoreboardScene);
-        scoreboardStage.setFullScreen(true);
-        scoreboardStage.show();
-    }
-
-    private HBox createScoreboardLayout() {
-        HBox root = new HBox();
-
-        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
-        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
-        StackPane middlePanel = new StackPane(createTimerDisplay());
-
-        HBox.setHgrow(akaPanel, Priority.ALWAYS);
-        HBox.setHgrow(aoPanel, Priority.ALWAYS);
-        akaPanel.setMaxWidth(Double.MAX_VALUE);
-        aoPanel.setMaxWidth(Double.MAX_VALUE);
-
-        root.getChildren().addAll(akaPanel, middlePanel, aoPanel);
-        return root;
-    }
-
-    private Label createTimerDisplay() {
-        Label timerLabel = new Label("1:30");
-        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-        return timerLabel;
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
@@ -189,32 +155,22 @@ public class KarateScoreboardApp extends Application {
         timerPanel.setPadding(new Insets(20));
         timerPanel.getStyleClass().add("timer-panel");
 
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 20px;");
 
-        // Create the timer component and set it up
-        TimerComponent timerComponent = new TimerComponent();
-        HBox inputRow = new HBox(10); // Horizontal box with spacing
-        Label labelMinutes = new Label("Minutes:");
+        // Setup for user input and timer control buttons
         TextField minutesInput = new TextField();
-        minutesInput.setPromptText("Enter minutes");
-        Label labelSeconds = new Label("Seconds:");
         TextField secondsInput = new TextField();
-        secondsInput.setPromptText("Enter seconds");
-        inputRow.getChildren().addAll(labelMinutes, minutesInput, labelSeconds, secondsInput);
-
-
-        Button setTimeButton = getButton(minutesInput, secondsInput, timerComponent);
-
+        Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
         Button startTimerButton = new Button("Start Timer");
-        startTimerButton.setOnAction(e -> timerComponent.start());
-
+        startTimerButton.setOnAction(e -> timerService.start());
         Button stopTimerButton = new Button("Stop Timer");
-        stopTimerButton.setOnAction(e -> timerComponent.stop());
-
+        stopTimerButton.setOnAction(e -> timerService.stop());
         Button resetTimerButton = new Button("Reset Timer");
-        resetTimerButton.setOnAction(e -> timerComponent.reset());
+        resetTimerButton.setOnAction(e -> timerService.reset());  // Resets to 00:00
 
-        timerPanel.getChildren().addAll(timerComponent, labelMinutes, minutesInput, labelSeconds, secondsInput, setTimeButton, startTimerButton, stopTimerButton, resetTimerButton);
-
+        timerPanel.getChildren().addAll(timerLabel, minutesInput, secondsInput, setTimeButton, startTimerButton, stopTimerButton, resetTimerButton);
         return timerPanel;
     }
 
