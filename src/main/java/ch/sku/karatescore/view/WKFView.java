@@ -55,7 +55,7 @@ public class WKFView {
 
         Label scoreLabel = new Label();
         scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d, Ippon: %d", type, participant.yukoScoreProperty(), participant.wazaAriScoreProperty(), participant.ipponScoreProperty()));
-        addPenaltyLabels(participant, type, panel);
+        addPenaltyLabels(participant, panel);
         panel.getChildren().add(scoreLabel);
         return panel;
     }
@@ -70,12 +70,27 @@ public class WKFView {
     }
 
 
-    private void addPenaltyLabels(Participant participant, ParticipantType type, VBox panel) {
+    private void addPenaltyLabels(Participant participant, VBox panel) {
+        HBox penaltyContainer = new HBox(10); // Create an HBox with spacing
+        penaltyContainer.setAlignment(Pos.CENTER); // Center the penalties horizontally
+
         for (PenaltyType penaltyType : PenaltyType.values()) {
-            Label penaltyLabel = new Label();
-            penaltyLabel.textProperty().bind(Bindings.when(participant.getPenaltyProperty(penaltyType)).then(penaltyType.toString() + ": Given").otherwise(penaltyType + ": Not Given"));
-            panel.getChildren().add(penaltyLabel);
+            Label penaltyLabel = new Label(penaltyType.toString());
+            penaltyLabel.getStyleClass().add("penalty-label"); // Applying styles
+
+            // Bind the visible property to whether the penalty is given or not
+            penaltyLabel.visibleProperty().bind(participant.getPenaltyProperty(penaltyType));
+            penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
+
+            // Bind opacity for smooth visual transitions
+            penaltyLabel.opacityProperty().bind(Bindings.when(participant.getPenaltyProperty(penaltyType))
+                    .then(1.0)
+                    .otherwise(0.0));
+
+            penaltyContainer.getChildren().add(penaltyLabel);
         }
+
+        panel.getChildren().add(penaltyContainer);
     }
 
 

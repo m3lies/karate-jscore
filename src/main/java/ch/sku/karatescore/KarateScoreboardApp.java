@@ -40,7 +40,9 @@ public class KarateScoreboardApp extends Application {
             try {
                 int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
                 int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-
+                if (mins < 0 || secs < 0 || secs >= 60) {
+                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+                }
                 timerService.setUpTimer(mins, secs);
             } catch (NumberFormatException ex) {
                 minutesInput.setText("");
@@ -159,18 +161,30 @@ public class KarateScoreboardApp extends Application {
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
         timerLabel.setStyle("-fx-font-size: 20px;");
 
-        // Setup for user input and timer control buttons
+        // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
+        minutesInput.setPromptText("Enter minutes");
+        secondsInput.setPromptText("Enter seconds");
+
+        // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
+        Button resetTimerButton = new Button("Reset Timer");
+        resetTimerButton.setOnAction(e -> timerService.reset());
+
+        // Start and Stop buttons
         Button startTimerButton = new Button("Start Timer");
         startTimerButton.setOnAction(e -> timerService.start());
         Button stopTimerButton = new Button("Stop Timer");
         stopTimerButton.setOnAction(e -> timerService.stop());
-        Button resetTimerButton = new Button("Reset Timer");
-        resetTimerButton.setOnAction(e -> timerService.reset());  // Resets to 00:00
 
-        timerPanel.getChildren().addAll(timerLabel, minutesInput, secondsInput, setTimeButton, startTimerButton, stopTimerButton, resetTimerButton);
+        // Organizing buttons into rows
+        HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
+        HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
+        HBox inputFields = new HBox(10, minutesInput, secondsInput);
+
+        // Adding all components to the timer panel
+        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons);
         return timerPanel;
     }
 

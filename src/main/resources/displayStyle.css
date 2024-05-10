@@ -1,0 +1,9 @@
+.penalty-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-background-color: red; /* visible color */
+    -fx-padding: 5px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    display: none; /* Start with hidden */
+}
