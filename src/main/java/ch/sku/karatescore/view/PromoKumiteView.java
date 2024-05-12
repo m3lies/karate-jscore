@@ -2,77 +2,98 @@ package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
-import ch.sku.karatescore.model.MatchData;
+import ch.sku.karatescore.commons.ScoreType;
+import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.PenaltyService;
+import ch.sku.karatescore.services.ScoreService;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class PromoKumiteView {
-    private final VBox component = new VBox();
-    private Stage dataStage = null;
+    private final Participant aka;
+    private final Participant ao;
+    private final Stage stage;
 
-    public void showPromoKumiteView(MatchData matchData) {
-        if(dataStage == null ){
-            Stage dataStage = new Stage();
-            dataStage.setTitle("Promo Kumite");
+    private final ScoreService scoreService;
 
-            BorderPane borderPane = new BorderPane();
+    private final PenaltyService penaltyService;
 
-            // Timer Label
-            Label timerLabel = new Label();
-            timerLabel.textProperty().bind(matchData.timerProperty());
-            VBox dataLayoutAka = createParticipantScoreLayout(matchData, ParticipantType.AKA);
-            VBox dataLayoutAo = createParticipantScoreLayout(matchData, ParticipantType.AO);
-            borderPane.setLeft(dataLayoutAka);
-            borderPane.setRight(dataLayoutAo);
-
-            Scene dataScene = new Scene(borderPane, 200, 300);
-            dataStage.setScene(dataScene);
-            dataStage.show();
-        }
+    public PromoKumiteView(Participant aka, Participant ao, ScoreService scoreService, PenaltyService penaltyService) {
+        this.aka = aka;
+        this.ao = ao;
+        this.scoreService = scoreService;
+        this.penaltyService = penaltyService;
+        this.stage = new Stage();
+        initializeUI();
 
     }
 
+    private void initializeUI() {
+        HBox root = new HBox();
 
-    public VBox createParticipantScoreLayout(MatchData matchData, ParticipantType type) {
-        VBox dataLayout = new VBox(10);
-        dataLayout.setPadding(new Insets(15));
+        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
+        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
 
-        // Participant Label
-        Label participantLabel = new Label(type.name());
+        HBox.setHgrow(akaPanel, Priority.ALWAYS);
+        HBox.setHgrow(aoPanel, Priority.ALWAYS);
+        akaPanel.setMaxWidth(Double.MAX_VALUE);
+        aoPanel.setMaxWidth(Double.MAX_VALUE);
 
-        // Labels for scores and penalties
-        Label yukoLabel = new Label();
-        yukoLabel.textProperty().bind(matchData.yukoProperty(type).asString().concat(" Yuko"));
-
-        Label wazaAriLabel = new Label();
-        wazaAriLabel.textProperty().bind(matchData.wazaAriProperty(type).asString().concat(" Waza-ari"));
-
-        Label totalScoreLabel = new Label();
-        totalScoreLabel.textProperty().bind(matchData.totalScoreProperty(type).asString().concat("Total"));
-        addPenaltyLabels(matchData, type, dataLayout);
-
-
-
-        // Add all labels to the VBox
-        dataLayout.getChildren().addAll(participantLabel, yukoLabel, wazaAriLabel, totalScoreLabel);
-
-        return dataLayout;
-
-
+        root.getChildren().addAll(akaPanel, aoPanel);
+        Scene scene = new Scene(root, 1920, 1080);
+        stage.setScene(scene);
+        setFullScreen();
+        stage.setTitle("Karate Match Scoreboard");
     }
-    private void addPenaltyLabels(MatchData matchData, ParticipantType participantType, VBox parent) {
+
+    private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
+        VBox panel = new VBox(10);
+        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
+        panel.setAlignment(Pos.CENTER);
+
+        Label scoreLabel = new Label();
+        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d", participantType, scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
+        addPenaltyLabels(participant, panel);
+        panel.getChildren().add(scoreLabel);
+        return panel;
+    }
+
+    public void show() {
+        stage.show();
+    }
+
+    private void addPenaltyLabels(Participant participant, VBox panel) {
+        HBox penaltyContainer = new HBox(10); // Create an HBox with spacing
+        penaltyContainer.setAlignment(Pos.CENTER); // Center the penalties horizontally
+
         for (PenaltyType penaltyType : PenaltyType.values()) {
-            Label penaltyLabel = new Label();
-            penaltyLabel.textProperty().bind(Bindings.when(matchData.penaltyProperty(participantType, penaltyType))
-                    .then(penaltyType.toString() + ": Given")
-                    .otherwise(penaltyType.toString() + ": Not Given"));
-            parent.getChildren().add(penaltyLabel);
+            Label penaltyLabel = new Label(penaltyType.toString());
+            penaltyLabel.getStyleClass().add("penalty-label"); // Applying styles
+
+            // Bind the visible property to whether the penalty is given or not
+            penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
+            penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
+
+            penaltyContainer.getChildren().add(penaltyLabel);
         }
+
+        panel.getChildren().add(penaltyContainer);
+    }
+
+    private void setFullScreen() {
+        Screen screen = Screen.getPrimary();  // Adjust this if multi-screen setup
+        stage.setX(screen.getVisualBounds().getMinX());
+        stage.setY(screen.getVisualBounds().getMinY());
+        stage.setWidth(screen.getVisualBounds().getWidth());
+        stage.setHeight(screen.getVisualBounds().getHeight());
+        stage.setFullScreen(true);
     }
 
 }

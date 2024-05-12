@@ -4,7 +4,10 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.PenaltyService;
+import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
+import ch.sku.karatescore.view.PromoKumiteView;
 import ch.sku.karatescore.view.WKFView;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -28,6 +31,8 @@ public class KarateScoreboardApp extends Application {
     private final Participant ao = new Participant(ParticipantType.AO);
 
     private final TimerService timerService = new TimerService();
+    private final ScoreService scoreService = new ScoreService();
+    private final PenaltyService penaltyService = new PenaltyService();
 
     public static void main(String[] args) {
         launch(args);
@@ -60,11 +65,18 @@ public class KarateScoreboardApp extends Application {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
         Button btnOpenScoreboard = new Button("Open Scoreboard on TV");
         btnOpenScoreboard.setOnAction(e -> {
-            WKFView wkfView = new WKFView(aka, ao, timerService);
+            WKFView wkfView = new WKFView(aka, ao, timerService , scoreService, penaltyService);
             wkfView.show();
         });
 
+        Button btnOpenPromoKumite = new Button("Open Promokumite");
+        btnOpenPromoKumite.setOnAction(e -> {
+            PromoKumiteView promoKumiteView = new PromoKumiteView(aka, ao, scoreService, penaltyService);
+            promoKumiteView.show();
+        });
+
         StackPane rootPane = new StackPane(btnOpenScoreboard);
+        StackPane secondPane = new StackPane(btnOpenPromoKumite);
 
 
         HBox mainLayout = new HBox(10);
@@ -76,7 +88,7 @@ public class KarateScoreboardApp extends Application {
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
         // Add to main layout with AO on the left, AKA on the right
-        mainLayout.getChildren().addAll(rootPane, participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(rootPane,secondPane, participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
         Scene scene = new Scene(root, 1920, 1080);
@@ -91,7 +103,7 @@ public class KarateScoreboardApp extends Application {
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
 
-        Label header = new Label(participantName + " - Total Points: " + participant.calculateTotalScore());
+        Label header = new Label(participantName + " - Total Points: " + scoreService.calculateTotalScore(participantName));
         header.getStyleClass().add("header");
         // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
@@ -102,16 +114,16 @@ public class KarateScoreboardApp extends Application {
 
         updateHeaderWithScore(header, participant);
 
-        Label scoreYuko = new Label("Yuko: " + participant.getScores().getOrDefault(ScoreType.YUKO, 0));
-        Label scoreWazaAri = new Label("Waza-ari: " + participant.getScores().getOrDefault(ScoreType.WAZARI, 0));
-        Label scoreIppon = new Label("Ippon: " + participant.getScores().getOrDefault(ScoreType.IPPON, 0));
+        Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
+        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
+        Label scoreIppon = new Label("Ippon: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
 
         addButtonControls(panel, participant, scoreYuko, scoreWazaAri, scoreIppon, header);
 
 
-        PenaltyComponent penaltyComponent = new PenaltyComponent(participant);
+        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService);
         panel.getChildren().add(penaltyComponent.getComponent());
         return panel;
     }
@@ -128,11 +140,11 @@ public class KarateScoreboardApp extends Application {
         Button btnRemove = new Button("- " + scoreType.name());
 
         btnAdd.setOnAction(e -> {
-            participant.addScore(scoreType);
+            scoreService.addScore(participant.getParticipantType() ,scoreType);
             updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
         });
         btnRemove.setOnAction(e -> {
-            participant.subtractScore(scoreType);
+            scoreService.subtractScore(participant.getParticipantType(), scoreType);
             updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
         });
 
@@ -141,14 +153,14 @@ public class KarateScoreboardApp extends Application {
     }
 
     private void updateScoresAndUI(Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
-        scoreYuko.setText("Yuko: " + participant.getScoreCounts().getOrDefault(ScoreType.YUKO, 0));
-        scoreWazaAri.setText("Waza-ari: " + participant.getScoreCounts().getOrDefault(ScoreType.WAZARI, 0));
-        scoreIppon.setText("Ippon: " + participant.getScoreCounts().getOrDefault(ScoreType.IPPON, 0));
+        scoreYuko.setText("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
+        scoreWazaAri.setText("Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
+        scoreIppon.setText("Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
         updateHeaderWithScore(header, participant);
     }
 
     private void updateHeaderWithScore(Label header, Participant participant) {
-        int totalScore = participant.calculateTotalScore();
+        int totalScore = scoreService.calculateTotalScore(participant.getParticipantType());
         header.setText(participant.getParticipantType() + " - Total Points: " + totalScore);
     }
 

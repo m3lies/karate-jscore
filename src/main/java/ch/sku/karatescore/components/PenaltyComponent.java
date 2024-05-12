@@ -2,6 +2,7 @@ package ch.sku.karatescore.components;
 
 import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.PenaltyService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.control.Button;
@@ -13,33 +14,36 @@ import lombok.Getter;
 @Getter
 public class PenaltyComponent {
     private final VBox component = new VBox(10);  // Main container with spacing
+    private final PenaltyService penaltyService;
 
-    public PenaltyComponent(Participant participant) {
-        HBox labelContainer = new HBox(10);  // Container for labels
-        HBox buttonContainer = new HBox(10);  // Container for buttons
+    public PenaltyComponent(Participant participant, PenaltyService penaltyService) {
+        this.penaltyService = penaltyService;
+        HBox labelContainer = new HBox(10);
+        HBox buttonContainer = new HBox(10);
 
         for (PenaltyType penalty : PenaltyType.values()) {
             Label penaltyStatusLabel = new Label(penalty.name());
-            penaltyStatusLabel.visibleProperty().bind(participant.getPenaltyProperty(penalty));  // Visibility bound to the penalty's BooleanProperty
-            penaltyStatusLabel.managedProperty().set(true);  // Always managed, to maintain spacing
+            penaltyStatusLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penalty));
+            penaltyStatusLabel.managedProperty().set(true);
 
             Button penaltyButton = new Button(penalty.name());
             penaltyButton.styleProperty().bind(
-                    Bindings.when(participant.getPenaltyProperty(penalty))
+                    Bindings.when(penaltyService.getPenaltyProperty(participant.getParticipantType(), penalty))
                             .then("-fx-background-color: darkgray; -fx-text-fill: white;")
                             .otherwise("-fx-background-color: white; -fx-text-fill: black;")
             );
-            penaltyButton.setOnAction(e -> togglePenalty(participant, penalty));
+            penaltyButton.setOnAction(e -> penaltyService.togglePenalty(participant.getParticipantType(), penalty));
 
-            labelContainer.getChildren().add(penaltyStatusLabel);  // Add each label to the label container
-            buttonContainer.getChildren().add(penaltyButton);  // Add each button to the button container
+            labelContainer.getChildren().add(penaltyStatusLabel);
+            buttonContainer.getChildren().add(penaltyButton);
         }
 
-        this.component.getChildren().addAll(labelContainer, buttonContainer);  // Add both containers to the main component
+        this.component.getChildren().addAll(labelContainer, buttonContainer);
     }
 
+
     private void togglePenalty(Participant participant, PenaltyType penalty) {
-        BooleanProperty currentPenaltyProperty = participant.getPenaltyProperty(penalty);
+        BooleanProperty currentPenaltyProperty =penaltyService.getPenaltyProperty(participant.getParticipantType(), penalty);
         boolean isCurrentlyActive = currentPenaltyProperty.get();
 
         // If activating a penalty that is currently inactive:
@@ -57,14 +61,14 @@ public class PenaltyComponent {
 
     private void deactivateHigherPenalties(Participant participant) {
         for (PenaltyType pt : PenaltyType.values()) {
-            participant.getPenaltyProperty(pt).set(false);
+            penaltyService.getPenaltyProperty(participant.getParticipantType(), pt).set(false);
         }
     }
 
     private void activateLowerPenalties(Participant participant, PenaltyType penalty) {
         for (PenaltyType pt : PenaltyType.values()) {
             if (pt.ordinal() <= penalty.ordinal()) {
-                participant.getPenaltyProperty(pt).set(true);
+                penaltyService.getPenaltyProperty(participant.getParticipantType(), penalty).set(true);
             }
         }
     }
@@ -72,7 +76,7 @@ public class PenaltyComponent {
     private void deactivateHigherPenaltiesExcludingCurrent(Participant participant, PenaltyType penalty) {
         for (PenaltyType pt : PenaltyType.values()) {
             if (pt.ordinal() > penalty.ordinal()) {
-                participant.getPenaltyProperty(pt).set(false);
+                penaltyService.getPenaltyProperty(participant.getParticipantType(), pt).set(false);
             }
         }
     }

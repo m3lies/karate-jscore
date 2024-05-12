@@ -2,7 +2,10 @@ package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
+import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.PenaltyService;
+import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -21,10 +24,15 @@ public class WKFView {
     private final Participant ao;
     private final TimerService timerService;
 
-    public WKFView(Participant aka, Participant ao, TimerService timerService) {
+    private final ScoreService scoreService;
+    private final PenaltyService penaltyService;
+
+    public WKFView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
+        this.scoreService = scoreService;
+        this.penaltyService = penaltyService;
         this.stage = new Stage();
         initializeUI();
     }
@@ -48,13 +56,18 @@ public class WKFView {
         stage.setTitle("Karate Match Scoreboard");
     }
 
+
     private VBox createParticipantPanel(Participant participant, ParticipantType type) {
         VBox panel = new VBox(10);
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
         Label scoreLabel = new Label();
-        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d, Ippon: %d", type, participant.yukoScoreProperty(), participant.wazaAriScoreProperty(), participant.ipponScoreProperty()));
+        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d, Ippon: %d",
+                type,
+                scoreService.getScoreProperty(participant.getParticipantType(),ScoreType.YUKO),
+                scoreService.getScoreProperty(participant.getParticipantType(),ScoreType.WAZARI),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
         addPenaltyLabels(participant, panel);
         panel.getChildren().add(scoreLabel);
         return panel;
@@ -63,7 +76,8 @@ public class WKFView {
     private StackPane createTimerDisplay() {
         StackPane timerDisplay = new StackPane();
         Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(),
+                timerService.secondsProperty()));
         timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
         timerDisplay.getChildren().add(timerLabel);
         return timerDisplay;
@@ -79,13 +93,13 @@ public class WKFView {
             penaltyLabel.getStyleClass().add("penalty-label"); // Applying styles
 
             // Bind the visible property to whether the penalty is given or not
-            penaltyLabel.visibleProperty().bind(participant.getPenaltyProperty(penaltyType));
+            penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
 
             // Bind opacity for smooth visual transitions
-            penaltyLabel.opacityProperty().bind(Bindings.when(participant.getPenaltyProperty(penaltyType))
-                    .then(1.0)
-                    .otherwise(0.0));
+            penaltyLabel.opacityProperty().bind(Bindings.when(
+                    penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType))
+                    .then(1.0).otherwise(0.0));
 
             penaltyContainer.getChildren().add(penaltyLabel);
         }
