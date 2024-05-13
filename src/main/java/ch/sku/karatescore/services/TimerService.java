@@ -12,6 +12,10 @@ import javafx.util.Duration;
 public class TimerService {
     private final IntegerProperty minutes = new SimpleIntegerProperty(0);
     private final IntegerProperty seconds = new SimpleIntegerProperty(0);
+    private final IntegerProperty intervalSeconds = new SimpleIntegerProperty(15);
+    private final Timeline intervalTimeline;
+    private final IntegerProperty period = new SimpleIntegerProperty(1);
+
     private final Timeline timeline;
     private int lastSetTimeInSeconds = 0;
 
@@ -25,6 +29,10 @@ public class TimerService {
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e-> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
+
+        intervalTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementIntervalTime()));
+        intervalTimeline.setCycleCount(Timeline.INDEFINITE);
+        resetInterval();
 
         reset();
     }
@@ -43,6 +51,10 @@ public class TimerService {
 
     public IntegerProperty secondsProperty() {
         return seconds;
+    }
+
+    public IntegerProperty intervalSecondsProperty() {
+        return intervalSeconds;
     }
     public void reset() {
         setTimer(lastSetTimeInSeconds);
@@ -69,4 +81,27 @@ public class TimerService {
             seconds.set(seconds.get() - 1);
         }
     }
+
+    private void decrementIntervalTime() {
+        if (intervalSeconds.get() > 0) {
+            intervalSeconds.set(intervalSeconds.get() - 1);
+        } else {
+            intervalSeconds.set(15); // Reset after reaching zero
+        }
+    }
+
+    public void startIntervalTimer() {
+        intervalTimeline.play();
+    }
+
+    public void stopIntervalTimer() {
+        intervalTimeline.stop();
+    }
+
+    public void resetInterval() {
+        intervalSeconds.set(15);
+    }
+
+
+
 }
