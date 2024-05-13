@@ -5,7 +5,6 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
@@ -23,11 +22,9 @@ public class TimerService {
         Label timeLabel = new Label();
         timeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        timeLabel.textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("%02d:%02d", minutes.get(), seconds.get()),
-                minutes, seconds));
+        timeLabel.textProperty().bind(Bindings.createStringBinding(() -> String.format("%02d:%02d", minutes.get(), seconds.get()), minutes, seconds));
 
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e-> decrementTime()));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
         intervalTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementIntervalTime()));
@@ -56,6 +53,11 @@ public class TimerService {
     public IntegerProperty intervalSecondsProperty() {
         return intervalSeconds;
     }
+
+    public IntegerProperty periodProperty() {
+        return period;
+    }
+
     public void reset() {
         setTimer(lastSetTimeInSeconds);
     }
@@ -71,6 +73,7 @@ public class TimerService {
     public void setUpTimer(int mins, int secs) {
         setTimer(mins * 60 + secs);
     }
+
     private void decrementTime() {
         if (seconds.get() == 0 && minutes.get() == 0) {
             stop();
@@ -86,7 +89,14 @@ public class TimerService {
         if (intervalSeconds.get() > 0) {
             intervalSeconds.set(intervalSeconds.get() - 1);
         } else {
-            intervalSeconds.set(15); // Reset after reaching zero
+            stopIntervalTimer();
+            intervalSeconds.set(15);  // Reset the countdown every 15 seconds
+            if (period.get() <=4) {
+                period.set(period.get() + 1);  // Increment period up to 4
+            }
+            if (period.get() > 4) {
+                resetInterval();  // Optional: Stop the interval timer after 4 periods
+            }
         }
     }
 
@@ -100,8 +110,8 @@ public class TimerService {
 
     public void resetInterval() {
         intervalSeconds.set(15);
+        period.set(1);
     }
-
 
 
 }

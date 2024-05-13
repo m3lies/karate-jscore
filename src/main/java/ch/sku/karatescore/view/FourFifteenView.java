@@ -95,9 +95,12 @@ public class FourFifteenView {
     private StackPane createIntervalTimerDisplay() {
         StackPane intervalDisplay = new StackPane();
         Label intervalLabel = new Label();
+        Label periodLabel = new Label();
+        periodLabel.textProperty().bind(Bindings.format("Period %02d ", timerService.periodProperty()));
         intervalLabel.textProperty().bind(Bindings.format("Interval Time: %02d seconds", timerService.intervalSecondsProperty()));
         intervalLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
         intervalDisplay.getChildren().add(intervalLabel);
+        intervalDisplay.getChildren().add(periodLabel);
         return intervalDisplay;
     }
 
