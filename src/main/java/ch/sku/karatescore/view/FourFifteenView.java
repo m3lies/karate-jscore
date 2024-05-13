@@ -82,6 +82,15 @@ public class FourFifteenView {
         panel.getChildren().add(penaltyContainer);
     }
 
+    private StackPane createTimerDisplay() {
+        StackPane timerDisplay = new StackPane();
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(),
+                timerService.secondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+        timerDisplay.getChildren().add(timerLabel);
+        return timerDisplay;
+    }
 
     private StackPane createIntervalTimerDisplay() {
         StackPane intervalDisplay = new StackPane();

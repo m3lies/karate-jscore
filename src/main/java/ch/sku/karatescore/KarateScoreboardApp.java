@@ -198,13 +198,23 @@ public class KarateScoreboardApp extends Application {
         Button stopTimerButton = new Button("Stop Timer");
         stopTimerButton.setOnAction(e -> timerService.stop());
 
+        Label timerIntervalLabel = new Label();
+        timerIntervalLabel.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty()));
+        timerIntervalLabel.setStyle("-fx-font-size: 20px;");
+
+        Button startIntervalButton = new Button("4x15 start");
+        startIntervalButton.setOnAction(e-> timerService.startIntervalTimer());
+        Button stopIntervalButton = new Button ("4x15 stop");
+        stopIntervalButton.setOnAction(e-> timerService.stopIntervalTimer());
+
         // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
+        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
 
         // Adding all components to the timer panel
-        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons);
+        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel, startStopIntervalButtons);
         return timerPanel;
     }
 
