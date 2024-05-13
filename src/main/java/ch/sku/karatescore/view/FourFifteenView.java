@@ -55,6 +55,7 @@ public class FourFifteenView {
         VBox panel = new VBox(10);
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+        addPenaltyLabels(participant, panel);
          return panel;
     }
 

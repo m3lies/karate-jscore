@@ -7,6 +7,7 @@ import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
+import ch.sku.karatescore.view.FourFifteenView;
 import ch.sku.karatescore.view.PromoKumiteView;
 import ch.sku.karatescore.view.WKFView;
 import javafx.application.Application;
@@ -63,20 +64,27 @@ public class KarateScoreboardApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
-        Button btnOpenScoreboard = new Button("Open Scoreboard on TV");
+        Button btnOpenScoreboard = new Button("WKF");
         btnOpenScoreboard.setOnAction(e -> {
             WKFView wkfView = new WKFView(aka, ao, timerService , scoreService, penaltyService);
             wkfView.show();
         });
 
-        Button btnOpenPromoKumite = new Button("Open Promokumite");
+        Button btnOpenPromoKumite = new Button("Promokumite");
         btnOpenPromoKumite.setOnAction(e -> {
             PromoKumiteView promoKumiteView = new PromoKumiteView(aka, ao, scoreService, penaltyService);
             promoKumiteView.show();
         });
 
+        Button btnOpenFourFifteen = new Button("4 x 15 ");
+        btnOpenFourFifteen.setOnAction(e -> {
+            FourFifteenView fourFifteenView = new FourFifteenView(aka, ao, timerService, penaltyService);
+            fourFifteenView.show();
+        });
+
         StackPane rootPane = new StackPane(btnOpenScoreboard);
         StackPane secondPane = new StackPane(btnOpenPromoKumite);
+        StackPane thirdPane = new StackPane(btnOpenFourFifteen);
 
 
         HBox mainLayout = new HBox(10);
@@ -88,7 +96,7 @@ public class KarateScoreboardApp extends Application {
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
         // Add to main layout with AO on the left, AKA on the right
-        mainLayout.getChildren().addAll(rootPane,secondPane, participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(rootPane,secondPane, thirdPane, participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
         Scene scene = new Scene(root, 1920, 1080);
