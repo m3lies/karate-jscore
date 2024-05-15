@@ -123,7 +123,7 @@ public class KarateScoreboardApp extends Application {
         updateHeaderWithScore(header, participant);
 
         Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
-        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
+        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).toString());
         Label scoreIppon = new Label("Ippon: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
@@ -211,24 +211,37 @@ public class KarateScoreboardApp extends Application {
         timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
         timerIntervalLabel4.setStyle("-fx-font-size: 20px;");
 
-        Button startIntervalButton = new Button("4x15 Start");
+        Button startIntervalButton = new Button("Start Interval Timer");
         startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
 
-        Button stopIntervalButton = new Button("4x15 Stop");
+        Button stopIntervalButton = new Button("Stop Interval Timer");
         stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
 
-        Button resetTimerIntervalButton = new Button("4x15 Reset");
-        resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
+        Button resetIntervalButton1 = new Button("Reset P1");
+        resetIntervalButton1.setOnAction(e -> timerService.resetIntervalForPeriod(1));
+
+        Button resetIntervalButton2 = new Button("Reset P2");
+        resetIntervalButton2.setOnAction(e -> timerService.resetIntervalForPeriod(2));
+
+        Button resetIntervalButton3 = new Button("Reset P3");
+        resetIntervalButton3.setOnAction(e -> timerService.resetIntervalForPeriod(3));
+
+        Button resetIntervalButton4 = new Button("Reset P4");
+        resetIntervalButton4.setOnAction(e -> timerService.resetIntervalForPeriod(4));
+
+        Button nextPeriodButton = new Button("Next Period");
+        nextPeriodButton.setOnAction(e -> timerService.nextPeriod());
 
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
-        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
-        HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
+        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton,nextPeriodButton);
+        HBox resetIntervalButtons = new HBox(10, resetIntervalButton1, resetIntervalButton2, resetIntervalButton3, resetIntervalButton4);
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
 
         timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
         return timerPanel;
     }
+
 
 
 }

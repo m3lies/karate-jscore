@@ -47,8 +47,7 @@ public class TimerService {
                 System.out.println("Period " + targetPeriod + " Timer: 00:" + intervalSeconds.get());
                 if (intervalSeconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
-                    period.set(period.get() % 4 + 1);
-                    startIntervalTimer(period.get());
+                    System.out.println("Timer for period " + targetPeriod + " reached 0. Stopped.");
                 }
             }
         }));
@@ -59,7 +58,6 @@ public class TimerService {
     public void start() {
         System.out.println("Starting main timer");
         timeline.play();
-        startIntervalTimer(period.get());  // Start the interval timer for the current period
     }
 
     public void stop() {
@@ -180,5 +178,30 @@ public class TimerService {
         intervalSeconds4.set(15);
         period.set(1);
         System.out.println("Reset all intervals and period to 1");
+    }
+
+    public void resetIntervalForPeriod(int period) {
+        switch (period) {
+            case 1:
+                intervalSeconds1.set(15);
+                break;
+            case 2:
+                intervalSeconds2.set(15);
+                break;
+            case 3:
+                intervalSeconds3.set(15);
+                break;
+            case 4:
+                intervalSeconds4.set(15);
+                break;
+        }
+        System.out.println("Reset interval for period: " + period);
+    }
+
+    public void nextPeriod() {
+        int currentPeriod = period.get();
+        int nextPeriod = (currentPeriod % 4) + 1;
+        period.set(nextPeriod);
+        System.out.println("Moved to next period: " + nextPeriod);
     }
 }

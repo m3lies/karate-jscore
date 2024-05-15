@@ -130,6 +130,10 @@
     -fx-border-style: solid inside;
     -fx-border-width: 2;
     -fx-border-radius: 5;
-    -fx-border-color: gray;
     -fx-min-width: 80px;  // Ensuring buttons and labels have minimum width for better alignment
+
+    -fx-background-color: #ffffff;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+
 }
