@@ -22,6 +22,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.transform.Scale;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -99,6 +101,10 @@ public class KarateScoreboardApp extends Application {
         mainLayout.getChildren().addAll(rootPane,secondPane, thirdPane, participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
+        // Apply scaling to the root pane
+        Scale scale = new Scale(1, 1);
+        root.getTransforms().add(scale);
+
         Scene scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
@@ -106,6 +112,7 @@ public class KarateScoreboardApp extends Application {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
+
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
@@ -118,6 +125,7 @@ public class KarateScoreboardApp extends Application {
         } else if (participant.getParticipantType() == ParticipantType.AO) {
             header.setStyle("-fx-background-color: #007bff; -fx-text-fill: white;");
         }
+
         updateHeaderWithScore(header, participant);
 
         Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
@@ -180,19 +188,29 @@ public class KarateScoreboardApp extends Application {
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
         timerLabel.setStyle("-fx-font-size: 20px;");
 
+        // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
         minutesInput.setPromptText("Enter minutes");
         secondsInput.setPromptText("Enter seconds");
 
+        // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
         Button resetTimerButton = new Button("Reset Timer");
         resetTimerButton.setOnAction(e -> timerService.reset());
 
+        // Start and Stop buttons
         Button startTimerButton = new Button("Start Timer");
         startTimerButton.setOnAction(e -> timerService.start());
         Button stopTimerButton = new Button("Stop Timer");
         stopTimerButton.setOnAction(e -> timerService.stop());
+
+        Button startIntervalButton = new Button("4x15 Start");
+        startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
+        Button stopIntervalButton = new Button("4x15 stop");
+        stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
+        Button resetTimerIntervalButton = new Button("4 x 15 Reset");
+        resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
 
         Label timerIntervalLabel1 = new Label();
         timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
@@ -210,37 +228,18 @@ public class KarateScoreboardApp extends Application {
         timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
         timerIntervalLabel4.setStyle("-fx-font-size: 20px;");
 
-        Button startIntervalButton = new Button("Start Interval Timer");
-        startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
-
-        Button stopIntervalButton = new Button("Stop Interval Timer");
-        stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
-
-        Button resetIntervalButton1 = new Button("Reset P1");
-        resetIntervalButton1.setOnAction(e -> timerService.resetIntervalForPeriod(1));
-
-        Button resetIntervalButton2 = new Button("Reset P2");
-        resetIntervalButton2.setOnAction(e -> timerService.resetIntervalForPeriod(2));
-
-        Button resetIntervalButton3 = new Button("Reset P3");
-        resetIntervalButton3.setOnAction(e -> timerService.resetIntervalForPeriod(3));
-
-        Button resetIntervalButton4 = new Button("Reset P4");
-        resetIntervalButton4.setOnAction(e -> timerService.resetIntervalForPeriod(4));
-
         Button nextPeriodButton = new Button("Next Period");
         nextPeriodButton.setOnAction(e -> timerService.nextPeriod());
 
+        // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
-        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton,nextPeriodButton);
-        HBox resetIntervalButtons = new HBox(10, resetIntervalButton1, resetIntervalButton2, resetIntervalButton3, resetIntervalButton4);
+        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton, nextPeriodButton);
+        HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
 
+        // Adding all components to the timer panel
         timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
         return timerPanel;
     }
-
-
-
 }
