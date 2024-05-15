@@ -49,7 +49,7 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type) {
         VBox panel = new VBox(10);
-        String backgroundColor = type == ParticipantType.AKA ? "#ff0000" : "#0000ff";  // Red for AKA, Blue for AO
+        String backgroundColor = type == ParticipantType.AKA ? "#dc3545" : "#007bff";  // Red for AKA, Blue for AO
         panel.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 

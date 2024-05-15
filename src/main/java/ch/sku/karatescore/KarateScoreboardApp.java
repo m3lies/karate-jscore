@@ -114,11 +114,10 @@ public class KarateScoreboardApp extends Application {
         header.getStyleClass().add("header");
         // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
-            header.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+            header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
         } else if (participant.getParticipantType() == ParticipantType.AO) {
-            header.setStyle("-fx-background-color: blue; -fx-text-fill: white;");
+            header.setStyle("-fx-background-color: #007bff; -fx-text-fill: white;");
         }
-
         updateHeaderWithScore(header, participant);
 
         Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
