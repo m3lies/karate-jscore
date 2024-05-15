@@ -37,10 +37,9 @@ public class FourFifteenView {
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
 
-        HBox.setHgrow(akaPanel, Priority.ALWAYS);
-        HBox.setHgrow(aoPanel, Priority.ALWAYS);
-        akaPanel.setMaxWidth(Double.MAX_VALUE);
-        aoPanel.setMaxWidth(Double.MAX_VALUE);
+        // Ensure each panel takes up exactly half the width
+        akaPanel.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
+        aoPanel.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
 
         root.getChildren().addAll(akaPanel, aoPanel);
         Scene scene = new Scene(root, 1920, 1080);
@@ -51,46 +50,45 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type) {
         VBox panel = new VBox(10);
-        String backgroundColor = type == ParticipantType.AKA ?  "#dc3545" : "#007bff";  // Red for AKA, Blue for AO
+        String backgroundColor = type == ParticipantType.AKA ? "#dc3545" : "#007bff";  // Red for AKA, Blue for AO
         panel.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
-        // Timer label specific to the participant
-
+        // Timer labels specific to the participant
         Label timerIntervalLabel1 = new Label();
         Label timerIntervalLabel2 = new Label();
         Label timerIntervalLabel3 = new Label();
         Label timerIntervalLabel4 = new Label();
-//        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-//        double halfScreenWidth = screenWidth / 2;
-//
-//        timerIntervalLabel1.setPrefWidth(halfScreenWidth);
-//        timerIntervalLabel2.setPrefWidth(halfScreenWidth);
-//        timerIntervalLabel3.setPrefWidth(halfScreenWidth);
-//        timerIntervalLabel4.setPrefWidth(halfScreenWidth);
+
+        // Set the preferred width for the interval labels
+        double halfScreenWidth = Screen.getPrimary().getVisualBounds().getWidth() / 2;
+
+        timerIntervalLabel1.setPrefWidth(halfScreenWidth);
+        timerIntervalLabel2.setPrefWidth(halfScreenWidth);
+        timerIntervalLabel3.setPrefWidth(halfScreenWidth);
+        timerIntervalLabel4.setPrefWidth(halfScreenWidth);
 
         timerIntervalLabel1.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
         timerIntervalLabel2.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
         timerIntervalLabel3.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
         timerIntervalLabel4.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
 
-
-        // Bind the timer label text and period label text to the appropriate timer service properties
+        // Bind the timer label text to the appropriate timer service properties
         if (type == ParticipantType.AKA) {
             timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
             timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty3()));
-
         } else {
             timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty2()));
             timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
-
-
         }
 
+        // Create a VBox for the timer interval labels and center them
+        VBox intervalLabelsBox = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4);
+        intervalLabelsBox.setAlignment(Pos.CENTER);
 
+        // Add the interval labels box to the panel
+        panel.getChildren().add(intervalLabelsBox);
 
-        // Add the timer and period labels to the panel
-        panel.getChildren().addAll(timerIntervalLabel1, timerIntervalLabel3,  timerIntervalLabel2,timerIntervalLabel4);
         // Add penalty labels
         addPenaltyLabels(participant, panel);
 
@@ -103,9 +101,7 @@ public class FourFifteenView {
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
             Label penaltyLabel = new Label(penaltyType.toString());
-            penaltyLabel.getStyleClass().add("penalty-label");
-            penaltyLabel.getStyleClass().add("button");
-            penaltyLabel.setStyle("-fx-font-size: 15px;");// Applying styles
+            penaltyLabel.getStyleClass().add("penalty-label"); // Applying styles
 
             // Bind the visible property to whether the penalty is given or not
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
@@ -117,9 +113,9 @@ public class FourFifteenView {
             penaltyContainer.getChildren().add(penaltyLabel);
         }
 
+        // Ensure the penalty container is always present to maintain layout
         panel.getChildren().add(penaltyContainer);
     }
-
 
     private void setFullScreen() {
         Screen screen = Screen.getPrimary();  // Adjust this if multi-screen setup
@@ -133,5 +129,4 @@ public class FourFifteenView {
     public void show() {
         stage.show();
     }
-
 }
