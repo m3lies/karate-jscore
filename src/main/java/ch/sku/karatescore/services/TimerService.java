@@ -21,8 +21,6 @@ public class TimerService {
     private final Timeline intervalTimeline2;
     private final Timeline intervalTimeline3;
     private final Timeline intervalTimeline4;
-
-    private final Timeline intervalTimeline;
     private final IntegerProperty period = new SimpleIntegerProperty(1);
 
     private int lastSetTimeInSeconds = 0;
@@ -36,20 +34,17 @@ public class TimerService {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-        intervalTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementTime()));
-        intervalTimeline.setCycleCount(Timeline.INDEFINITE);
         intervalTimeline1 = createIntervalTimeline(intervalSeconds1, 1);
         intervalTimeline2 = createIntervalTimeline(intervalSeconds2, 2);
         intervalTimeline3 = createIntervalTimeline(intervalSeconds3, 3);
         intervalTimeline4 = createIntervalTimeline(intervalSeconds4, 4);
-
-
-        // Removed the reset call from the constructor
     }
+
     private Timeline createIntervalTimeline(IntegerProperty intervalSeconds, int targetPeriod) {
-        return new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             if (period.get() == targetPeriod && intervalSeconds.get() > 0) {
                 intervalSeconds.set(intervalSeconds.get() - 1);
+                System.out.println("Period " + targetPeriod + " Timer: 00:" + intervalSeconds.get());
                 if (intervalSeconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
                     period.set(period.get() % 4 + 1);
@@ -57,30 +52,20 @@ public class TimerService {
                 }
             }
         }));
-    }
-    private Timeline setupIntervalTimeline(IntegerProperty intervalSeconds, IntegerProperty period) {
-        return new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            if (intervalSeconds.get() > 0) {
-                intervalSeconds.set(intervalSeconds.get() - 1);
-            } else {
-                intervalSeconds.set(15);
-                period.set((period.get() % 4) + 1); // Cycle through 4 periods
-            }
-        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);  // Ensure the timeline repeats indefinitely
+        return timeline;
     }
 
     public void start() {
+        System.out.println("Starting main timer");
         timeline.play();
-    }
-
-    // New method to reset and start the timer
-    public void resetAndStart() {
-        reset();
-        start();
+        startIntervalTimer(period.get());  // Start the interval timer for the current period
     }
 
     public void stop() {
+        System.out.println("Stopping main timer");
         timeline.stop();
+        stopAllIntervalTimers();
     }
 
     private void stopIntervalTimer(int period) {
@@ -98,6 +83,7 @@ public class TimerService {
                 intervalTimeline4.stop();
                 break;
         }
+        System.out.println("Stopped interval timer for period: " + period);
     }
 
     public IntegerProperty minutesProperty() {
@@ -128,12 +114,8 @@ public class TimerService {
         return period;
     }
 
-
     public void reset() {
         setTimer(lastSetTimeInSeconds);
-    }
-    private void resetPeriod() {
-        period.set(1);
     }
 
     public void setTimer(int totalSeconds) {
@@ -160,25 +142,43 @@ public class TimerService {
     }
 
     public void startIntervalTimer(int period) {
+        System.out.println("Request to start interval timer for period: " + period);
+        stopAllIntervalTimers();  // Ensure all other timers are stopped before starting the new one
         switch (period) {
             case 1:
+                System.out.println("Starting interval timer for period 1");
                 intervalTimeline1.play();
                 break;
             case 2:
+                System.out.println("Starting interval timer for period 2");
                 intervalTimeline2.play();
                 break;
             case 3:
+                System.out.println("Starting interval timer for period 3");
                 intervalTimeline3.play();
                 break;
             case 4:
+                System.out.println("Starting interval timer for period 4");
                 intervalTimeline4.play();
                 break;
         }
+        System.out.println("Started interval timer for period: " + period);
     }
 
-    public void stopIntervalTimer() {
-        intervalTimeline.stop();
+    public void stopAllIntervalTimers() {
+        intervalTimeline1.stop();
+        intervalTimeline2.stop();
+        intervalTimeline3.stop();
+        intervalTimeline4.stop();
+        System.out.println("Stopped all interval timers");
     }
 
-
+    public void resetInterval() {
+        intervalSeconds1.set(15);
+        intervalSeconds2.set(15);
+        intervalSeconds3.set(15);
+        intervalSeconds4.set(15);
+        period.set(1);
+        System.out.println("Reset all intervals and period to 1");
+    }
 }

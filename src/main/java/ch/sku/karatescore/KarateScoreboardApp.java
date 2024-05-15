@@ -181,44 +181,52 @@ public class KarateScoreboardApp extends Application {
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
         timerLabel.setStyle("-fx-font-size: 20px;");
 
-        // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
         minutesInput.setPromptText("Enter minutes");
         secondsInput.setPromptText("Enter seconds");
 
-        // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
         Button resetTimerButton = new Button("Reset Timer");
         resetTimerButton.setOnAction(e -> timerService.reset());
 
-        // Start and Stop buttons
         Button startTimerButton = new Button("Start Timer");
         startTimerButton.setOnAction(e -> timerService.start());
         Button stopTimerButton = new Button("Stop Timer");
         stopTimerButton.setOnAction(e -> timerService.stop());
 
+        Label timerIntervalLabel1 = new Label();
+        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
+        timerIntervalLabel1.setStyle("-fx-font-size: 20px;");
 
-        Label timerIntervalLabel = new Label();
-        timerIntervalLabel.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty()));
-        timerIntervalLabel.setStyle("-fx-font-size: 20px;");
+        Label timerIntervalLabel2 = new Label();
+        timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty2()));
+        timerIntervalLabel2.setStyle("-fx-font-size: 20px;");
 
-        Button startIntervalButton = new Button("4x15 start");
-        startIntervalButton.setOnAction(e-> timerService.startIntervalTimer());
-        Button stopIntervalButton = new Button ("4x15 stop");
-        stopIntervalButton.setOnAction(e-> timerService.stopIntervalTimer());
-        Button resetTimerIntervalButton = new Button("4 x 15 Reset");
+        Label timerIntervalLabel3 = new Label();
+        timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty3()));
+        timerIntervalLabel3.setStyle("-fx-font-size: 20px;");
+
+        Label timerIntervalLabel4 = new Label();
+        timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
+        timerIntervalLabel4.setStyle("-fx-font-size: 20px;");
+
+        Button startIntervalButton = new Button("4x15 Start");
+        startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
+
+        Button stopIntervalButton = new Button("4x15 Stop");
+        stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
+
+        Button resetTimerIntervalButton = new Button("4x15 Reset");
         resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
 
-        // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
 
-        // Adding all components to the timer panel
-        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel, startStopIntervalButtons, resetIntervalButtons);
+        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
         return timerPanel;
     }
 
