@@ -39,6 +39,7 @@ public class PenaltyService {
             }
         }
     }
+
     public void togglePenalty(ParticipantType type, PenaltyType penalty) {
         BooleanProperty penaltyProperty = getPenaltyProperty(type, penalty);
         boolean isCurrentlyActive = penaltyProperty.get();
@@ -49,4 +50,5 @@ public class PenaltyService {
             deactivateHigherPenalties(type, penalty);
         }
     }
+
 }

@@ -106,7 +106,6 @@ public class KarateScoreboardApp extends Application {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
-
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
@@ -123,16 +122,17 @@ public class KarateScoreboardApp extends Application {
         updateHeaderWithScore(header, participant);
 
         Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
-        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).toString());
+        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
         Label scoreIppon = new Label("Ippon: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
 
         addButtonControls(panel, participant, scoreYuko, scoreWazaAri, scoreIppon, header);
 
-
-        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService);
+        // Pass true to include buttons
+        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
         panel.getChildren().add(penaltyComponent.getComponent());
+
         return panel;
     }
 
