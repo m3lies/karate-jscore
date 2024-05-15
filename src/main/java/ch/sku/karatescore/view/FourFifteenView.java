@@ -2,18 +2,17 @@ package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
-import ch.sku.karatescore.commons.ScoreType;
-import ch.sku.karatescore.model.MatchData;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
-import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -25,13 +24,14 @@ public class FourFifteenView {
     private final PenaltyService penaltyService;
 
     public FourFifteenView(Participant aka, Participant ao, TimerService timerService, PenaltyService penaltyService) {
-        this.stage =  new Stage();
+        this.stage = new Stage();
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
         this.penaltyService = penaltyService;
         initializeUI();
     }
+
     private void initializeUI() {
         HBox root = new HBox();
 
@@ -53,10 +53,66 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type) {
         VBox panel = new VBox(10);
-        panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
+        String backgroundColor = type == ParticipantType.AKA ? "#ff0000" : "#0000ff";  // Red for AKA, Blue for AO
+        panel.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+
+        // Timer label specific to the participant
+        Label timerLabel = new Label();
+        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
+
+        // Period label specific to the participant
+        Label periodLabel = new Label();
+        periodLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
+
+        // Bind the timer label text and period label text to the appropriate timer service properties
+        if (type == ParticipantType.AKA) {
+            timerLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+                int period = timerService.periodProperty().get();
+                if (period == 1) {
+                    return String.format("00:%02d", timerService.intervalSecondsProperty1().get());
+                } else if (period == 3) {
+                    return String.format("00:%02d", timerService.intervalSecondsProperty3().get());
+                } else {
+                    return "00:00";
+                }
+            }, timerService.intervalSecondsProperty1(), timerService.intervalSecondsProperty3(), timerService.periodProperty()));
+            periodLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+                int period = timerService.periodProperty().get();
+                if (period == 1 || period == 3) {
+                    return String.format("Period %02d", period);
+                } else {
+                    return "Period --";
+                }
+            }, timerService.periodProperty()));
+        } else {
+            timerLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+                int period = timerService.periodProperty().get();
+                if (period == 2) {
+                    return String.format("00:%02d", timerService.intervalSecondsProperty2().get());
+                } else if (period == 4) {
+                    return String.format("00:%02d", timerService.intervalSecondsProperty4().get());
+                } else {
+                    return "00:00";
+                }
+            }, timerService.intervalSecondsProperty2(), timerService.intervalSecondsProperty4(), timerService.periodProperty()));
+            periodLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+                int period = timerService.periodProperty().get();
+                if (period == 2 || period == 4) {
+                    return String.format("Period %02d", period);
+                } else {
+                    return "Period --";
+                }
+            }, timerService.periodProperty()));
+        }
+
+        // Add penalty labels
         addPenaltyLabels(participant, panel);
-         return panel;
+
+        // Add the timer and period labels to the panel
+        panel.getChildren().addAll(timerLabel, periodLabel);
+
+        return panel;
     }
 
     private void addPenaltyLabels(Participant participant, VBox panel) {
@@ -72,9 +128,7 @@ public class FourFifteenView {
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
 
             // Bind opacity for smooth visual transitions
-            penaltyLabel.opacityProperty().bind(Bindings.when(
-                            penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType))
-                    .then(1.0).otherwise(0.0));
+            penaltyLabel.opacityProperty().bind(Bindings.when(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType)).then(1.0).otherwise(0.0));
 
             penaltyContainer.getChildren().add(penaltyLabel);
         }
@@ -82,25 +136,13 @@ public class FourFifteenView {
         panel.getChildren().add(penaltyContainer);
     }
 
-    private StackPane createTimerDisplay() {
-        StackPane timerDisplay = new StackPane();
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(),
-                timerService.secondsProperty()));
-        timerLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-        timerDisplay.getChildren().add(timerLabel);
-        return timerDisplay;
-    }
-
     private StackPane createIntervalTimerDisplay() {
         StackPane intervalDisplay = new StackPane();
         Label intervalLabel = new Label();
         Label periodLabel = new Label();
         periodLabel.textProperty().bind(Bindings.format("Period %02d ", timerService.periodProperty()));
-        intervalLabel.textProperty().bind(Bindings.format("Interval Time: %02d seconds", timerService.intervalSecondsProperty()));
         intervalLabel.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-        intervalDisplay.getChildren().add(intervalLabel);
-        intervalDisplay.getChildren().add(periodLabel);
+        intervalDisplay.getChildren().addAll(intervalLabel, periodLabel);
         return intervalDisplay;
     }
 
@@ -112,6 +154,7 @@ public class FourFifteenView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
+
     public void show() {
         stage.show();
     }

@@ -208,7 +208,7 @@ public class KarateScoreboardApp extends Application {
         Button stopIntervalButton = new Button ("4x15 stop");
         stopIntervalButton.setOnAction(e-> timerService.stopIntervalTimer());
         Button resetTimerIntervalButton = new Button("4 x 15 Reset");
-        resetTimerIntervalButton.setOnAction(e -> timerService.reset());
+        resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
 
         // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
