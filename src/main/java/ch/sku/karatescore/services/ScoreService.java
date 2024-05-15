@@ -27,13 +27,13 @@ public class ScoreService {
     public void addScore(ParticipantType type, ScoreType scoreType) {
         IntegerProperty scoreProp = getScoreProperty(type, scoreType);
         int oldValue = scoreProp.get();
-        scoreProp.set(oldValue + getScoreValue(scoreType));
+        scoreProp.set(oldValue + 1);
     }
 
     public void subtractScore(ParticipantType type, ScoreType scoreType) {
         IntegerProperty scoreProp = getScoreProperty(type, scoreType);
         if (scoreProp.get() > 0) {
-            scoreProp.set(scoreProp.get() - getScoreValue(scoreType));
+            scoreProp.set(scoreProp.get() - 1);
         }
     }
 
@@ -48,8 +48,8 @@ public class ScoreService {
     public int calculateTotalScore(ParticipantType type) {
         int totalScore = 0;
         totalScore += getScoreProperty(type, ScoreType.YUKO).get();
-        totalScore +=  getScoreProperty(type, ScoreType.WAZARI).get();
-        totalScore +=  getScoreProperty(type, ScoreType.IPPON).get();
+        totalScore += 2* getScoreProperty(type, ScoreType.WAZARI).get();
+        totalScore +=  3*getScoreProperty(type, ScoreType.IPPON).get();
         return totalScore;
     }
 }
