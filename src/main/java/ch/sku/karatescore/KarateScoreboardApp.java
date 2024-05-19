@@ -7,22 +7,17 @@ import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
-import ch.sku.karatescore.view.FourFifteenView;
-import ch.sku.karatescore.view.PromoKumiteView;
-import ch.sku.karatescore.view.WKFView;
+import ch.sku.karatescore.view.MenuView;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.transform.Scale;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -35,6 +30,7 @@ public class KarateScoreboardApp extends Application {
     private final TimerService timerService = new TimerService();
     private final ScoreService scoreService = new ScoreService();
     private final PenaltyService penaltyService = new PenaltyService();
+
 
     public static void main(String[] args) {
         launch(args);
@@ -64,50 +60,36 @@ public class KarateScoreboardApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
-        Button btnOpenScoreboard = new Button("WKF");
-        btnOpenScoreboard.setOnAction(e -> {
-            WKFView wkfView = new WKFView(aka, ao, timerService , scoreService, penaltyService);
-            wkfView.show();
-        });
+        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
 
-        Button btnOpenPromoKumite = new Button("Promokumite");
-        btnOpenPromoKumite.setOnAction(e -> {
-            PromoKumiteView promoKumiteView = new PromoKumiteView(aka, ao, scoreService, penaltyService);
-            promoKumiteView.show();
-        });
-
-        Button btnOpenFourFifteen = new Button("4 x 15 ");
-        btnOpenFourFifteen.setOnAction(e -> {
-            FourFifteenView fourFifteenView = new FourFifteenView(aka, ao, timerService, penaltyService);
-            fourFifteenView.show();
-        });
-
-        StackPane rootPane = new StackPane(btnOpenScoreboard);
-        StackPane secondPane = new StackPane(btnOpenPromoKumite);
-        StackPane thirdPane = new StackPane(btnOpenFourFifteen);
-
-
+        // Main layout setup
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
+        mainLayout.setSpacing(20);  // Increased spacing
 
-        // Create panels for AO (left), Timer (center), and AKA (right)
+        // Dynamically resize panels based on screen size
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
         VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
 
-        // Add to main layout with AO on the left, AKA on the right
-        mainLayout.getChildren().addAll(rootPane,secondPane, thirdPane, participantAO, timerPanel, participantAKA);
+        // Setting HGrow to always for expanding automatically
+        HBox.setHgrow(participantAO, Priority.ALWAYS);
+        HBox.setHgrow(timerPanel, Priority.ALWAYS);
+        HBox.setHgrow(participantAKA, Priority.ALWAYS);
+
+        // Adding panels to the layout
+        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
-        // Apply scaling to the root pane
-        Scale scale = new Scale(1, 1);
-        root.getTransforms().add(scale);
-
-        Scene scene = new Scene(root, 1920, 1080);
+        Scene scene = new Scene(root, 1920, 1080);  // Set initial size but it can be maximized
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
+        primaryStage.setMaximized(true);  // Start maximized
+        adjustFontSize(primaryStage, root);
         primaryStage.show();
+
+        MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService);
+        menuView.show();  // Assuming MenuView is another stage/dialog
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
@@ -116,8 +98,11 @@ public class KarateScoreboardApp extends Application {
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
 
-        Label header = new Label(participantName + " - Total Points: " + scoreService.calculateTotalScore(participantName));
+        Label header = new Label();
+        header.setText(participantName + " - Total Points: " + scoreService.calculateTotalScore(participantName));
         header.getStyleClass().add("header");
+        panel.setAlignment(Pos.CENTER);  // Center align contents
+
         // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
             header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
@@ -127,9 +112,14 @@ public class KarateScoreboardApp extends Application {
 
         updateHeaderWithScore(header, participant);
 
-        Label scoreYuko = new Label("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
-        Label scoreWazaAri = new Label("Waza-ari: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
-        Label scoreIppon = new Label("Ippon: " +scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
+        Label scoreYuko = new Label();
+        scoreYuko.textProperty().bind(Bindings.format("Yuko: %d", scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)));
+
+        Label scoreWazaAri = new Label();
+        scoreWazaAri.textProperty().bind(Bindings.format("Waza-ari: %d", scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
+
+        Label scoreIppon = new Label();
+        scoreIppon.textProperty().bind(Bindings.format("Ippon: %d", scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
 
@@ -140,6 +130,13 @@ public class KarateScoreboardApp extends Application {
         panel.getChildren().add(penaltyComponent.getComponent());
 
         return panel;
+    }
+
+    private void adjustFontSize(Stage stage, Pane root) {
+        DoubleBinding fontSizeBinding = Bindings.createDoubleBinding(() -> stage.getWidth() * 0.025, // 2.5% of the stage width as font size
+                stage.widthProperty());
+
+        root.styleProperty().bind(Bindings.createStringBinding(() -> String.format("-fx-font-size: %.2fpx;", fontSizeBinding.get()), fontSizeBinding));
     }
 
     private void addButtonControls(VBox panel, Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
@@ -154,22 +151,19 @@ public class KarateScoreboardApp extends Application {
         Button btnRemove = new Button("- " + scoreType.name());
 
         btnAdd.setOnAction(e -> {
-            scoreService.addScore(participant.getParticipantType() ,scoreType);
-            updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
+            scoreService.addScore(participant.getParticipantType(), scoreType);
+            updateScoresAndUI(participant, header);
         });
         btnRemove.setOnAction(e -> {
             scoreService.subtractScore(participant.getParticipantType(), scoreType);
-            updateScoresAndUI(participant, scoreYuko, scoreWazaAri, scoreIppon, header);
+            updateScoresAndUI(participant, header);
         });
 
         HBox scoreControls = new HBox(5, btnAdd, btnRemove);
         panel.getChildren().add(scoreControls);
     }
 
-    private void updateScoresAndUI(Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
-        scoreYuko.setText("Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO));
-        scoreWazaAri.setText("Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI));
-        scoreIppon.setText("Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON));
+    private void updateScoresAndUI(Participant participant, Label header) {
         updateHeaderWithScore(header, participant);
     }
 
@@ -185,7 +179,6 @@ public class KarateScoreboardApp extends Application {
 
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
-        timerLabel.setStyle("-fx-font-size: 20px;");
 
         // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
@@ -204,6 +197,7 @@ public class KarateScoreboardApp extends Application {
         Button stopTimerButton = new Button("Stop Timer");
         stopTimerButton.setOnAction(e -> timerService.stop());
 
+        // Interval control buttons
         Button startIntervalButton = new Button("4x15 Start");
         startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
         Button stopIntervalButton = new Button("4x15 stop");
@@ -213,19 +207,19 @@ public class KarateScoreboardApp extends Application {
 
         Label timerIntervalLabel1 = new Label();
         timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
-        timerIntervalLabel1.setStyle("-fx-font-size: 20px;");
+
 
         Label timerIntervalLabel2 = new Label();
         timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty2()));
-        timerIntervalLabel2.setStyle("-fx-font-size: 20px;");
+
 
         Label timerIntervalLabel3 = new Label();
         timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty3()));
-        timerIntervalLabel3.setStyle("-fx-font-size: 20px;");
+
 
         Label timerIntervalLabel4 = new Label();
         timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
-        timerIntervalLabel4.setStyle("-fx-font-size: 20px;");
+
 
         Button nextPeriodButton = new Button("Next Period");
         nextPeriodButton.setOnAction(e -> timerService.nextPeriod());
@@ -237,8 +231,21 @@ public class KarateScoreboardApp extends Application {
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
 
-        // Adding all components to the timer panel
-        timerPanel.getChildren().addAll(timerLabel, inputFields, startStopButtons, setResetButtons, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
+        // Container for interval timers, top and bottom
+        VBox timerTop = new VBox(10, timerLabel, inputFields, startStopButtons, setResetButtons);
+        timerTop.setPadding(new Insets(20));
+
+        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
+        intervalTimersBottom.setPadding(new Insets(20));
+        intervalTimersBottom.setAlignment(Pos.BOTTOM_CENTER);
+
+        // Make the interval timers take the remaining space at the bottom
+        VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
+
+        timerPanel.getChildren().addAll(timerTop, intervalTimersBottom);
+
         return timerPanel;
     }
+
+
 }

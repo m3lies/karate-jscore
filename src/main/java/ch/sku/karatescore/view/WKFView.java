@@ -62,14 +62,18 @@ public class WKFView {
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
+
         Label scoreLabel = new Label();
         scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d, Ippon: %d",
                 type,
                 scoreService.getScoreProperty(participant.getParticipantType(),ScoreType.YUKO),
                 scoreService.getScoreProperty(participant.getParticipantType(),ScoreType.WAZARI),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
-        addPenaltyLabels(participant, panel);
-        panel.getChildren().add(scoreLabel);
+        VBox penaltiesPanel = new VBox(10);
+        penaltiesPanel.setAlignment(Pos.BOTTOM_CENTER);
+        addPenaltyLabels(participant, penaltiesPanel);
+        panel.getChildren().addAll(scoreLabel, penaltiesPanel);
+
         return panel;
     }
 

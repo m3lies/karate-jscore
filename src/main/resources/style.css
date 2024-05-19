@@ -1,5 +1,5 @@
 .timer-label {
-    -fx-font-size: 24px;
+    -fx-font-size:35px;
     -fx-text-fill: black;
     -fx-background-color: white;
     -fx-padding: 10px;
@@ -14,9 +14,11 @@
 .button {
     -fx-background-radius: 5;
     -fx-padding: 10px 20px;
+    -fx-font-size: 30px;
 }
 
 .card {
+    -fx-font-size: 30px;
     -fx-padding: 10;
     -fx-border-style: solid inside;
     -fx-border-width: 2;
@@ -28,7 +30,7 @@
 .card-header {
     -fx-background-color: #007bff;
     -fx-text-fill: white;
-    -fx-font-size: 14pt;
+    -fx-font-size: 30pt;
 }
 
 .btn-success {
@@ -52,7 +54,7 @@
 }
 
 .timer {
-    -fx-font-size: 16pt;
+    -fx-font-size:35pt;
     -fx-background-color: #ffffff;
     -fx-padding: 10;
 }
@@ -136,4 +138,14 @@
     -fx-text-fill: black;
     -fx-border-color: black;
 
+}
+.label{
+    -fx-font-size: 35px;
+}
+
+.text-field{
+    -fx-font-size: 30px;
+}
+.root {
+    -fx-font-size: 30px; /* Default font size if no binding applies */
 }
