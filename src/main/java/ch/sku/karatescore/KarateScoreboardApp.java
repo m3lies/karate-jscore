@@ -34,8 +34,6 @@ public class KarateScoreboardApp extends Application {
 
     private final SenshuService senshuService = new SenshuService();
 
-
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -65,7 +63,6 @@ public class KarateScoreboardApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
-
 
         // Main layout setup
         HBox mainLayout = new HBox(10);
@@ -104,9 +101,7 @@ public class KarateScoreboardApp extends Application {
         Label header = new Label();
         header.textProperty().bind(Bindings.createStringBinding(
                 () -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(),
-                scoreService.getScoreProperty(participantName, ScoreType.YUKO),
-                scoreService.getScoreProperty(participantName, ScoreType.WAZARI),
-                scoreService.getScoreProperty(participantName, ScoreType.IPPON)
+                scoreService.getTotalScoreProperty(participantName)
         ));
         header.getStyleClass().add("header");
         panel.setAlignment(Pos.CENTER);  // Center align contents
@@ -173,15 +168,6 @@ public class KarateScoreboardApp extends Application {
 
         HBox scoreControls = new HBox(5, btnAdd, btnRemove);
         panel.getChildren().add(scoreControls);
-    }
-
-    private void updateScoresAndUI(Participant participant, Label header) {
-        updateHeaderWithScore(header, participant);
-    }
-
-    private void updateHeaderWithScore(Label header, Participant participant) {
-
-        header.setText(participant.getParticipantType() + " - Total Points: " + scoreService.getTotalScoreProperty(participant.getParticipantType()).get());
     }
 
     private VBox createTimerPanel() {

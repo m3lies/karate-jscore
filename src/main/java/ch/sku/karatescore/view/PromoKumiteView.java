@@ -57,16 +57,14 @@ public class PromoKumiteView {
         VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
-
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
         totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d, Ippon: %d",
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d",
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
         detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
 
         panel.getChildren().addAll(totalScoreLabel, detailedScoreLabel);
