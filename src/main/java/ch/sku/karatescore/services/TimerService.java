@@ -39,10 +39,7 @@ public class TimerService {
 
         shortBeep = new AudioClip(getClass().getResource("/sounds/short-beep.mp3").toString());
         longBeep = new AudioClip(getClass().getResource("/sounds/long-beep.mp3").toString());
-
     }
-
-
 
     private Timeline createIntervalTimeline(IntegerProperty intervalSeconds, int targetPeriod) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
@@ -51,6 +48,7 @@ public class TimerService {
                 if (intervalSeconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
                     longBeep.play();
+                    nextPeriod(); // Move to the next period
                 }
             }
         }));
@@ -138,7 +136,6 @@ public class TimerService {
         }
 
         if (minutes.get() == 0 && seconds.get() == 15) {
-            System.out.println("Short beep should play now");
             shortBeep.play();
         }
     }
