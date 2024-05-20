@@ -3,24 +3,19 @@ package ch.sku.karatescore.services;
 import ch.sku.karatescore.commons.ParticipantType;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
 public class SenshuService {
-    private final BooleanProperty akaSenshu = new SimpleBooleanProperty(false);
-    private final BooleanProperty aoSenshu = new SimpleBooleanProperty(false);
+    private final ObservableMap<ParticipantType, BooleanProperty> senshuProperties = FXCollections.observableHashMap();
 
-    public BooleanProperty getSenshuProperty(ParticipantType participantType) {
-        if (participantType == ParticipantType.AKA) {
-            return akaSenshu;
-        } else {
-            return aoSenshu;
+    public SenshuService() {
+        for (ParticipantType type : ParticipantType.values()) {
+            senshuProperties.put(type, new SimpleBooleanProperty(false));
         }
     }
 
-    public void toggleSenshu(ParticipantType participantType) {
-        if (participantType == ParticipantType.AKA) {
-            akaSenshu.set(!akaSenshu.get());
-        } else {
-            aoSenshu.set(!aoSenshu.get());
-        }
+    public BooleanProperty getSenshuProperty(ParticipantType type) {
+        return senshuProperties.get(type);
     }
 }

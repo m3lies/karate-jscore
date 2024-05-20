@@ -123,4 +123,8 @@ public class FourFifteenView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
+    public Stage getStage() {
+        return stage;
+    }
+
 }

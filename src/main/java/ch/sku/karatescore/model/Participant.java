@@ -1,10 +1,8 @@
 package ch.sku.karatescore.model;
 
 import ch.sku.karatescore.commons.ParticipantType;
-import lombok.Data;
 
 
-@Data
 public class Participant {
     private ParticipantType participantType;
 
@@ -13,4 +11,7 @@ public class Participant {
 
     }
 
+    public ParticipantType getParticipantType() {
+        return participantType;
+    }
 }

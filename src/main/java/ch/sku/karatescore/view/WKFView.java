@@ -21,7 +21,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 public class WKFView {
-    @Getter
+
     private final Stage stage;
     private final Participant aka;
     private final Participant ao;
@@ -131,4 +131,8 @@ public class WKFView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
+    public Stage getStage() {
+        return stage;
+    }
 }
+
