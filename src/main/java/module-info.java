@@ -8,6 +8,7 @@ module ch.sku.karatescore {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires static lombok;
+    requires javafx.media;
 
     opens ch.sku.karatescore to javafx.fxml;
     exports ch.sku.karatescore;

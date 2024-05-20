@@ -5,7 +5,7 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.control.Label;
+import javafx.scene.media.AudioClip;
 import javafx.util.Duration;
 
 public class TimerService {
@@ -23,14 +23,12 @@ public class TimerService {
     private final Timeline intervalTimeline4;
     private final IntegerProperty period = new SimpleIntegerProperty(1);
 
+    private final AudioClip shortBeep;
+    private final AudioClip longBeep;
+
     private int lastSetTimeInSeconds = 0;
 
     public TimerService() {
-        Label timeLabel = new Label();
-        timeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        timeLabel.textProperty().bind(Bindings.createStringBinding(() -> String.format("%02d:%02d", minutes.get(), seconds.get()), minutes, seconds));
-
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
@@ -38,31 +36,37 @@ public class TimerService {
         intervalTimeline2 = createIntervalTimeline(intervalSeconds2, 2);
         intervalTimeline3 = createIntervalTimeline(intervalSeconds3, 3);
         intervalTimeline4 = createIntervalTimeline(intervalSeconds4, 4);
+
+        shortBeep = new AudioClip(getClass().getResource("/sounds/short-beep.mp3").toString());
+        longBeep = new AudioClip(getClass().getResource("/sounds/long-beep.mp3").toString());
+
+        // Debug statements to verify audio file loading
+        System.out.println("Short beep: " + shortBeep.getSource());
+        System.out.println("Long beep: " + longBeep.getSource());
+
     }
+
+
 
     private Timeline createIntervalTimeline(IntegerProperty intervalSeconds, int targetPeriod) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             if (period.get() == targetPeriod && intervalSeconds.get() > 0) {
                 intervalSeconds.set(intervalSeconds.get() - 1);
-                System.out.println("Period " + targetPeriod + " Timer: 00:" + intervalSeconds.get());
                 if (intervalSeconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
-                    System.out.println("Timer for period " + targetPeriod + " reached 0. Stopped.");
-                    nextPeriod();  // Move to next period
+                    longBeep.play();
                 }
             }
         }));
-        timeline.setCycleCount(Timeline.INDEFINITE);  // Ensure the timeline repeats indefinitely
+        timeline.setCycleCount(Timeline.INDEFINITE);
         return timeline;
     }
 
     public void start() {
-        System.out.println("Starting main timer");
         timeline.play();
     }
 
     public void stop() {
-        System.out.println("Stopping main timer");
         timeline.stop();
         stopAllIntervalTimers();
     }
@@ -82,7 +86,6 @@ public class TimerService {
                 intervalTimeline4.stop();
                 break;
         }
-        System.out.println("Stopped interval timer for period: " + period);
     }
 
     public IntegerProperty minutesProperty() {
@@ -118,11 +121,9 @@ public class TimerService {
     }
 
     public void setTimer(int totalSeconds) {
-        System.out.println("Setting timer: " + totalSeconds);
         lastSetTimeInSeconds = totalSeconds;
         minutes.set(totalSeconds / 60);
         seconds.set(totalSeconds % 60);
-        System.out.println("Minutes set to: " + minutes.get() + ", Seconds set to: " + seconds.get());
     }
 
     public void setUpTimer(int mins, int secs) {
@@ -132,36 +133,36 @@ public class TimerService {
     private void decrementTime() {
         if (seconds.get() == 0 && minutes.get() == 0) {
             stop();
+            longBeep.play();
         } else if (seconds.get() == 0) {
             minutes.set(minutes.get() - 1);
             seconds.set(59);
         } else {
             seconds.set(seconds.get() - 1);
         }
+
+        if (minutes.get() == 0 && seconds.get() == 15) {
+            System.out.println("Short beep should play now");
+            shortBeep.play();
+        }
     }
 
     public void startIntervalTimer(int period) {
-        System.out.println("Request to start interval timer for period: " + period);
-        stopAllIntervalTimers();  // Ensure all other timers are stopped before starting the new one
+        stopAllIntervalTimers();
         switch (period) {
             case 1:
-                System.out.println("Starting interval timer for period 1");
                 intervalTimeline1.play();
                 break;
             case 2:
-                System.out.println("Starting interval timer for period 2");
                 intervalTimeline2.play();
                 break;
             case 3:
-                System.out.println("Starting interval timer for period 3");
                 intervalTimeline3.play();
                 break;
             case 4:
-                System.out.println("Starting interval timer for period 4");
                 intervalTimeline4.play();
                 break;
         }
-        System.out.println("Started interval timer for period: " + period);
     }
 
     public void stopAllIntervalTimers() {
@@ -169,7 +170,6 @@ public class TimerService {
         intervalTimeline2.stop();
         intervalTimeline3.stop();
         intervalTimeline4.stop();
-        System.out.println("Stopped all interval timers");
     }
 
     public void resetInterval() {
@@ -178,7 +178,6 @@ public class TimerService {
         intervalSeconds3.set(15);
         intervalSeconds4.set(15);
         period.set(1);
-        System.out.println("Reset all intervals and period to 1");
     }
 
     public void resetIntervalForPeriod(int period) {
@@ -196,13 +195,11 @@ public class TimerService {
                 intervalSeconds4.set(15);
                 break;
         }
-        System.out.println("Reset interval for period: " + period);
     }
 
     public void nextPeriod() {
         int currentPeriod = period.get();
         int nextPeriod = (currentPeriod % 4) + 1;
         period.set(nextPeriod);
-        System.out.println("Moved to next period: " + nextPeriod);
     }
 }
