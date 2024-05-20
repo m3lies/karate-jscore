@@ -31,7 +31,10 @@ public class KarateScoreboardApp extends Application {
     private final TimerService timerService = new TimerService();
     private final ScoreService scoreService = new ScoreService();
     private final PenaltyService penaltyService = new PenaltyService();
+
     private final SenshuService senshuService = new SenshuService();
+
+
 
     public static void main(String[] args) {
         launch(args);
@@ -61,7 +64,8 @@ public class KarateScoreboardApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
+        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
+
 
         // Main layout setup
         HBox mainLayout = new HBox(10);
@@ -89,7 +93,7 @@ public class KarateScoreboardApp extends Application {
         primaryStage.show();
 
         MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
-        menuView.show();  // Assuming MenuView is another stage/dialog
+        menuView.show();
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
@@ -148,6 +152,7 @@ public class KarateScoreboardApp extends Application {
 
         return panel;
     }
+
     private void addButtonControls(VBox panel, Participant participant) {
         // Set up control for each score type with its respective label
         setupScoreControl(panel, participant, ScoreType.YUKO);
@@ -169,6 +174,16 @@ public class KarateScoreboardApp extends Application {
         HBox scoreControls = new HBox(5, btnAdd, btnRemove);
         panel.getChildren().add(scoreControls);
     }
+
+    private void updateScoresAndUI(Participant participant, Label header) {
+        updateHeaderWithScore(header, participant);
+    }
+
+    private void updateHeaderWithScore(Label header, Participant participant) {
+
+        header.setText(participant.getParticipantType() + " - Total Points: " + scoreService.getTotalScoreProperty(participant.getParticipantType()).get());
+    }
+
     private VBox createTimerPanel() {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));

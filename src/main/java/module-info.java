@@ -16,6 +16,5 @@ module ch.sku.karatescore {
     exports ch.sku.karatescore.components;
     exports ch.sku.karatescore.services;
     exports ch.sku.karatescore.model;
-    exports ch.sku.karatescore.view;
     opens ch.sku.karatescore.components to javafx.fxml;
 }
