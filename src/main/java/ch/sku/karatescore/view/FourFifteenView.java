@@ -1,7 +1,7 @@
 package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
-import ch.sku.karatescore.components.PenaltyComponent;
+import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.TimerService;
@@ -11,11 +11,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 public class FourFifteenView {
+    @Getter
     private final Stage stage;
     private final Participant aka;
     private final Participant ao;
@@ -36,11 +39,14 @@ public class FourFifteenView {
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
+        StackPane middlePanel = new StackPane(createIntervalTimerDisplay());
 
-        akaPanel.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
-        aoPanel.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
+        HBox.setHgrow(akaPanel, Priority.ALWAYS);
+        HBox.setHgrow(aoPanel, Priority.ALWAYS);
+        akaPanel.setMaxWidth(Double.MAX_VALUE);
+        aoPanel.setMaxWidth(Double.MAX_VALUE);
 
-        root.getChildren().addAll(akaPanel, aoPanel);
+        root.getChildren().addAll(akaPanel, middlePanel, aoPanel);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
@@ -49,43 +55,54 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type) {
         VBox panel = new VBox(10);
-        String backgroundColor = type == ParticipantType.AKA ? "#dc3545" : "#007bff";  // Red for AKA, Blue for AO
-        panel.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: white;");
+        panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+        addPenaltyLabels(participant, panel);
+        return panel;
+    }
 
-        Label timerIntervalLabel1 = new Label();
-        Label timerIntervalLabel2 = new Label();
-        Label timerIntervalLabel3 = new Label();
-        Label timerIntervalLabel4 = new Label();
+    private void addPenaltyLabels(Participant participant, VBox panel) {
+        HBox penaltyContainer = new HBox(10);
+        penaltyContainer.setAlignment(Pos.CENTER);
 
-        double halfScreenWidth = Screen.getPrimary().getVisualBounds().getWidth() / 2;
-
-        timerIntervalLabel1.setPrefWidth(halfScreenWidth);
-        timerIntervalLabel2.setPrefWidth(halfScreenWidth);
-        timerIntervalLabel3.setPrefWidth(halfScreenWidth);
-        timerIntervalLabel4.setPrefWidth(halfScreenWidth);
-
-        timerIntervalLabel1.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
-        timerIntervalLabel2.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
-        timerIntervalLabel3.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
-        timerIntervalLabel4.setStyle("-fx-font-size: 34px; -fx-text-fill: white;");
-
-        if (type == ParticipantType.AKA) {
-            timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
-            timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty3()));
-        } else {
-            timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty2()));
-            timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
+        for (PenaltyType penaltyType : PenaltyType.values()) {
+            Label penaltyLabel = new Label(penaltyType.toString());
+            penaltyLabel.getStyleClass().add("penalty-label");
+            penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
+            penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
+            penaltyContainer.getChildren().add(penaltyLabel);
         }
 
-        VBox intervalLabelsBox = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4);
-        intervalLabelsBox.setAlignment(Pos.CENTER);
+        panel.getChildren().add(penaltyContainer);
+    }
 
-        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, false);
+    private StackPane createIntervalTimerDisplay() {
+        StackPane intervalDisplay = new StackPane();
+        Label intervalLabel1 = new Label();
+        Label intervalLabel2 = new Label();
+        Label intervalLabel3 = new Label();
+        Label intervalLabel4 = new Label();
+        Label periodLabel = new Label();
 
-        panel.getChildren().addAll(intervalLabelsBox, penaltyComponent.getComponent());
+        periodLabel.textProperty().bind(Bindings.format("Period %02d", timerService.periodProperty()));
 
-        return panel;
+        intervalLabel1.textProperty().bind(Bindings.format("Interval Time 1: %02d seconds", timerService.intervalSecondsProperty1()));
+        intervalLabel1.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+
+        intervalLabel2.textProperty().bind(Bindings.format("Interval Time 2: %02d seconds", timerService.intervalSecondsProperty2()));
+        intervalLabel2.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+
+        intervalLabel3.textProperty().bind(Bindings.format("Interval Time 3: %02d seconds", timerService.intervalSecondsProperty3()));
+        intervalLabel3.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+
+        intervalLabel4.textProperty().bind(Bindings.format("Interval Time 4: %02d seconds", timerService.intervalSecondsProperty4()));
+        intervalLabel4.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
+
+        VBox intervalLabels = new VBox(intervalLabel1, intervalLabel2, intervalLabel3, intervalLabel4, periodLabel);
+        intervalLabels.setAlignment(Pos.CENTER);
+
+        intervalDisplay.getChildren().add(intervalLabels);
+        return intervalDisplay;
     }
 
     private void setFullScreen() {
@@ -97,7 +114,4 @@ public class FourFifteenView {
         stage.setFullScreen(true);
     }
 
-    public void show() {
-        stage.show();
-    }
 }

@@ -51,4 +51,12 @@ public class PenaltyService {
         }
     }
 
+    public void resetPenalties() {
+        for (ParticipantType type : ParticipantType.values()) {
+            for (PenaltyType penalty : PenaltyType.values()) {
+                penalties.get(type).get(penalty).set(false);
+            }
+        }
+    }
+
 }

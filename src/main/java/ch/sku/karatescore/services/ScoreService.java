@@ -45,6 +45,15 @@ public class ScoreService {
         };
     }
 
+    public void resetScores() {
+        for (ParticipantType type : ParticipantType.values()) {
+            for (ScoreType scoreType : ScoreType.values()) {
+                getScoreProperty(type, scoreType).set(0);
+            }
+            calculateTotalScore(type);
+        }
+
+    }
     public int calculateTotalScore(ParticipantType type) {
         int totalScore = 0;
         totalScore += getScoreProperty(type, ScoreType.YUKO).get();
