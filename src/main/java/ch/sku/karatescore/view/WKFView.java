@@ -6,12 +6,16 @@ import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
+import ch.sku.karatescore.services.SenshuService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -24,14 +28,16 @@ public class WKFView {
     private final TimerService timerService;
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
+    private final SenshuService senshuService;
 
-    public WKFView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService) {
+    public WKFView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
         this.stage = new Stage();
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
         this.scoreService = scoreService;
         this.penaltyService = penaltyService;
+        this.senshuService = senshuService;
         initializeUI();
     }
 
@@ -70,6 +76,9 @@ public class WKFView {
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
+        HBox scoreSenshuBox = new HBox(10);
+        scoreSenshuBox.setAlignment(Pos.CENTER);
+
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
         totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
@@ -81,7 +90,20 @@ public class WKFView {
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
         detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
 
-        panel.getChildren().addAll(totalScoreLabel, detailedScoreLabel);
+        VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
+        scoreBox.setAlignment(Pos.CENTER);
+
+        Label senshuLabel = new Label("●");
+        senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
+        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
+
+        if (participantType == ParticipantType.AKA) {
+            scoreSenshuBox.getChildren().addAll(senshuLabel, scoreBox);
+        } else {
+            scoreSenshuBox.getChildren().addAll(scoreBox, senshuLabel);
+        }
+
+        panel.getChildren().addAll(scoreSenshuBox);
         addPenaltyLabels(participant, panel);
         return panel;
     }
@@ -89,16 +111,10 @@ public class WKFView {
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(10);
         penaltyContainer.setAlignment(Pos.CENTER);
-        penaltyContainer.setMinHeight(100);  // Fixed height
-        penaltyContainer.setPrefHeight(100); // Fixed height
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
             Label penaltyLabel = new Label(penaltyType.toString());
             penaltyLabel.getStyleClass().add("penalty-label");
-            penaltyLabel.setMinSize(60, 60);
-            penaltyLabel.setMaxSize(60, 60);
-            penaltyLabel.setAlignment(Pos.CENTER);
-            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2; -fx-font-size: 40px;");
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
             penaltyContainer.getChildren().add(penaltyLabel);

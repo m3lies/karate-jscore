@@ -6,6 +6,7 @@ import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
+import ch.sku.karatescore.services.SenshuService;
 import ch.sku.karatescore.services.TimerService;
 import ch.sku.karatescore.view.MenuView;
 import javafx.application.Application;
@@ -30,6 +31,9 @@ public class KarateScoreboardApp extends Application {
     private final TimerService timerService = new TimerService();
     private final ScoreService scoreService = new ScoreService();
     private final PenaltyService penaltyService = new PenaltyService();
+
+    private final SenshuService senshuService = new SenshuService();
+
 
 
     public static void main(String[] args) {
@@ -69,9 +73,9 @@ public class KarateScoreboardApp extends Application {
         mainLayout.setSpacing(20);  // Increased spacing
 
         // Dynamically resize panels based on screen size
-        VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
+        VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
         VBox timerPanel = createTimerPanel();
-        VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
+        VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
 
         // Setting HGrow to always for expanding automatically
         HBox.setHgrow(participantAO, Priority.ALWAYS);
@@ -88,20 +92,26 @@ public class KarateScoreboardApp extends Application {
         primaryStage.setMaximized(true);  // Start maximized
         primaryStage.show();
 
-        MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService);
+        MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
         menuView.show();
     }
 
-    private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
+    private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
 
         Label header = new Label();
-        header.textProperty().bind(Bindings.createStringBinding(() -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(), scoreService.getTotalScoreProperty(participantName)));
+        header.textProperty().bind(Bindings.createStringBinding(
+                () -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(),
+                scoreService.getScoreProperty(participantName, ScoreType.YUKO),
+                scoreService.getScoreProperty(participantName, ScoreType.WAZARI),
+                scoreService.getScoreProperty(participantName, ScoreType.IPPON)
+        ));
         header.getStyleClass().add("header");
-        panel.setAlignment(Pos.CENTER);
+        panel.setAlignment(Pos.CENTER);  // Center align contents
 
+        // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
             header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
         } else if (participant.getParticipantType() == ParticipantType.AO) {
@@ -109,31 +119,48 @@ public class KarateScoreboardApp extends Application {
         }
 
         Label scoreYuko = new Label();
-        scoreYuko.textProperty().bind(Bindings.createStringBinding(() -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)));
+        scoreYuko.textProperty().bind(Bindings.createStringBinding(
+                () -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)
+        ));
 
         Label scoreWazaAri = new Label();
-        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(() -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
+        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(
+                () -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
+        ));
 
         Label scoreIppon = new Label();
-        scoreIppon.textProperty().bind(Bindings.createStringBinding(() -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
+        scoreIppon.textProperty().bind(Bindings.createStringBinding(
+                () -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
+        ));
 
-        panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
-        addButtonControls(panel, participant, scoreYuko, scoreWazaAri, scoreIppon, header);
+        Label senshuLabel = new Label("●");
+        senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
+        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
 
+        Button toggleSenshuButton = new Button("Toggle Senshu");
+        toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
+
+        panel.getChildren().addAll(header, senshuLabel, scoreYuko, scoreWazaAri, scoreIppon, toggleSenshuButton);
+        addButtonControls(panel, participant);
+
+        // Pass true to include buttons
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
         panel.getChildren().add(penaltyComponent.getComponent());
 
         return panel;
     }
 
-    private void addButtonControls(VBox panel, Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {
+    private void addButtonControls(VBox panel, Participant participant) {
         // Set up control for each score type with its respective label
-        setupScoreControl(panel, participant, ScoreType.YUKO, header, scoreYuko, scoreWazaAri, scoreIppon);
-        setupScoreControl(panel, participant, ScoreType.WAZARI, header, scoreYuko, scoreWazaAri, scoreIppon);
-        setupScoreControl(panel, participant, ScoreType.IPPON, header, scoreYuko, scoreWazaAri, scoreIppon);
+        setupScoreControl(panel, participant, ScoreType.YUKO);
+        setupScoreControl(panel, participant, ScoreType.WAZARI);
+        setupScoreControl(panel, participant, ScoreType.IPPON);
     }
 
-    private void setupScoreControl(VBox panel, Participant participant, ScoreType scoreType, Label header, Label scoreYuko, Label scoreWazaAri, Label scoreIppon) {
+    private void setupScoreControl(VBox panel, Participant participant, ScoreType scoreType) {
         Button btnAdd = new Button("+ " + scoreType.name());
         Button btnRemove = new Button("- " + scoreType.name());
 

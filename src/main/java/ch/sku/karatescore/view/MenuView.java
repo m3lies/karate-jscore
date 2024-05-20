@@ -4,6 +4,7 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
+import ch.sku.karatescore.services.SenshuService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,8 +13,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-
+import java.util.List;
 import java.util.Objects;
 
 public class MenuView {
@@ -22,15 +24,18 @@ public class MenuView {
     private final TimerService timerService;
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
+
+    private final SenshuService senshuService;
     private final Stage stage;
     private final BorderPane root = new BorderPane();
 
-    public MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService) {
+    public MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
         this.scoreService = scoreService;
         this.penaltyService = penaltyService;
+        this.senshuService = senshuService;
         this.stage = new Stage();
         initializeUI();
     }
@@ -39,7 +44,7 @@ public class MenuView {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
         Button btnOpenWKF = new Button("WKF");
-        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService).getStage()));
+        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService,senshuService ).getStage()));
 
         Button btnOpenPromoKumite = new Button("Promokumite");
         btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage()));
@@ -73,6 +78,21 @@ public class MenuView {
 
     private void openMode(Stage modeStage) {
         hide();
+
+        // Get all screens
+        List<Screen> screens = Screen.getScreens();
+        if (screens.size() > 1) {
+            // Get the second screen
+            Screen secondScreen = screens.get(1);
+
+            // Set the stage to the second screen
+            modeStage.setX(secondScreen.getVisualBounds().getMinX());
+            modeStage.setY(secondScreen.getVisualBounds().getMinY());
+            modeStage.setWidth(secondScreen.getVisualBounds().getWidth());
+            modeStage.setHeight(secondScreen.getVisualBounds().getHeight());
+            modeStage.setFullScreen(true);
+        }
+
         modeStage.setOnHidden(event -> show());
         modeStage.show();
     }
