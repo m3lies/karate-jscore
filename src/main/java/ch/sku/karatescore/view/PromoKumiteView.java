@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -53,14 +54,24 @@ public class PromoKumiteView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
-        VBox panel = new VBox(10);
+        VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
-        Label scoreLabel = new Label();
-        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d", participantType, scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
+        Label totalScoreLabel = new Label();
+        totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
+        totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
+
+        Label detailedScoreLabel = new Label();
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d, Ippon: %d",
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
+        detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        panel.getChildren().addAll(totalScoreLabel, detailedScoreLabel);
         addPenaltyLabels(participant, panel);
-        panel.getChildren().add(scoreLabel);
+
         return panel;
     }
 
@@ -87,5 +98,4 @@ public class PromoKumiteView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
-
 }

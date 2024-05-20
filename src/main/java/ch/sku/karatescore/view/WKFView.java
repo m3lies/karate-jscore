@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -38,13 +39,7 @@ public class WKFView {
     }
 
     private void initializeUI() {
-        VBox root = new VBox(10);
-
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
-        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: black;");
-        timerLabel.setAlignment(Pos.CENTER);
-        timerLabel.setMaxWidth(Double.MAX_VALUE);
+        StackPane root = new StackPane();
 
         HBox participantsBox = new HBox(10);
 
@@ -57,8 +52,15 @@ public class WKFView {
         aoPanel.setMaxWidth(Double.MAX_VALUE);
 
         participantsBox.getChildren().addAll(akaPanel, aoPanel);
-        root.getChildren().addAll(timerLabel, participantsBox);
-        VBox.setVgrow(participantsBox, Priority.ALWAYS);
+
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10px;");
+
+        StackPane timerPane = new StackPane(timerLabel);
+        StackPane.setAlignment(timerPane, Pos.CENTER);
+
+        root.getChildren().addAll(participantsBox, timerPane);
 
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
@@ -68,7 +70,7 @@ public class WKFView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
-        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
+        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
         Label totalScoreLabel = new Label();

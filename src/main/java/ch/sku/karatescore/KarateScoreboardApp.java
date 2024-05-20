@@ -30,8 +30,6 @@ public class KarateScoreboardApp extends Application {
     private final TimerService timerService = new TimerService();
     private final ScoreService scoreService = new ScoreService();
     private final PenaltyService penaltyService = new PenaltyService();
-    private Stage primaryStage;
-    private Stage currentStage;
 
 
     public static void main(String[] args) {
@@ -63,7 +61,7 @@ public class KarateScoreboardApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
-        this.primaryStage = primaryStage;
+
 
         // Main layout setup
         HBox mainLayout = new HBox(10);
@@ -88,7 +86,6 @@ public class KarateScoreboardApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
         primaryStage.setMaximized(true);  // Start maximized
-        adjustFontSize(primaryStage, root);
         primaryStage.show();
 
         MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService);
@@ -127,14 +124,6 @@ public class KarateScoreboardApp extends Application {
         panel.getChildren().add(penaltyComponent.getComponent());
 
         return panel;
-    }
-
-
-    private void adjustFontSize(Stage stage, Pane root) {
-        DoubleBinding fontSizeBinding = Bindings.createDoubleBinding(() -> stage.getWidth() * 0.025, // 2.5% of the stage width as font size
-                stage.widthProperty());
-
-        root.styleProperty().bind(Bindings.createStringBinding(() -> String.format("-fx-font-size: %.2fpx;", fontSizeBinding.get()), fontSizeBinding));
     }
 
     private void addButtonControls(VBox panel, Participant participant, Label scoreYuko, Label scoreWazaAri, Label scoreIppon, Label header) {

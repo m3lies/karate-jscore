@@ -6,13 +6,12 @@ import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -37,32 +36,66 @@ public class FourFifteenView {
     private void initializeUI() {
         HBox root = new HBox();
 
-        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
-        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
-        StackPane middlePanel = new StackPane(createIntervalTimerDisplay());
+        VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA, timerService.intervalSecondsProperty1(), timerService.intervalSecondsProperty3());
+        VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO, timerService.intervalSecondsProperty2(), timerService.intervalSecondsProperty4());
 
         HBox.setHgrow(akaPanel, Priority.ALWAYS);
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
 
-        root.getChildren().addAll(akaPanel, middlePanel, aoPanel);
+        root.getChildren().addAll(akaPanel, aoPanel);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
     }
 
-    private VBox createParticipantPanel(Participant participant, ParticipantType type) {
-        VBox panel = new VBox(10);
+    private VBox createParticipantPanel(Participant participant, ParticipantType type, IntegerProperty interval1, IntegerProperty interval2) {
+        VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+
+        Label intervalLabel1 = createIntervalLabel(interval1, type == ParticipantType.AKA ? 1 : 2);
+        Label intervalLabel2 = createIntervalLabel(interval2, type == ParticipantType.AKA ? 3 : 4);
+
+        VBox intervalBox = new VBox(50, intervalLabel1, intervalLabel2);
+        intervalBox.setAlignment(Pos.CENTER);
+
+        panel.getChildren().add(intervalBox);
         addPenaltyLabels(participant, panel);
         return panel;
     }
 
+    private Label createIntervalLabel(IntegerProperty intervalProperty, int periodNumber) {
+        Label intervalLabel = new Label();
+        StringBinding timeBinding = createTimerStringBinding(intervalProperty);
+        StringBinding styleBinding = createStyleBinding(intervalProperty, periodNumber);
+
+        intervalLabel.textProperty().bind(timeBinding);
+        intervalLabel.styleProperty().bind(styleBinding);
+
+        return intervalLabel;
+    }
+
+    private StringBinding createTimerStringBinding(IntegerProperty intervalProperty) {
+        return Bindings.createStringBinding(() -> String.format("00:%02d", intervalProperty.get()), intervalProperty);
+    }
+
+    private StringBinding createStyleBinding(IntegerProperty intervalProperty, int periodNumber) {
+        return Bindings.createStringBinding(() -> {
+            if (timerService.periodProperty().get() == periodNumber) {
+                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.5);";
+            } else if (intervalProperty.get() == 0) {
+                return "-fx-font-size: 100px; -fx-text-fill: grey;";
+            } else {
+                return "-fx-font-size: 100px; -fx-text-fill: white;";
+            }
+        }, intervalProperty, timerService.periodProperty());
+    }
+
     private void addPenaltyLabels(Participant participant, VBox panel) {
-        HBox penaltyContainer = new HBox(10);
+        HBox penaltyContainer = new HBox(20);
         penaltyContainer.setAlignment(Pos.CENTER);
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
@@ -76,35 +109,6 @@ public class FourFifteenView {
         panel.getChildren().add(penaltyContainer);
     }
 
-    private StackPane createIntervalTimerDisplay() {
-        StackPane intervalDisplay = new StackPane();
-        Label intervalLabel1 = new Label();
-        Label intervalLabel2 = new Label();
-        Label intervalLabel3 = new Label();
-        Label intervalLabel4 = new Label();
-        Label periodLabel = new Label();
-
-        periodLabel.textProperty().bind(Bindings.format("Period %02d", timerService.periodProperty()));
-
-        intervalLabel1.textProperty().bind(Bindings.format("Interval Time 1: %02d seconds", timerService.intervalSecondsProperty1()));
-        intervalLabel1.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-
-        intervalLabel2.textProperty().bind(Bindings.format("Interval Time 2: %02d seconds", timerService.intervalSecondsProperty2()));
-        intervalLabel2.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-
-        intervalLabel3.textProperty().bind(Bindings.format("Interval Time 3: %02d seconds", timerService.intervalSecondsProperty3()));
-        intervalLabel3.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-
-        intervalLabel4.textProperty().bind(Bindings.format("Interval Time 4: %02d seconds", timerService.intervalSecondsProperty4()));
-        intervalLabel4.setStyle("-fx-font-size: 34px; -fx-text-fill: black;");
-
-        VBox intervalLabels = new VBox(intervalLabel1, intervalLabel2, intervalLabel3, intervalLabel4, periodLabel);
-        intervalLabels.setAlignment(Pos.CENTER);
-
-        intervalDisplay.getChildren().add(intervalLabels);
-        return intervalDisplay;
-    }
-
     private void setFullScreen() {
         Screen screen = Screen.getPrimary();
         stage.setX(screen.getVisualBounds().getMinX());
@@ -113,5 +117,4 @@ public class FourFifteenView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
-
 }
