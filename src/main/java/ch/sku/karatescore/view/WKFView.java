@@ -11,10 +11,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -92,10 +89,16 @@ public class WKFView {
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(10);
         penaltyContainer.setAlignment(Pos.CENTER);
+        penaltyContainer.setMinHeight(100);  // Fixed height
+        penaltyContainer.setPrefHeight(100); // Fixed height
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
             Label penaltyLabel = new Label(penaltyType.toString());
             penaltyLabel.getStyleClass().add("penalty-label");
+            penaltyLabel.setMinSize(60, 60);
+            penaltyLabel.setMaxSize(60, 60);
+            penaltyLabel.setAlignment(Pos.CENTER);
+            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2; -fx-font-size: 40px;");
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
             penaltyContainer.getChildren().add(penaltyLabel);

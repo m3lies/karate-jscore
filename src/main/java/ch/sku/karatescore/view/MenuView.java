@@ -58,7 +58,7 @@ public class MenuView {
         Scale scale = new Scale(1, 1);
         root.getTransforms().add(scale);
 
-        Scene scene = new Scene(root, 500, 250);
+        Scene scene = new Scene(root, 1000, 500);
         stage.setScene(scene);
         stage.setTitle("Choisir un mode");
     }
