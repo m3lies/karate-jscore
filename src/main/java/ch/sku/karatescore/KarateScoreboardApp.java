@@ -7,10 +7,7 @@ import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.TimerService;
-import ch.sku.karatescore.view.FourFifteenView;
 import ch.sku.karatescore.view.MenuView;
-import ch.sku.karatescore.view.PromoKumiteView;
-import ch.sku.karatescore.view.WKFView;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -41,6 +38,27 @@ public class KarateScoreboardApp extends Application {
         launch(args);
     }
 
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        Button setTimeButton = new Button("Set Timer");
+
+        setTimeButton.setOnAction(e -> {
+            try {
+                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+                if (mins < 0 || secs < 0 || secs >= 60) {
+                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+                }
+                timerService.setUpTimer(mins, secs);
+            } catch (NumberFormatException ex) {
+                minutesInput.setText("");
+                secondsInput.setText("");
+                minutesInput.setPromptText("Invalid input! Enter a number.");
+                secondsInput.setPromptText("Invalid input! Enter a number.");
+            }
+        });
+
+        return setTimeButton;
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -77,48 +95,16 @@ public class KarateScoreboardApp extends Application {
         menuView.show();
     }
 
-
-
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set Timer");
-
-        setTimeButton.setOnAction(e -> {
-            try {
-                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-                if (mins < 0 || secs < 0 || secs >= 60) {
-                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-                }
-                timerService.setUpTimer(mins, secs);
-            } catch (NumberFormatException ex) {
-                minutesInput.setText("");
-                secondsInput.setText("");
-                minutesInput.setPromptText("Invalid input! Enter a number.");
-                secondsInput.setPromptText("Invalid input! Enter a number.");
-            }
-        });
-
-        return setTimeButton;
-    }
-
-
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
-
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(15));
         panel.getStyleClass().add("participant-panel");
 
         Label header = new Label();
-        header.textProperty().bind(Bindings.createStringBinding(
-                () -> participantName + " - Total Points: " + scoreService.calculateTotalScore(participantName),
-                scoreService.getScoreProperty(participantName, ScoreType.YUKO),
-                scoreService.getScoreProperty(participantName, ScoreType.WAZARI),
-                scoreService.getScoreProperty(participantName, ScoreType.IPPON)
-        ));
+        header.textProperty().bind(Bindings.createStringBinding(() -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(), scoreService.getTotalScoreProperty(participantName)));
         header.getStyleClass().add("header");
-        panel.setAlignment(Pos.CENTER);  // Center align contents
+        panel.setAlignment(Pos.CENTER);
 
-        // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
             header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
         } else if (participant.getParticipantType() == ParticipantType.AO) {
@@ -126,32 +112,23 @@ public class KarateScoreboardApp extends Application {
         }
 
         Label scoreYuko = new Label();
-        scoreYuko.textProperty().bind(Bindings.createStringBinding(
-                () -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)
-        ));
+        scoreYuko.textProperty().bind(Bindings.createStringBinding(() -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)));
 
         Label scoreWazaAri = new Label();
-        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(
-                () -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
-        ));
+        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(() -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
 
         Label scoreIppon = new Label();
-        scoreIppon.textProperty().bind(Bindings.createStringBinding(
-                () -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
-        ));
+        scoreIppon.textProperty().bind(Bindings.createStringBinding(() -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
 
         panel.getChildren().addAll(header, scoreYuko, scoreWazaAri, scoreIppon);
         addButtonControls(panel, participant, scoreYuko, scoreWazaAri, scoreIppon, header);
 
-        // Pass true to include buttons
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
         panel.getChildren().add(penaltyComponent.getComponent());
 
         return panel;
     }
+
 
     private void adjustFontSize(Stage stage, Pane root) {
         DoubleBinding fontSizeBinding = Bindings.createDoubleBinding(() -> stage.getWidth() * 0.025, // 2.5% of the stage width as font size
@@ -187,8 +164,8 @@ public class KarateScoreboardApp extends Application {
     }
 
     private void updateHeaderWithScore(Label header, Participant participant) {
-        int totalScore = scoreService.calculateTotalScore(participant.getParticipantType());
-        header.setText(participant.getParticipantType() + " - Total Points: " + totalScore);
+
+        header.setText(participant.getParticipantType() + " - Total Points: " + scoreService.getTotalScoreProperty(participant.getParticipantType()).get());
     }
 
     private VBox createTimerPanel() {
@@ -225,7 +202,6 @@ public class KarateScoreboardApp extends Application {
         resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
 
 
-
         Label timerIntervalLabel1 = new Label();
         timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
 
@@ -242,12 +218,12 @@ public class KarateScoreboardApp extends Application {
         timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty4()));
 
 
-        Button nextPeriodButton = new Button("Next Period");
-        nextPeriodButton.setOnAction(e -> timerService.nextPeriod());
+//        Button nextPeriodButton = new Button("Next Period");
+//        nextPeriodButton.setOnAction(e -> timerService.nextPeriod());
 
         // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
-        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton, nextPeriodButton);
+        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
         HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
         HBox inputFields = new HBox(10, minutesInput, secondsInput);
@@ -257,8 +233,8 @@ public class KarateScoreboardApp extends Application {
         timerTop.setPadding(new Insets(20));
 
         VBox resetMiddle = new VBox(10);
-        Button resetAll= new Button("Remettre à zéro TOUT");
-        resetAll.setOnAction(e-> {
+        Button resetAll = new Button("Remettre à zéro TOUT");
+        resetAll.setOnAction(e -> {
             timerService.resetInterval();
             timerService.reset();
             scoreService.resetScores();
@@ -274,7 +250,7 @@ public class KarateScoreboardApp extends Application {
         // Make the interval timers take the remaining space at the bottom
         VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
 
-        timerPanel.getChildren().addAll(timerTop,resetMiddle, intervalTimersBottom);
+        timerPanel.getChildren().addAll(timerTop, resetMiddle, intervalTimersBottom);
 
         return timerPanel;
     }

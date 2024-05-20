@@ -48,6 +48,7 @@ public class TimerService {
                 if (intervalSeconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
                     System.out.println("Timer for period " + targetPeriod + " reached 0. Stopped.");
+                    nextPeriod();  // Move to next period
                 }
             }
         }));

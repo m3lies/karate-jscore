@@ -38,7 +38,15 @@ public class WKFView {
     }
 
     private void initializeUI() {
-        HBox root = new HBox();
+        VBox root = new VBox(10);
+
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: black;");
+        timerLabel.setAlignment(Pos.CENTER);
+        timerLabel.setMaxWidth(Double.MAX_VALUE);
+
+        HBox participantsBox = new HBox(10);
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
@@ -48,7 +56,10 @@ public class WKFView {
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
 
-        root.getChildren().addAll(akaPanel, aoPanel);
+        participantsBox.getChildren().addAll(akaPanel, aoPanel);
+        root.getChildren().addAll(timerLabel, participantsBox);
+        VBox.setVgrow(participantsBox, Priority.ALWAYS);
+
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
@@ -56,14 +67,23 @@ public class WKFView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
-        VBox panel = new VBox(10);
-        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
+        VBox panel = new VBox(20);
+        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
-        Label scoreLabel = new Label();
-        scoreLabel.textProperty().bind(Bindings.format("%s Scores - Yuko: %d, Waza-ari: %d", participantType, scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
+        Label totalScoreLabel = new Label();
+        totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
+        totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
+
+        Label detailedScoreLabel = new Label();
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d, Ippon: %d",
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
+        detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        panel.getChildren().addAll(totalScoreLabel, detailedScoreLabel);
         addPenaltyLabels(participant, panel);
-        panel.getChildren().add(scoreLabel);
         return panel;
     }
 
@@ -90,5 +110,4 @@ public class WKFView {
         stage.setHeight(screen.getVisualBounds().getHeight());
         stage.setFullScreen(true);
     }
-
 }

@@ -9,6 +9,7 @@ import javafx.collections.ObservableMap;
 
 public class ScoreService {
     private final ObservableMap<ParticipantType, ObservableMap<ScoreType, IntegerProperty>> scores = FXCollections.observableHashMap();
+    private final ObservableMap<ParticipantType, IntegerProperty> totalScores = FXCollections.observableHashMap();
 
     public ScoreService() {
         for (ParticipantType type : ParticipantType.values()) {
@@ -17,6 +18,7 @@ public class ScoreService {
                 scoreMap.put(scoreType, new SimpleIntegerProperty(0));
             }
             scores.put(type, scoreMap);
+            totalScores.put(type, new SimpleIntegerProperty(0));
         }
     }
 
@@ -24,25 +26,30 @@ public class ScoreService {
         return scores.get(type).get(scoreType);
     }
 
+    public IntegerProperty getTotalScoreProperty(ParticipantType type) {
+        return totalScores.get(type);
+    }
+
     public void addScore(ParticipantType type, ScoreType scoreType) {
         IntegerProperty scoreProp = getScoreProperty(type, scoreType);
-        int oldValue = scoreProp.get();
-        scoreProp.set(oldValue + 1);
+        scoreProp.set(scoreProp.get() + 1);
+        updateTotalScore(type);
     }
 
     public void subtractScore(ParticipantType type, ScoreType scoreType) {
         IntegerProperty scoreProp = getScoreProperty(type, scoreType);
         if (scoreProp.get() > 0) {
             scoreProp.set(scoreProp.get() - 1);
+            updateTotalScore(type);
         }
     }
 
-    private int getScoreValue(ScoreType scoreType) {
-        return switch (scoreType) {
-            case YUKO -> 1;
-            case WAZARI -> 2;
-            case IPPON -> 3;
-        };
+    private void updateTotalScore(ParticipantType type) {
+        int totalScore = 0;
+        totalScore += getScoreProperty(type, ScoreType.YUKO).get();
+        totalScore += 2 * getScoreProperty(type, ScoreType.WAZARI).get();
+        totalScore += 3 * getScoreProperty(type, ScoreType.IPPON).get();
+        totalScores.get(type).set(totalScore);
     }
 
     public void resetScores() {
@@ -50,15 +57,7 @@ public class ScoreService {
             for (ScoreType scoreType : ScoreType.values()) {
                 getScoreProperty(type, scoreType).set(0);
             }
-            calculateTotalScore(type);
+            updateTotalScore(type);
         }
-
-    }
-    public int calculateTotalScore(ParticipantType type) {
-        int totalScore = 0;
-        totalScore += getScoreProperty(type, ScoreType.YUKO).get();
-        totalScore += 2* getScoreProperty(type, ScoreType.WAZARI).get();
-        totalScore +=  3*getScoreProperty(type, ScoreType.IPPON).get();
-        return totalScore;
     }
 }
