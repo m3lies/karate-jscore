@@ -53,7 +53,7 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type, IntegerProperty interval1, IntegerProperty interval2) {
         VBox panel = new VBox(20);
-        panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
+        panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
         Label intervalLabel1 = createIntervalLabel(interval1, type == ParticipantType.AKA ? 1 : 2);

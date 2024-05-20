@@ -73,7 +73,7 @@ public class WKFView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
-        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#ff0000" : "#0000ff") + "; -fx-text-fill: white;");
+        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
         HBox scoreSenshuBox = new HBox(10);

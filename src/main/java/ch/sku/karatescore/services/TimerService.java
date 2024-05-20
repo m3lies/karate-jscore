@@ -40,10 +40,6 @@ public class TimerService {
         shortBeep = new AudioClip(getClass().getResource("/sounds/short-beep.mp3").toString());
         longBeep = new AudioClip(getClass().getResource("/sounds/long-beep.mp3").toString());
 
-        // Debug statements to verify audio file loading
-        System.out.println("Short beep: " + shortBeep.getSource());
-        System.out.println("Long beep: " + longBeep.getSource());
-
     }
 
 
