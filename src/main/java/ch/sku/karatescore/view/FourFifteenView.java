@@ -93,7 +93,7 @@ public class FourFifteenView {
             }
         }, intervalProperty, timerService.periodProperty());
     }
-
+//TODO change color dark red and dark blue
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(20);
         penaltyContainer.setAlignment(Pos.CENTER);
@@ -106,7 +106,7 @@ public class FourFifteenView {
             penaltyLabel.setMinSize(60, 60);
             penaltyLabel.setMaxSize(60, 60);
             penaltyLabel.setAlignment(Pos.CENTER);
-            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2; -fx-font-size: 40px;");
+            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: #dc3545; -fx-border-width: 2; -fx-font-size: 40px;");
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
             penaltyContainer.getChildren().add(penaltyLabel);
@@ -114,7 +114,7 @@ public class FourFifteenView {
 
         panel.getChildren().add(penaltyContainer);
     }
-
+//TODO quand ca reset, on reset aussi les penalités
     private void setFullScreen() {
         Screen screen = Screen.getPrimary();
         stage.setX(screen.getVisualBounds().getMinX());

@@ -67,6 +67,7 @@ public class MenuView {
         stage.setScene(scene);
         stage.setTitle("Choisir un mode");
     }
+    //TODO - Categorie en input
 
     public void show() {
         stage.show();

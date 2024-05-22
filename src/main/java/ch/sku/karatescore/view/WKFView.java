@@ -58,7 +58,8 @@ public class WKFView {
 
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
-        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10px;");
+        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 1); -fx-padding: 10px;");
+        //TODO reduire l'encadré en haut et en bas et bords arrondis
 
         StackPane timerPane = new StackPane(timerLabel);
         StackPane.setAlignment(timerPane, Pos.CENTER);
@@ -84,7 +85,7 @@ public class WKFView {
         totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d, Ippon: %d",
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
@@ -92,6 +93,8 @@ public class WKFView {
 
         VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
         scoreBox.setAlignment(Pos.CENTER);
+
+        //TODO add senshu en petite taille
 
         Label senshuLabel = new Label("●");
         senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
@@ -107,6 +110,8 @@ public class WKFView {
         addPenaltyLabels(participant, panel);
         return panel;
     }
+
+    //TODO encadrer les avertissements fond blanc, police couleur aka, ao
 
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(10);

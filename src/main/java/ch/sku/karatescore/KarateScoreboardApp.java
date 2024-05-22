@@ -37,7 +37,8 @@ public class KarateScoreboardApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
+    //TODO mettre label catégorie pour savoir
+    //TODO mettre milliemes de secondes
     private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
         Button setTimeButton = new Button("Set Timer");
 
@@ -59,7 +60,7 @@ public class KarateScoreboardApp extends Application {
 
         return setTimeButton;
     }
-
+//TODO - mettre set timer en haut, temps au milieu (en dessous )
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
@@ -131,11 +132,11 @@ public class KarateScoreboardApp extends Application {
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
         ));
 
-        Label senshuLabel = new Label("●");
+        Label senshuLabel = new Label("●" + "senshu");
         senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
         senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
 
-        Button toggleSenshuButton = new Button("Toggle Senshu");
+        Button toggleSenshuButton = new Button("Senshu");
         toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
 
         panel.getChildren().addAll(header, senshuLabel, scoreYuko, scoreWazaAri, scoreIppon, toggleSenshuButton);
@@ -147,7 +148,8 @@ public class KarateScoreboardApp extends Application {
 
         return panel;
     }
-
+    //TODO initiales avertissement, changer la couleur bouton senshu, tout realigner, arrondir boutons avertissement
+// TODO ajouter bouton pour fermer le 2eme ecran
     private void addButtonControls(VBox panel, Participant participant) {
         // Set up control for each score type with its respective label
         setupScoreControl(panel, participant, ScoreType.YUKO);

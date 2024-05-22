@@ -52,7 +52,7 @@ public class PromoKumiteView {
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
     }
-
+//TODO mettre la separation - entre les scores
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
