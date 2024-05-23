@@ -89,7 +89,7 @@ public class FourFifteenView {
     private StringBinding createStyleBinding(IntegerProperty intervalProperty, int periodNumber) {
         return Bindings.createStringBinding(() -> {
             if (timerService.periodProperty().get() == periodNumber) {
-                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.5);";
+                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.5);-fx-background-radius: 10px;";
             } else if (intervalProperty.get() == 0) {
                 return "-fx-font-size: 100px; -fx-text-fill: grey;";
             } else {
