@@ -34,7 +34,9 @@ public class FourFifteenView {
     }
 
     private void initializeUI() {
-        HBox root = new HBox();
+        StackPane root = new StackPane();
+
+        HBox participantsBox = new HBox(10);
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA, timerService.intervalSecondsProperty1(), timerService.intervalSecondsProperty3());
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO, timerService.intervalSecondsProperty2(), timerService.intervalSecondsProperty4());
@@ -43,8 +45,8 @@ public class FourFifteenView {
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
-
-        root.getChildren().addAll(akaPanel, aoPanel);
+        participantsBox.getChildren().addAll(akaPanel, aoPanel);
+        root.getChildren().add(participantsBox);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
@@ -53,6 +55,8 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type, IntegerProperty interval1, IntegerProperty interval2) {
         VBox panel = new VBox(20);
+        Label participantTypeName = new Label(type.getType());
+        participantTypeName.setAlignment(type == ParticipantType.AKA ? Pos.TOP_LEFT : Pos.TOP_RIGHT);
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 

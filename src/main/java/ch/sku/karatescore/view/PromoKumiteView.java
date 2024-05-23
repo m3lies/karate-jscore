@@ -36,7 +36,9 @@ public class PromoKumiteView {
     }
 
     private void initializeUI() {
-        HBox root = new HBox();
+        StackPane root = new StackPane();
+
+        HBox participantsBox = new HBox(10);
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
@@ -45,8 +47,9 @@ public class PromoKumiteView {
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
+        participantsBox.getChildren().addAll(akaPanel, aoPanel);
 
-        root.getChildren().addAll(akaPanel, aoPanel);
+        root.getChildren().add(participantsBox);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();

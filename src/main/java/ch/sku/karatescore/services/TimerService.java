@@ -2,7 +2,6 @@ package ch.sku.karatescore.services;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.media.AudioClip;
@@ -11,16 +10,14 @@ import javafx.util.Duration;
 public class TimerService {
     private final IntegerProperty minutes = new SimpleIntegerProperty(0);
     private final IntegerProperty seconds = new SimpleIntegerProperty(0);
+    private final IntegerProperty milliseconds = new SimpleIntegerProperty(0);
     private final IntegerProperty intervalSeconds1 = new SimpleIntegerProperty(15);
     private final IntegerProperty intervalSeconds2 = new SimpleIntegerProperty(15);
     private final IntegerProperty intervalSeconds3 = new SimpleIntegerProperty(15);
     private final IntegerProperty intervalSeconds4 = new SimpleIntegerProperty(15);
 
     private final Timeline timeline;
-    private final Timeline intervalTimeline1;
-    private final Timeline intervalTimeline2;
-    private final Timeline intervalTimeline3;
-    private final Timeline intervalTimeline4;
+    private final Timeline intervalTimeline;
     private final IntegerProperty period = new SimpleIntegerProperty(1);
 
     private final AudioClip shortBeep;
@@ -29,23 +26,26 @@ public class TimerService {
     private int lastSetTimeInSeconds = 0;
 
     public TimerService() {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> decrementTime()));
+        timeline = new Timeline(new KeyFrame(Duration.millis(10), e -> decrementTime()));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-        intervalTimeline1 = createIntervalTimeline(intervalSeconds1, 1);
-        intervalTimeline2 = createIntervalTimeline(intervalSeconds2, 2);
-        intervalTimeline3 = createIntervalTimeline(intervalSeconds3, 3);
-        intervalTimeline4 = createIntervalTimeline(intervalSeconds4, 4);
+        intervalTimeline = new Timeline(new KeyFrame(Duration.millis(10), e -> decrementIntervalTime()));
+        intervalTimeline.setCycleCount(Timeline.INDEFINITE);
 
         shortBeep = new AudioClip(getClass().getResource("/sounds/short-beep.mp3").toString());
         longBeep = new AudioClip(getClass().getResource("/sounds/long-beep.mp3").toString());
     }
 
     private Timeline createIntervalTimeline(IntegerProperty intervalSeconds, int targetPeriod) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             if (period.get() == targetPeriod && intervalSeconds.get() > 0) {
-                intervalSeconds.set(intervalSeconds.get() - 1);
-                if (intervalSeconds.get() == 0) {
+                if (milliseconds.get() > 0) {
+                    milliseconds.set(milliseconds.get() - 1);
+                } else {
+                    milliseconds.set(99);
+                    intervalSeconds.set(intervalSeconds.get() - 1);
+                }
+                if (intervalSeconds.get() == 0 && milliseconds.get() == 0) {
                     stopIntervalTimer(targetPeriod);
                     longBeep.play();
                     nextPeriod(); // Move to the next period
@@ -68,16 +68,16 @@ public class TimerService {
     private void stopIntervalTimer(int period) {
         switch (period) {
             case 1:
-                intervalTimeline1.stop();
+                intervalTimeline.stop();
                 break;
             case 2:
-                intervalTimeline2.stop();
+                intervalTimeline.stop();
                 break;
             case 3:
-                intervalTimeline3.stop();
+                intervalTimeline.stop();
                 break;
             case 4:
-                intervalTimeline4.stop();
+                intervalTimeline.stop();
                 break;
         }
     }
@@ -88,6 +88,10 @@ public class TimerService {
 
     public IntegerProperty secondsProperty() {
         return seconds;
+    }
+
+    public IntegerProperty millisecondsProperty() {
+        return milliseconds;
     }
 
     public IntegerProperty intervalSecondsProperty1() {
@@ -118,6 +122,7 @@ public class TimerService {
         lastSetTimeInSeconds = totalSeconds;
         minutes.set(totalSeconds / 60);
         seconds.set(totalSeconds % 60);
+        milliseconds.set(0);
     }
 
     public void setUpTimer(int mins, int secs) {
@@ -125,44 +130,66 @@ public class TimerService {
     }
 
     private void decrementTime() {
-        if (seconds.get() == 0 && minutes.get() == 0) {
+        if (minutes.get() == 0 && seconds.get() == 0 && milliseconds.get() == 0) {
             stop();
             longBeep.play();
-        } else if (seconds.get() == 0) {
+        } else if (seconds.get() == 0 && milliseconds.get() == 0) {
             minutes.set(minutes.get() - 1);
             seconds.set(59);
-        } else {
+            milliseconds.set(99);
+        } else if (milliseconds.get() == 0) {
             seconds.set(seconds.get() - 1);
+            milliseconds.set(99);
+        } else {
+            milliseconds.set(milliseconds.get() - 1);
         }
 
-        if (minutes.get() == 0 && seconds.get() == 15) {
+        if (minutes.get() == 0 && seconds.get() == 0 && milliseconds.get() == 50) {
             shortBeep.play();
         }
     }
 
-    public void startIntervalTimer(int period) {
-        stopAllIntervalTimers();
-        switch (period) {
-            case 1:
-                intervalTimeline1.play();
-                break;
-            case 2:
-                intervalTimeline2.play();
-                break;
-            case 3:
-                intervalTimeline3.play();
-                break;
-            case 4:
-                intervalTimeline4.play();
-                break;
+    private void decrementIntervalTime() {
+        IntegerProperty intervalSeconds = getCurrentIntervalSeconds();
+        if (intervalSeconds == null) {
+            return;
+        }
+
+        if (intervalSeconds.get() == 0 && milliseconds.get() == 0) {
+            stopAllIntervalTimers();
+            longBeep.play();
+            nextPeriod();
+        } else if (milliseconds.get() == 0) {
+            intervalSeconds.set(intervalSeconds.get() - 1);
+            milliseconds.set(99);
+        } else {
+            milliseconds.set(milliseconds.get() - 1);
         }
     }
 
+    private IntegerProperty getCurrentIntervalSeconds() {
+        switch (period.get()) {
+            case 1:
+                return intervalSeconds1;
+            case 2:
+                return intervalSeconds2;
+            case 3:
+                return intervalSeconds3;
+            case 4:
+                return intervalSeconds4;
+            default:
+                return null;
+        }
+    }
+
+    public void startIntervalTimer(int period) {
+        this.period.set(period);
+        stopAllIntervalTimers();
+        intervalTimeline.play();
+    }
+
     public void stopAllIntervalTimers() {
-        intervalTimeline1.stop();
-        intervalTimeline2.stop();
-        intervalTimeline3.stop();
-        intervalTimeline4.stop();
+        intervalTimeline.stop();
     }
 
     public void resetInterval() {

@@ -58,7 +58,7 @@ public class WKFView {
 
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
-        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 1); -fx-padding: 10px;");
+        timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 1);-fx-background-radius: 10px; -fx-padding:0em 0.2em 0em 0.2em;;");
         //TODO reduire l'encadré en haut et en bas et bords arrondis
 
         StackPane timerPane = new StackPane(timerLabel);
@@ -71,6 +71,7 @@ public class WKFView {
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
     }
+
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
@@ -88,7 +89,9 @@ public class WKFView {
         detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
+                )
+        );
         detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
 
         VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);

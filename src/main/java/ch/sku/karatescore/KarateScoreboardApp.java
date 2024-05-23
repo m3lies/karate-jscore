@@ -39,27 +39,7 @@ public class KarateScoreboardApp extends Application {
     }
     //TODO mettre label catégorie pour savoir
     //TODO mettre milliemes de secondes
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set Timer");
 
-        setTimeButton.setOnAction(e -> {
-            try {
-                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-                if (mins < 0 || secs < 0 || secs >= 60) {
-                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-                }
-                timerService.setUpTimer(mins, secs);
-            } catch (NumberFormatException ex) {
-                minutesInput.setText("");
-                secondsInput.setText("");
-                minutesInput.setPromptText("Invalid input! Enter a number.");
-                secondsInput.setPromptText("Invalid input! Enter a number.");
-            }
-        });
-
-        return setTimeButton;
-    }
 //TODO - mettre set timer en haut, temps au milieu (en dessous )
     @Override
     public void start(Stage primaryStage) {
@@ -178,7 +158,7 @@ public class KarateScoreboardApp extends Application {
         timerPanel.getStyleClass().add("timer-panel");
 
         Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty(), timerService.millisecondsProperty()));
 
         // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
@@ -188,8 +168,6 @@ public class KarateScoreboardApp extends Application {
 
         // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
-        Button resetTimerButton = new Button("Reset Timer");
-        resetTimerButton.setOnAction(e -> timerService.reset());
 
         // Start and Stop buttons
         Button startTimerButton = new Button("Start Timer");
@@ -207,7 +185,7 @@ public class KarateScoreboardApp extends Application {
 
 
         Label timerIntervalLabel1 = new Label();
-        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty1()));
+        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.millisecondsProperty()));
 
 
         Label timerIntervalLabel2 = new Label();
@@ -229,15 +207,15 @@ public class KarateScoreboardApp extends Application {
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
-        HBox setResetButtons = new HBox(10, setTimeButton, resetTimerButton);
-        HBox inputFields = new HBox(10, minutesInput, secondsInput);
+
+        HBox inputFieldsSetTimeButton = new HBox(5, minutesInput, secondsInput,setTimeButton);
 
         // Container for interval timers, top and bottom
-        VBox timerTop = new VBox(10, timerLabel, inputFields, startStopButtons, setResetButtons);
+        VBox timerTop = new VBox(10, timerLabel, inputFieldsSetTimeButton, startStopButtons);
         timerTop.setPadding(new Insets(20));
 
         VBox resetMiddle = new VBox(10);
-        Button resetAll = new Button("Remettre à zéro TOUT");
+        Button resetAll = new Button("Reset ALL");
         resetAll.setOnAction(e -> {
             timerService.resetInterval();
             timerService.reset();
@@ -257,6 +235,27 @@ public class KarateScoreboardApp extends Application {
         timerPanel.getChildren().addAll(timerTop, resetMiddle, intervalTimersBottom);
 
         return timerPanel;
+    }
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        Button setTimeButton = new Button("Set");
+
+        setTimeButton.setOnAction(e -> {
+            try {
+                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+                if (mins < 0 || secs < 0 || secs >= 60) {
+                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+                }
+                timerService.setUpTimer(mins, secs);
+            } catch (NumberFormatException ex) {
+                minutesInput.setText("");
+                secondsInput.setText("");
+                minutesInput.setPromptText("Invalid input! Enter a number.");
+                secondsInput.setPromptText("Invalid input! Enter a number.");
+            }
+        });
+
+        return setTimeButton;
     }
 
 
