@@ -11,10 +11,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -24,10 +24,10 @@ public class MenuView {
     private final TimerService timerService;
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
-
     private final SenshuService senshuService;
     private final Stage stage;
     private final BorderPane root = new BorderPane();
+    private Stage currentModeStage;
 
     public MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
         this.aka = aka;
@@ -44,7 +44,7 @@ public class MenuView {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
         Button btnOpenWKF = new Button("WKF");
-        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService,senshuService ).getStage()));
+        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService).getStage()));
 
         Button btnOpenPromoKumite = new Button("Promokumite");
         btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage()));
@@ -65,9 +65,8 @@ public class MenuView {
 
         Scene scene = new Scene(root, 1000, 500);
         stage.setScene(scene);
-        stage.setTitle("Choisir un mode");
+        stage.setTitle("Select a mode");
     }
-    //TODO - Categorie en input
 
     public void show() {
         stage.show();
@@ -78,6 +77,11 @@ public class MenuView {
     }
 
     private void openMode(Stage modeStage) {
+        if (currentModeStage != null) {
+            currentModeStage.close();
+        }
+
+        currentModeStage = modeStage;
         hide();
 
         // Get all screens
@@ -94,7 +98,17 @@ public class MenuView {
             modeStage.setFullScreen(true);
         }
 
-        modeStage.setOnHidden(event -> show());
+        modeStage.setOnHidden(event -> {
+            currentModeStage = null;
+            show();
+        });
         modeStage.show();
+    }
+
+    public void closeCurrentMode() {
+        if (currentModeStage != null) {
+            currentModeStage.close();
+            currentModeStage = null;
+        }
     }
 }

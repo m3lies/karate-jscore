@@ -70,8 +70,12 @@ public class KarateScoreboardApp extends Application {
         primaryStage.setMaximized(true);  // Start maximized
         primaryStage.show();
 
+
         MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
         menuView.show();
+        Button closeModeButton = new Button("Close Current Mode");
+        closeModeButton.setOnAction(e -> menuView.closeCurrentMode());
+        timerPanel.getChildren().add(closeModeButton);
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
@@ -122,7 +126,6 @@ public class KarateScoreboardApp extends Application {
         panel.getChildren().addAll(header, senshuLabel, scoreYuko, scoreWazaAri, scoreIppon, toggleSenshuButton);
         addButtonControls(panel, participant);
 
-        // Pass true to include buttons
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
         panel.getChildren().add(penaltyComponent.getComponent());
 
@@ -159,7 +162,6 @@ public class KarateScoreboardApp extends Application {
 
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty(), timerService.millisecondsProperty()));
-
         // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
@@ -185,8 +187,7 @@ public class KarateScoreboardApp extends Application {
 
 
         Label timerIntervalLabel1 = new Label();
-        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.millisecondsProperty()));
-
+        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.intervalMillisecondsProperty1()));
 
         Label timerIntervalLabel2 = new Label();
         timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d", timerService.intervalSecondsProperty2()));
@@ -205,13 +206,15 @@ public class KarateScoreboardApp extends Application {
 
         // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
+        startStopButtons.setAlignment(Pos.CENTER);
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
 
         HBox inputFieldsSetTimeButton = new HBox(5, minutesInput, secondsInput,setTimeButton);
 
         // Container for interval timers, top and bottom
-        VBox timerTop = new VBox(10, timerLabel, inputFieldsSetTimeButton, startStopButtons);
+        VBox timerTop = new VBox(10, inputFieldsSetTimeButton, timerLabel,startStopButtons);
+        timerTop.setAlignment(Pos.CENTER);
         timerTop.setPadding(new Insets(20));
 
         VBox resetMiddle = new VBox(10);

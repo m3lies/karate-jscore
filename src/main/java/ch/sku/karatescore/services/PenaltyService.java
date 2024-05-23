@@ -34,7 +34,7 @@ public class PenaltyService {
 
     private void deactivateHigherPenalties(ParticipantType type, PenaltyType penalty) {
         for (PenaltyType pt : PenaltyType.values()) {
-            if (pt.ordinal() > penalty.ordinal()) {
+            if (pt.ordinal() >= penalty.ordinal()) {
                 penalties.get(type).get(pt).set(false);
             }
         }
@@ -58,5 +58,4 @@ public class PenaltyService {
             }
         }
     }
-
 }

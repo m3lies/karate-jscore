@@ -60,7 +60,6 @@
 }
 
 .penalty-button {
-    -fx-padding: 8 15;
     -fx-border-style: solid;
     -fx-border-width: 2;
     -fx-border-color: black;
@@ -126,6 +125,10 @@
     -fx-spacing: 10;  // Spacing between elements in the horizontal box
 -fx-alignment: center-left;
 }
+.penalty-label {
+    -fx-font-size: 20px;
+}
+
 
 .penalty-status-label, .penalty-button {
     -fx-padding: 5;

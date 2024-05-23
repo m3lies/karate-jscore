@@ -11,10 +11,22 @@ public class TimerService {
     private final IntegerProperty minutes = new SimpleIntegerProperty(0);
     private final IntegerProperty seconds = new SimpleIntegerProperty(0);
     private final IntegerProperty milliseconds = new SimpleIntegerProperty(0);
+
+    private final IntegerProperty intervalMinutes1 = new SimpleIntegerProperty(0);
     private final IntegerProperty intervalSeconds1 = new SimpleIntegerProperty(15);
+    private final IntegerProperty intervalMilliseconds1 = new SimpleIntegerProperty(0);
+
+    private final IntegerProperty intervalMinutes2 = new SimpleIntegerProperty(0);
     private final IntegerProperty intervalSeconds2 = new SimpleIntegerProperty(15);
+    private final IntegerProperty intervalMilliseconds2 = new SimpleIntegerProperty(0);
+
+    private final IntegerProperty intervalMinutes3 = new SimpleIntegerProperty(0);
     private final IntegerProperty intervalSeconds3 = new SimpleIntegerProperty(15);
+    private final IntegerProperty intervalMilliseconds3 = new SimpleIntegerProperty(0);
+
+    private final IntegerProperty intervalMinutes4 = new SimpleIntegerProperty(0);
     private final IntegerProperty intervalSeconds4 = new SimpleIntegerProperty(15);
+    private final IntegerProperty intervalMilliseconds4 = new SimpleIntegerProperty(0);
 
     private final Timeline timeline;
     private final Timeline intervalTimeline;
@@ -36,26 +48,6 @@ public class TimerService {
         longBeep = new AudioClip(getClass().getResource("/sounds/long-beep.mp3").toString());
     }
 
-    private Timeline createIntervalTimeline(IntegerProperty intervalSeconds, int targetPeriod) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(10), e -> {
-            if (period.get() == targetPeriod && intervalSeconds.get() > 0) {
-                if (milliseconds.get() > 0) {
-                    milliseconds.set(milliseconds.get() - 1);
-                } else {
-                    milliseconds.set(99);
-                    intervalSeconds.set(intervalSeconds.get() - 1);
-                }
-                if (intervalSeconds.get() == 0 && milliseconds.get() == 0) {
-                    stopIntervalTimer(targetPeriod);
-                    longBeep.play();
-                    nextPeriod(); // Move to the next period
-                }
-            }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        return timeline;
-    }
-
     public void start() {
         timeline.play();
     }
@@ -63,23 +55,6 @@ public class TimerService {
     public void stop() {
         timeline.stop();
         stopAllIntervalTimers();
-    }
-
-    private void stopIntervalTimer(int period) {
-        switch (period) {
-            case 1:
-                intervalTimeline.stop();
-                break;
-            case 2:
-                intervalTimeline.stop();
-                break;
-            case 3:
-                intervalTimeline.stop();
-                break;
-            case 4:
-                intervalTimeline.stop();
-                break;
-        }
     }
 
     public IntegerProperty minutesProperty() {
@@ -94,20 +69,52 @@ public class TimerService {
         return milliseconds;
     }
 
+    public IntegerProperty intervalMinutesProperty1() {
+        return intervalMinutes1;
+    }
+
     public IntegerProperty intervalSecondsProperty1() {
         return intervalSeconds1;
+    }
+
+    public IntegerProperty intervalMillisecondsProperty1() {
+        return intervalMilliseconds1;
+    }
+
+    public IntegerProperty intervalMinutesProperty2() {
+        return intervalMinutes2;
     }
 
     public IntegerProperty intervalSecondsProperty2() {
         return intervalSeconds2;
     }
 
+    public IntegerProperty intervalMillisecondsProperty2() {
+        return intervalMilliseconds2;
+    }
+
+    public IntegerProperty intervalMinutesProperty3() {
+        return intervalMinutes3;
+    }
+
     public IntegerProperty intervalSecondsProperty3() {
         return intervalSeconds3;
     }
 
+    public IntegerProperty intervalMillisecondsProperty3() {
+        return intervalMilliseconds3;
+    }
+
+    public IntegerProperty intervalMinutesProperty4() {
+        return intervalMinutes4;
+    }
+
     public IntegerProperty intervalSecondsProperty4() {
         return intervalSeconds4;
+    }
+
+    public IntegerProperty intervalMillisecondsProperty4() {
+        return intervalMilliseconds4;
     }
 
     public IntegerProperty periodProperty() {
@@ -150,20 +157,42 @@ public class TimerService {
     }
 
     private void decrementIntervalTime() {
+        IntegerProperty intervalMinutes = getCurrentIntervalMinutes();
         IntegerProperty intervalSeconds = getCurrentIntervalSeconds();
-        if (intervalSeconds == null) {
+        IntegerProperty intervalMilliseconds = getCurrentIntervalMilliseconds();
+
+        if (intervalMinutes == null || intervalSeconds == null || intervalMilliseconds == null) {
             return;
         }
 
-        if (intervalSeconds.get() == 0 && milliseconds.get() == 0) {
+        if (intervalMinutes.get() == 0 && intervalSeconds.get() == 0 && intervalMilliseconds.get() == 0) {
             stopAllIntervalTimers();
             longBeep.play();
             nextPeriod();
-        } else if (milliseconds.get() == 0) {
+        } else if (intervalSeconds.get() == 0 && intervalMilliseconds.get() == 0) {
+            intervalMinutes.set(intervalMinutes.get() - 1);
+            intervalSeconds.set(59);
+            intervalMilliseconds.set(99);
+        } else if (intervalMilliseconds.get() == 0) {
             intervalSeconds.set(intervalSeconds.get() - 1);
-            milliseconds.set(99);
+            intervalMilliseconds.set(99);
         } else {
-            milliseconds.set(milliseconds.get() - 1);
+            intervalMilliseconds.set(intervalMilliseconds.get() - 1);
+        }
+    }
+
+    private IntegerProperty getCurrentIntervalMinutes() {
+        switch (period.get()) {
+            case 1:
+                return intervalMinutes1;
+            case 2:
+                return intervalMinutes2;
+            case 3:
+                return intervalMinutes3;
+            case 4:
+                return intervalMinutes4;
+            default:
+                return null;
         }
     }
 
@@ -182,6 +211,21 @@ public class TimerService {
         }
     }
 
+    private IntegerProperty getCurrentIntervalMilliseconds() {
+        switch (period.get()) {
+            case 1:
+                return intervalMilliseconds1;
+            case 2:
+                return intervalMilliseconds2;
+            case 3:
+                return intervalMilliseconds3;
+            case 4:
+                return intervalMilliseconds4;
+            default:
+                return null;
+        }
+    }
+
     public void startIntervalTimer(int period) {
         this.period.set(period);
         stopAllIntervalTimers();
@@ -193,26 +237,46 @@ public class TimerService {
     }
 
     public void resetInterval() {
+        intervalMinutes1.set(0);
         intervalSeconds1.set(15);
+        intervalMilliseconds1.set(0);
+
+        intervalMinutes2.set(0);
         intervalSeconds2.set(15);
+        intervalMilliseconds2.set(0);
+
+        intervalMinutes3.set(0);
         intervalSeconds3.set(15);
+        intervalMilliseconds3.set(0);
+
+        intervalMinutes4.set(0);
         intervalSeconds4.set(15);
+        intervalMilliseconds4.set(0);
+
         period.set(1);
     }
 
     public void resetIntervalForPeriod(int period) {
         switch (period) {
             case 1:
+                intervalMinutes1.set(0);
                 intervalSeconds1.set(15);
+                intervalMilliseconds1.set(0);
                 break;
             case 2:
+                intervalMinutes2.set(0);
                 intervalSeconds2.set(15);
+                intervalMilliseconds2.set(0);
                 break;
             case 3:
+                intervalMinutes3.set(0);
                 intervalSeconds3.set(15);
+                intervalMilliseconds3.set(0);
                 break;
             case 4:
+                intervalMinutes4.set(0);
                 intervalSeconds4.set(15);
+                intervalMilliseconds4.set(0);
                 break;
         }
     }

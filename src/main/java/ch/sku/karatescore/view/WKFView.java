@@ -121,8 +121,8 @@ public class WKFView {
         penaltyContainer.setAlignment(Pos.CENTER);
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
-            Label penaltyLabel = new Label(penaltyType.toString());
-            penaltyLabel.getStyleClass().add("penalty-label");
+            Label penaltyLabel = new Label(penaltyType.name());
+            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: #dc3545; -fx-border-width: 2; -fx-font-size: 40px;");
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
             penaltyContainer.getChildren().add(penaltyLabel);
