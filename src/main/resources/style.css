@@ -125,12 +125,10 @@
     -fx-spacing: 10;  // Spacing between elements in the horizontal box
 -fx-alignment: center-left;
 }
-.penalty-label {
-    -fx-font-size: 20px;
-}
 
 
-.penalty-status-label, .penalty-button {
+
+/*.penalty-status-label, .penalty-button {
     -fx-padding: 5;
     -fx-border-style: solid inside;
     -fx-border-width: 2;
@@ -141,7 +139,7 @@
     -fx-text-fill: black;
     -fx-border-color: black;
 
-}
+}*/
 .label{
     -fx-font-size: 35px;
 }

@@ -161,8 +161,11 @@ public class KarateScoreboardApp extends Application {
         // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
-        minutesInput.setPromptText("Enter minutes");
-        secondsInput.setPromptText("Enter seconds");
+        minutesInput.setPromptText("minutes");
+        secondsInput.setPromptText("seconds");
+        // Setting preferred size for text fields
+        minutesInput.setPrefWidth(200);
+        secondsInput.setPrefWidth(200);
 
         // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
