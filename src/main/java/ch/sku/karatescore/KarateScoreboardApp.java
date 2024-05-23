@@ -41,35 +41,32 @@ public class KarateScoreboardApp extends Application {
     //TODO mettre milliemes de secondes
 
 //TODO - mettre set timer en haut, temps au milieu (en dessous )
+
+
     @Override
     public void start(Stage primaryStage) {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
 
-        // Main layout setup
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
-        mainLayout.setSpacing(20);  // Increased spacing
+        mainLayout.setSpacing(20);
 
-        // Dynamically resize panels based on screen size
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
         VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
 
-        // Setting HGrow to always for expanding automatically
         HBox.setHgrow(participantAO, Priority.ALWAYS);
         HBox.setHgrow(timerPanel, Priority.ALWAYS);
         HBox.setHgrow(participantAKA, Priority.ALWAYS);
 
-        // Adding panels to the layout
         mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
 
-        Scene scene = new Scene(root, 1920, 1080);  // Set initial size but it can be maximized
+        Scene scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Karate Match Scoreboard");
-        primaryStage.setMaximized(true);  // Start maximized
+        primaryStage.setMaximized(true);
         primaryStage.show();
-
 
         MenuView menuView = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
         menuView.show();
@@ -89,9 +86,8 @@ public class KarateScoreboardApp extends Application {
                 scoreService.getTotalScoreProperty(participantName)
         ));
         header.getStyleClass().add("header");
-        panel.setAlignment(Pos.CENTER);  // Center align contents
+        panel.setAlignment(Pos.CENTER);
 
-        // Setting header background color based on participant type
         if (participant.getParticipantType() == ParticipantType.AKA) {
             header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
         } else if (participant.getParticipantType() == ParticipantType.AO) {
@@ -116,25 +112,28 @@ public class KarateScoreboardApp extends Application {
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
         ));
 
-        Label senshuLabel = new Label("●" + "senshu");
-        senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
-        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
+        HBox scoreControls = new HBox(10, scoreYuko, scoreWazaAri, scoreIppon);
+        scoreControls.setAlignment(Pos.CENTER);
 
         Button toggleSenshuButton = new Button("Senshu");
         toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
+        toggleSenshuButton.setStyle("-fx-font-size: 20px;");
 
-        panel.getChildren().addAll(header, senshuLabel, scoreYuko, scoreWazaAri, scoreIppon, toggleSenshuButton);
-        addButtonControls(panel, participant);
+        Label senshuLabel = new Label("● Senshu");
+        senshuLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: orange;");
+        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
 
+        HBox senshuBox = new HBox(10, toggleSenshuButton, senshuLabel);
+        senshuBox.setAlignment(Pos.CENTER);
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
-        panel.getChildren().add(penaltyComponent.getComponent());
 
+        panel.getChildren().addAll(header, scoreControls, senshuBox);
+        addButtonControls(panel, participant);
+        panel.getChildren().add(penaltyComponent.getComponent());
         return panel;
     }
-    //TODO initiales avertissement, changer la couleur bouton senshu, tout realigner, arrondir boutons avertissement
-// TODO ajouter bouton pour fermer le 2eme ecran
+
     private void addButtonControls(VBox panel, Participant participant) {
-        // Set up control for each score type with its respective label
         setupScoreControl(panel, participant, ScoreType.YUKO);
         setupScoreControl(panel, participant, ScoreType.WAZARI);
         setupScoreControl(panel, participant, ScoreType.IPPON);
@@ -144,14 +143,11 @@ public class KarateScoreboardApp extends Application {
         Button btnAdd = new Button("+ " + scoreType.name());
         Button btnRemove = new Button("- " + scoreType.name());
 
-        btnAdd.setOnAction(e -> {
-            scoreService.addScore(participant.getParticipantType(), scoreType);
-        });
-        btnRemove.setOnAction(e -> {
-            scoreService.subtractScore(participant.getParticipantType(), scoreType);
-        });
+        btnAdd.setOnAction(e -> scoreService.addScore(participant.getParticipantType(), scoreType));
+        btnRemove.setOnAction(e -> scoreService.subtractScore(participant.getParticipantType(), scoreType));
 
         HBox scoreControls = new HBox(5, btnAdd, btnRemove);
+        scoreControls.setAlignment(Pos.CENTER);
         panel.getChildren().add(scoreControls);
     }
 
