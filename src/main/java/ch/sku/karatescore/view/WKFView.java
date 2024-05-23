@@ -12,10 +12,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -59,7 +56,6 @@ public class WKFView {
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty()));
         timerLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 1);-fx-background-radius: 10px; -fx-padding:0em 0.2em 0em 0.2em;;");
-        //TODO reduire l'encadré en haut et en bas et bords arrondis
 
         StackPane timerPane = new StackPane(timerLabel);
         StackPane.setAlignment(timerPane, Pos.CENTER);
@@ -72,7 +68,6 @@ public class WKFView {
         stage.setTitle("Karate Match Scoreboard");
     }
 
-
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
@@ -83,21 +78,18 @@ public class WKFView {
 
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
-        totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
+        totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
         detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
-                )
-        );
-        detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        ));
+        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
 
         VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
         scoreBox.setAlignment(Pos.CENTER);
-
-        //TODO add senshu en petite taille
 
         Label senshuLabel = new Label("●");
         senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
@@ -114,18 +106,40 @@ public class WKFView {
         return panel;
     }
 
-    //TODO encadrer les avertissements fond blanc, police couleur aka, ao
-
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(10);
         penaltyContainer.setAlignment(Pos.CENTER);
 
         for (PenaltyType penaltyType : PenaltyType.values()) {
-            Label penaltyLabel = new Label(penaltyType.name());
-            penaltyLabel.setStyle("-fx-background-color: white; -fx-border-color: #dc3545; -fx-border-width: 2; -fx-font-size: 40px;");
-            penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
-            penaltyLabel.managedProperty().bind(penaltyLabel.visibleProperty());
-            penaltyContainer.getChildren().add(penaltyLabel);
+            VBox penaltyBox = new VBox(5);
+            penaltyBox.setAlignment(Pos.CENTER);
+
+            Label penaltyNameLabel = new Label(penaltyType.getName());
+            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+            penaltyNameLabel.setMinSize(80, 80); // Ensure fixed size based on the preferred size
+            penaltyNameLabel.setMaxSize(80, 80); // Ensure fixed size based on the preferred size
+
+            // Set background color based on participant type
+            if (participant.getParticipantType() == ParticipantType.AKA) {
+                penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #dc3545;");
+            } else if (participant.getParticipantType() == ParticipantType.AO) {
+                penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #007bff;");
+            }
+
+            // Bind visibility to the penalty property
+            penaltyNameLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
+            penaltyNameLabel.managedProperty().bind(penaltyNameLabel.visibleProperty());
+            penaltyNameLabel.setAlignment(Pos.CENTER);
+            // Create a Region to reserve space for the label
+            Region labelPlaceholder = new Region();
+            labelPlaceholder.setMinSize(80, 80); // Ensure the same size as the label
+            labelPlaceholder.setMaxSize(80, 80); // Ensure the same size as the label
+
+            StackPane stackPane = new StackPane(labelPlaceholder, penaltyNameLabel);
+            stackPane.setAlignment(Pos.CENTER);
+
+            penaltyBox.getChildren().addAll(stackPane);
+            penaltyContainer.getChildren().add(penaltyBox);
         }
 
         panel.getChildren().add(penaltyContainer);
