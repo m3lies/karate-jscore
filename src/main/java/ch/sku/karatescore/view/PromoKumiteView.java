@@ -7,6 +7,7 @@ import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -47,29 +48,56 @@ public class PromoKumiteView {
         participantsBox.getChildren().addAll(akaPanel, aoPanel);
 
         root.getChildren().add(participantsBox);
+        // Adding participant type labels
+        Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
+        Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
+        StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
+        StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
+        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
     }
-//TODO mettre la separation - entre les scores
+    private Label createParticipantTypeLabel(ParticipantType participantType) {
+        Label label = new Label(participantType.name());
+        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
+        return label;
+    }
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
+
+        HBox scoreSenshuBox = new HBox(10);
+        scoreSenshuBox.setAlignment(Pos.CENTER);
+
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
-        totalScoreLabel.setStyle("-fx-font-size: 200px; -fx-text-fill: white;");
+        totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko: %d, Waza-ari: %d",
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d     Waza-ari %d",
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
-        detailedScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
 
-        panel.getChildren().addAll(totalScoreLabel, detailedScoreLabel);
+        ));
+        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+
+        VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
+        scoreBox.setAlignment(Pos.CENTER);
+
+
+
+        if (participantType == ParticipantType.AKA) {
+            scoreSenshuBox.getChildren().addAll( scoreBox);
+        } else {
+            scoreSenshuBox.getChildren().addAll(scoreBox);
+        }
+        panel.getChildren().addAll(scoreSenshuBox);
         addPenaltyLabels(participant, panel);
-
         return panel;
     }
 

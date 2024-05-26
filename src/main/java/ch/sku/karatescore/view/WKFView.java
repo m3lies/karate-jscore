@@ -9,6 +9,7 @@ import ch.sku.karatescore.services.ScoreService;
 import ch.sku.karatescore.services.SenshuService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -62,10 +63,25 @@ public class WKFView {
 
         root.getChildren().addAll(participantsBox, timerPane);
 
+        // Adding participant type labels
+        Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
+        Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
+        StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
+        StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
+        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
+
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
+    }
+
+    private Label createParticipantTypeLabel(ParticipantType participantType) {
+        Label label = new Label(participantType.name());
+        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
+        return label;
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
@@ -130,6 +146,7 @@ public class WKFView {
             penaltyNameLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyNameLabel.managedProperty().bind(penaltyNameLabel.visibleProperty());
             penaltyNameLabel.setAlignment(Pos.CENTER);
+
             // Create a Region to reserve space for the label
             Region labelPlaceholder = new Region();
             labelPlaceholder.setMinSize(80, 80); // Ensure the same size as the label

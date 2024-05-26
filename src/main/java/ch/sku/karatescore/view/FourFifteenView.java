@@ -8,6 +8,7 @@ import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -47,10 +48,25 @@ public class FourFifteenView {
         aoPanel.setMaxWidth(Double.MAX_VALUE);
         participantsBox.getChildren().addAll(akaPanel, aoPanel);
         root.getChildren().add(participantsBox);
+
+        Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
+        Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
+        StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
+        StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
+        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
+
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
         stage.setTitle("Karate Match Scoreboard");
+    }
+
+    private Label createParticipantTypeLabel(ParticipantType participantType) {
+        Label label = new Label(participantType.name());
+        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
+        return label;
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type, IntegerProperty interval1, IntegerProperty interval2) {

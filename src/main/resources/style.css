@@ -1,5 +1,5 @@
 .timer-label {
-    -fx-font-size:35px;
+    -fx-font-size:30px;
     -fx-text-fill: black;
     -fx-background-color: white;
     -fx-padding: 10px;
@@ -14,7 +14,7 @@
 .button {
     -fx-background-radius: 5;
     -fx-padding: 10px 20px;
-    -fx-font-size: 30px;
+    -fx-font-size: 15px;
 }
 
 .card {
@@ -60,11 +60,12 @@
 }
 
 .penalty-button {
-    -fx-border-style: solid;
-    -fx-border-width: 2;
-    -fx-border-color: black;
-    -fx-background-color: white;
-    -fx-text-fill: black;
+
+    -fx-font-size: 13;
+}
+
+.penalty-label{
+    -fx-font-size: 13;
 }
 
 .button:hover {
@@ -128,24 +129,13 @@
 
 
 
-/*.penalty-status-label, .penalty-button {
-    -fx-padding: 5;
-    -fx-border-style: solid inside;
-    -fx-border-width: 2;
-    -fx-border-radius: 5;
-    -fx-min-width: 80px;  // Ensuring buttons and labels have minimum width for better alignment
 
-    -fx-background-color: #ffffff;
-    -fx-text-fill: black;
-    -fx-border-color: black;
-
-}*/
 .label{
-    -fx-font-size: 35px;
+    -fx-font-size: 30px;
 }
 
 .text-field{
-    -fx-font-size: 30px;
+    -fx-font-size: 20px;
 }
 .root {
     -fx-font-size: 30px; /* Default font size if no binding applies */
