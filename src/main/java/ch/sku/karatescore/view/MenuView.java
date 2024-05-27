@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +26,7 @@ public class MenuView {
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
     private final SenshuService senshuService;
+    @Getter
     private final Stage stage;
     private final BorderPane root = new BorderPane();
     private Stage currentModeStage;
@@ -38,6 +40,10 @@ public class MenuView {
         this.senshuService = senshuService;
         this.stage = new Stage();
         initializeUI();
+        this.stage.setOnCloseRequest(event -> {
+            event.consume(); // Consume the event to prevent the window from closing
+            this.stage.setIconified(true); // Minimize the window instead
+        });
     }
 
     private void initializeUI() {

@@ -151,7 +151,7 @@ public class TimerService {
             milliseconds.set(milliseconds.get() - 1);
         }
 
-        if (minutes.get() == 0 && seconds.get() == 0 && milliseconds.get() == 50) {
+        if (minutes.get() == 0 && seconds.get() == 15 && milliseconds.get() == 99) {
             shortBeep.play();
         }
     }
