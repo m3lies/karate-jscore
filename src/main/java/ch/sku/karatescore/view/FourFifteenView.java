@@ -55,7 +55,14 @@ public class FourFifteenView {
         StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
         StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
         StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
+
+        // Add the "Penalties" label in the center of the root pane
+        Label penaltiesLabel = new Label("Penalties");
+        penaltiesLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+        StackPane.setAlignment(penaltiesLabel, Pos.CENTER);
+        StackPane.setMargin(penaltiesLabel, new Insets(400, 0, 0, 0)); // Adjust margin to position it appropriately
+
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel, penaltiesLabel);
 
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
@@ -65,7 +72,7 @@ public class FourFifteenView {
 
     private Label createParticipantTypeLabel(ParticipantType participantType) {
         Label label = new Label(participantType.name());
-        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
+        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px;");
         return label;
     }
 
@@ -113,46 +120,47 @@ public class FourFifteenView {
             }
         }, intervalProperty, timerService.periodProperty());
     }
-//TODO change color dark red and dark blue
-private void addPenaltyLabels(Participant participant, VBox panel) {
-    HBox penaltyContainer = new HBox(10);
-    penaltyContainer.setAlignment(Pos.CENTER);
 
-    for (PenaltyType penaltyType : PenaltyType.values()) {
-        VBox penaltyBox = new VBox(5);
-        penaltyBox.setAlignment(Pos.CENTER);
+    private void addPenaltyLabels(Participant participant, VBox panel) {
+        HBox penaltyContainer = new HBox(10);
+        penaltyContainer.setAlignment(Pos.CENTER);
 
-        Label penaltyNameLabel = new Label(penaltyType.getName());
-        penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
-        penaltyNameLabel.setMinSize(80, 80); // Ensure fixed size based on the preferred size
-        penaltyNameLabel.setMaxSize(80, 80); // Ensure fixed size based on the preferred size
+        for (PenaltyType penaltyType : PenaltyType.values()) {
+            VBox penaltyBox = new VBox(5);
+            penaltyBox.setAlignment(Pos.CENTER);
 
-        // Set background color based on participant type
-        if (participant.getParticipantType() == ParticipantType.AKA) {
-            penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #dc3545;");
-        } else if (participant.getParticipantType() == ParticipantType.AO) {
-            penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #007bff;");
+            Label penaltyNameLabel = new Label(penaltyType.getName());
+            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+            penaltyNameLabel.setMinSize(80, 80); // Ensure fixed size based on the preferred size
+            penaltyNameLabel.setMaxSize(80, 80); // Ensure fixed size based on the preferred size
+
+            // Set background color based on participant type
+            if (participant.getParticipantType() == ParticipantType.AKA) {
+                penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #dc3545;");
+            } else if (participant.getParticipantType() == ParticipantType.AO) {
+                penaltyNameLabel.setStyle(penaltyNameLabel.getStyle() + "-fx-background-color: #007bff;");
+            }
+
+            // Bind visibility to the penalty property
+            penaltyNameLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
+            penaltyNameLabel.managedProperty().bind(penaltyNameLabel.visibleProperty());
+            penaltyNameLabel.setAlignment(Pos.CENTER);
+
+            // Create a Region to reserve space for the label
+            Region labelPlaceholder = new Region();
+            labelPlaceholder.setMinSize(80, 80); // Ensure the same size as the label
+            labelPlaceholder.setMaxSize(80, 80); // Ensure the same size as the label
+
+            StackPane stackPane = new StackPane(labelPlaceholder, penaltyNameLabel);
+            stackPane.setAlignment(Pos.CENTER);
+
+            penaltyBox.getChildren().addAll(stackPane);
+            penaltyContainer.getChildren().add(penaltyBox);
         }
 
-        // Bind visibility to the penalty property
-        penaltyNameLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
-        penaltyNameLabel.managedProperty().bind(penaltyNameLabel.visibleProperty());
-        penaltyNameLabel.setAlignment(Pos.CENTER);
-        // Create a Region to reserve space for the label
-        Region labelPlaceholder = new Region();
-        labelPlaceholder.setMinSize(80, 80); // Ensure the same size as the label
-        labelPlaceholder.setMaxSize(80, 80); // Ensure the same size as the label
-
-        StackPane stackPane = new StackPane(labelPlaceholder, penaltyNameLabel);
-        stackPane.setAlignment(Pos.CENTER);
-
-        penaltyBox.getChildren().addAll(stackPane);
-        penaltyContainer.getChildren().add(penaltyBox);
+        panel.getChildren().add(penaltyContainer);
     }
 
-    panel.getChildren().add(penaltyContainer);
-}
-//TODO quand ca reset, on reset aussi les penalités
     private void setFullScreen() {
         Screen screen = Screen.getPrimary();
         stage.setX(screen.getVisualBounds().getMinX());

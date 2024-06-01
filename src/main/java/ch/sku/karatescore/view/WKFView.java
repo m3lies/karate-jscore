@@ -75,7 +75,7 @@ public class WKFView {
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("WKF View");
     }
 
     private Label createParticipantTypeLabel(ParticipantType participantType) {

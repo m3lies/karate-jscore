@@ -1,6 +1,5 @@
 package ch.sku.karatescore.view;
 
-import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class MenuView {
+    private static MenuView instance;
     private final Participant aka;
     private final Participant ao;
     private final TimerService timerService;
@@ -30,8 +30,9 @@ public class MenuView {
     private final Stage stage;
     private final BorderPane root = new BorderPane();
     private Stage currentModeStage;
+    private Stage editViewStage;
 
-    public MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
+    private MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
@@ -39,6 +40,7 @@ public class MenuView {
         this.penaltyService = penaltyService;
         this.senshuService = senshuService;
         this.stage = new Stage();
+
         initializeUI();
         this.stage.setOnCloseRequest(event -> {
             event.consume(); // Consume the event to prevent the window from closing
@@ -46,17 +48,24 @@ public class MenuView {
         });
     }
 
+    public static MenuView getInstance(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
+        if (instance == null) {
+            instance = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
+        }
+        return instance;
+    }
+
     private void initializeUI() {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
         Button btnOpenWKF = new Button("WKF");
-        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService).getStage()));
+        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService).getStage(), "WKF"));
 
         Button btnOpenPromoKumite = new Button("Promokumite");
-        btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage()));
+        btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite"));
 
         Button btnOpenFourFifteen = new Button("4 x 15 ");
-        btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService).getStage()));
+        btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService).getStage(), "4 x 15"));
 
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
@@ -82,39 +91,55 @@ public class MenuView {
         stage.hide();
     }
 
-    private void openMode(Stage modeStage) {
+    private void openMode(Stage specificModeStage, String modeName) {
         if (currentModeStage != null) {
             currentModeStage.close();
         }
 
-        currentModeStage = modeStage;
-        hide();
+        if (editViewStage != null) {
+            editViewStage.close();
+        }
 
-        // Get all screens
+        // Create and show EditView
+        EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, specificModeStage, modeName);
+        editViewStage = editView.getStage();
+        editViewStage.show();
+
+        // Set up and show the specific mode stage
+        currentModeStage = specificModeStage;
+
+        // Position the specific mode stage on the next available screen if there is more than one screen
         List<Screen> screens = Screen.getScreens();
         if (screens.size() > 1) {
             // Get the second screen
             Screen secondScreen = screens.get(1);
 
             // Set the stage to the second screen
-            modeStage.setX(secondScreen.getVisualBounds().getMinX());
-            modeStage.setY(secondScreen.getVisualBounds().getMinY());
-            modeStage.setWidth(secondScreen.getVisualBounds().getWidth());
-            modeStage.setHeight(secondScreen.getVisualBounds().getHeight());
-            modeStage.setFullScreen(true);
+            currentModeStage.setX(secondScreen.getVisualBounds().getMinX());
+            currentModeStage.setY(secondScreen.getVisualBounds().getMinY());
+            currentModeStage.setWidth(secondScreen.getVisualBounds().getWidth());
+            currentModeStage.setHeight(secondScreen.getVisualBounds().getHeight());
+            currentModeStage.setFullScreen(true);
         }
 
-        modeStage.setOnHidden(event -> {
+        // Minimize the MenuView
+        stage.setIconified(true);
+
+        currentModeStage.setOnHidden(event -> {
             currentModeStage = null;
-            show();
+            stage.setIconified(false); // Restore the MenuView when the specific mode stage is closed
         });
-        modeStage.show();
+        currentModeStage.show();
     }
 
     public void closeCurrentMode() {
         if (currentModeStage != null) {
             currentModeStage.close();
             currentModeStage = null;
+        }
+        if (editViewStage != null) {
+            editViewStage.close();
+            editViewStage = null;
         }
     }
 }

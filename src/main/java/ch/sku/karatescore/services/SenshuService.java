@@ -23,4 +23,9 @@ public class SenshuService {
             aoSenshu.set(!aoSenshu.get());
         }
     }
+
+    public void resetSenshus() {
+        akaSenshu.setValue(false);
+        aoSenshu.setValue(false);
+    }
 }

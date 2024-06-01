@@ -60,12 +60,27 @@
 }
 
 .penalty-button {
-
-    -fx-font-size: 13;
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+    -fx-min-height: 80px;
+    -fx-max-height: 80px;
 }
 
-.penalty-label{
-    -fx-font-size: 13;
+.penalty-label {
+    -fx-font-size: 20px;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-padding: 10px;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+    -fx-min-height: 80px;
+    -fx-max-height: 80px;
 }
 
 .button:hover {
