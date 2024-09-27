@@ -37,6 +37,7 @@ public class EditView {
     private final SenshuService senshuService;
     private final String modeName;
     private Stage currentModeStage; // Reference to the current mode stage
+
     public EditView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, Stage currentModeStage, String modeName) {
         this.aka = aka;
         this.ao = ao;
@@ -48,6 +49,28 @@ public class EditView {
         this.currentModeStage = currentModeStage; // Set the current mode stage
         this.modeName = modeName; // Set the name of the clicked button
         initializeUI();
+    }
+
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        Button setTimeButton = new Button("Set");
+
+        setTimeButton.setOnAction(e -> {
+            try {
+                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+                if (mins < 0 || secs < 0 || secs >= 60) {
+                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+                }
+                timerService.setUpTimer(mins, secs);
+            } catch (NumberFormatException ex) {
+                minutesInput.setText("");
+                secondsInput.setText("");
+                minutesInput.setPromptText("Invalid input! Enter a number.");
+                secondsInput.setPromptText("Invalid input! Enter a number.");
+            }
+        });
+
+        return setTimeButton;
     }
 
     public void initializeUI() {
@@ -77,13 +100,13 @@ public class EditView {
         stage.show();
 
 
-
         Button closeModeButton = new Button("Close " + modeName + " Mode");
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
             if (currentModeStage != null) {
                 currentModeStage.close();
                 currentModeStage = null;
+                stage.close();
             }
             closeModeButton.setVisible(false); // Hide the button when the mode is closed
         });
@@ -98,10 +121,7 @@ public class EditView {
         panel.getStyleClass().add("participant-panel");
 
         Label header = new Label();
-        header.textProperty().bind(Bindings.createStringBinding(
-                () -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(),
-                scoreService.getTotalScoreProperty(participantName)
-        ));
+        header.textProperty().bind(Bindings.createStringBinding(() -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(), scoreService.getTotalScoreProperty(participantName)));
         header.getStyleClass().add("header");
         panel.setAlignment(Pos.CENTER);
 
@@ -112,22 +132,13 @@ public class EditView {
         }
 
         Label scoreYuko = new Label();
-        scoreYuko.textProperty().bind(Bindings.createStringBinding(
-                () -> "Yuko(1) : " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)
-        ));
+        scoreYuko.textProperty().bind(Bindings.createStringBinding(() -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)));
 
         Label scoreWazaAri = new Label();
-        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(
-                () -> "Waza-ari(2) : " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
-        ));
+        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(() -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
 
         Label scoreIppon = new Label();
-        scoreIppon.textProperty().bind(Bindings.createStringBinding(
-                () -> "Ippon(3) : " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
-        ));
+        scoreIppon.textProperty().bind(Bindings.createStringBinding(() -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
 
         HBox scoreControls = new HBox(10, scoreYuko, scoreWazaAri, scoreIppon);
         scoreControls.setAlignment(Pos.CENTER);
@@ -157,8 +168,8 @@ public class EditView {
     }
 
     private void setupScoreControl(VBox panel, Participant participant, ScoreType scoreType) {
-        Button btnAdd = new Button("+ " + scoreType.name());
-        Button btnRemove = new Button("- " + scoreType.name());
+        Button btnAdd = new Button("+ " + scoreType.getStringValue());
+        Button btnRemove = new Button("- " + scoreType.getStringValue());
 
         btnAdd.setOnAction(e -> scoreService.addScore(participant.getParticipantType(), scoreType));
         btnRemove.setOnAction(e -> scoreService.subtractScore(participant.getParticipantType(), scoreType));
@@ -189,9 +200,9 @@ public class EditView {
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
 
         // Start and Stop buttons
-        Button startTimerButton = new Button("Start Timer");
+        Button startTimerButton = new Button("Start");
         startTimerButton.setOnAction(e -> timerService.start());
-        Button stopTimerButton = new Button("Stop Timer");
+        Button stopTimerButton = new Button("Stop");
         stopTimerButton.setOnAction(e -> timerService.stop());
 
         // Interval control buttons
@@ -251,28 +262,6 @@ public class EditView {
         timerPanel.getChildren().addAll(timerTop, resetMiddle, intervalTimersBottom);
 
         return timerPanel;
-    }
-
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set");
-
-        setTimeButton.setOnAction(e -> {
-            try {
-                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-                if (mins < 0 || secs < 0 || secs >= 60) {
-                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-                }
-                timerService.setUpTimer(mins, secs);
-            } catch (NumberFormatException ex) {
-                minutesInput.setText("");
-                secondsInput.setText("");
-                minutesInput.setPromptText("Invalid input! Enter a number.");
-                secondsInput.setPromptText("Invalid input! Enter a number.");
-            }
-        });
-
-        return setTimeButton;
     }
 
 
