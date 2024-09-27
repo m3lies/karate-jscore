@@ -56,13 +56,15 @@ public class FourFifteenView {
         StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
         StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
 
+/*
         // Add the "Penalties" label in the center of the root pane
-        Label penaltiesLabel = new Label("Penalties");
+        //Label penaltiesLabel = new Label("Penalties");
         penaltiesLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
         StackPane.setAlignment(penaltiesLabel, Pos.CENTER);
         StackPane.setMargin(penaltiesLabel, new Insets(400, 0, 0, 0)); // Adjust margin to position it appropriately
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel, penaltiesLabel);*/
 
-        root.getChildren().addAll(akaTypeLabel, aoTypeLabel, penaltiesLabel);
+        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
 
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
