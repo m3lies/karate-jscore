@@ -29,7 +29,7 @@ public class PenaltyComponent {
             penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
             penaltyLabel.managedProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
 
-            penaltyLabel.setMinWidth(40);  // Set minimum width for labels
+            //penaltyLabel.setMinWidth(40);  // Set minimum width for labels
             penaltyLabel.setAlignment(Pos.CENTER);  // Center align text
 
             if (includeButtons) {
