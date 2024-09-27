@@ -179,8 +179,8 @@ public class EditView {
         // User input fields for minutes and seconds
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
-        minutesInput.setPromptText("minutes");
-        secondsInput.setPromptText("seconds");
+        minutesInput.setPromptText("min");
+        secondsInput.setPromptText("sec");
         // Setting preferred size for text fields
         minutesInput.setPrefWidth(80);
         secondsInput.setPrefWidth(80);
