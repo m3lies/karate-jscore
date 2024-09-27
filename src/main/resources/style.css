@@ -72,11 +72,7 @@
 
 .penalty-label {
     -fx-font-size: 10px;
-    -fx-border-color: white;
     -fx-border-width: 2;
-    -fx-padding: 10px;
-    -fx-background-radius: 15px;
-    -fx-border-radius: 15px;
     -fx-min-width: 20px;
     -fx-max-width: 50px;
     -fx-min-height: 50px;
