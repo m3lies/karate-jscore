@@ -64,16 +64,16 @@
     -fx-text-fill: white;
     -fx-border-color: white;
     -fx-border-width: 2;
-    -fx-min-width: 20px;
+    -fx-min-width: 15px;
     -fx-max-width: 50px;
     -fx-min-height: 20px;
     -fx-max-height: 50px;
 }
 
 .penalty-label {
-    -fx-font-size: 10px;
+    -fx-font-size: 15px;
     -fx-border-width: 2;
-    -fx-min-width: 20px;
+    -fx-min-width: 15px;
     -fx-max-width: 50px;
     -fx-min-height: 50px;
     -fx-max-height: 50px;
