@@ -99,20 +99,27 @@ public class EditView {
         stage.setMaximized(true);
         stage.show();
 
+        // Handle window close event (for the window close button)
+        stage.setOnCloseRequest(e -> {
+            closeAllStages();
+        });
 
         Button closeModeButton = new Button("Close " + modeName + " Mode");
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
-            if (currentModeStage != null) {
-                currentModeStage.close();
-                currentModeStage = null;
-                stage.close();
-            }
-            closeModeButton.setVisible(false); // Hide the button when the mode is closed
+            closeAllStages();
         });
         closeModeButton.setAlignment(Pos.CENTER);
         timerPanel.getChildren().add(closeModeButton);
 
+    }
+
+    private void closeAllStages() {
+        if (currentModeStage != null) {
+            currentModeStage.close();
+            currentModeStage = null;
+            stage.close();
+        }
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
