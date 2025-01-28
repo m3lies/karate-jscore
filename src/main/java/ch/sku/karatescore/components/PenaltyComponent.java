@@ -9,42 +9,56 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import lombok.Getter;
 
 public class PenaltyComponent {
-    private final HBox component;
+    @Getter
+    private HBox component;
+    private final Participant participant;
+    private final PenaltyService penaltyService;
+    private final boolean includeButtons;
 
     public PenaltyComponent(Participant participant, PenaltyService penaltyService, boolean includeButtons) {
+        this.participant = participant;
+        this.penaltyService = penaltyService;
+        this.includeButtons = includeButtons;
+        initComponent();
+    }
+
+    private void initComponent() {
         component = new HBox(10);
         component.setPadding(new Insets(10));
         component.setAlignment(Pos.CENTER);
         ParticipantType participantType = participant.getParticipantType();
-
         for (PenaltyType penalty : PenaltyType.values()) {
-            VBox penaltyBox = new VBox(5);
-            penaltyBox.setAlignment(Pos.CENTER);
-
-            Label penaltyLabel = new Label(penalty.getName());
-            penaltyLabel.getStyleClass().add("penalty-label");
-            penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
-            penaltyLabel.managedProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
-
-            //penaltyLabel.setMinWidth(40);  // Set minimum width for labels
-            penaltyLabel.setAlignment(Pos.CENTER);  // Center align text
-
-            if (includeButtons) {
-                Button penaltyButton = new Button(penalty.getName());
-                penaltyButton.setOnAction(e -> penaltyService.togglePenalty(participantType, penalty));
-                penaltyBox.getChildren().addAll(penaltyLabel, penaltyButton);
-            } else {
-                penaltyBox.getChildren().add(penaltyLabel);
-            }
-
-            component.getChildren().add(penaltyBox);
+            component.getChildren().add(createVBox(penaltyService, participantType, penalty, includeButtons));
         }
     }
 
-    public HBox getComponent() {
-        return component;
+    private VBox createVBox(PenaltyService penaltyService, ParticipantType participantType, PenaltyType penalty, boolean includeButtons) {
+        VBox penaltyBox = new VBox(5);
+        penaltyBox.setAlignment(Pos.CENTER);
+
+        Label penaltyLabel = new Label(penalty.getName());
+        penaltyLabel.getStyleClass().add("penalty-label");
+
+        penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
+        penaltyLabel.managedProperty().set(true);
+        penaltyLabel.setAlignment(Pos.CENTER);
+
+        Pane penaltyLabelContainer = new Pane();
+        penaltyLabelContainer.getChildren().add(penaltyLabel);
+
+        penaltyBox.getChildren().add(penaltyLabelContainer);
+
+        if (includeButtons) {
+            Button penaltyButton = new Button(penalty.getName());
+            penaltyButton.setOnAction(e -> penaltyService.togglePenalty(participantType, penalty));
+            penaltyBox.getChildren().add(penaltyButton);
+        }
+        return penaltyBox;
     }
+
 }
