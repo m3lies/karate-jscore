@@ -11,6 +11,7 @@ import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,10 +26,15 @@ import lombok.Getter;
 import java.util.Objects;
 
 public class EditView {
+    private static final String CLOSE_MODE = "Close mode ";
+    private static final String STYLE_CSS = "/style.css";
+    private static final String STYLE_BACKGROUND_RADIUS = "-fx-background-radius: 10px;";
+    private static final String STYLE_TEXT_FILL = "-fx-text-fill: white; -fx-padding: 10;";
+    private static final String STYLE_BACKGROUND_AO_COLOR = "-fx-background-color: #007bff; ";
+    private static final String STYLE_BACKGROUND_AKA_COLOR = "-fx-background-color: #dc3545; ";
     @Getter
     private final Stage stage;
     private final BorderPane root = new BorderPane();
-
     private final Participant aka;
     private final Participant ao;
     private final TimerService timerService;
@@ -51,67 +57,75 @@ public class EditView {
         initializeUI();
     }
 
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set");
 
-        setTimeButton.setOnAction(e -> {
-            try {
-                int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-                int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-                if (mins < 0 || secs < 0 || secs >= 60) {
-                    throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-                }
-                timerService.setUpTimer(mins, secs);
-            } catch (NumberFormatException ex) {
-                minutesInput.setText("");
-                secondsInput.setText("");
-                minutesInput.setPromptText("Invalid input! Enter a number.");
-                secondsInput.setPromptText("Invalid input! Enter a number.");
-            }
-        });
+    private Label getParticipantHeader(Participant participant, ParticipantType participantName) {
+        Label header = new Label();
+        header.textProperty().bind(Bindings.createStringBinding(() -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(), scoreService.getTotalScoreProperty(participantName)));
+        header.getStyleClass().add("header");
 
-        return setTimeButton;
+        if (participant.getParticipantType() == ParticipantType.AKA) {
+            header.setStyle(STYLE_BACKGROUND_AKA_COLOR + STYLE_TEXT_FILL + STYLE_BACKGROUND_RADIUS);
+        } else if (participant.getParticipantType() == ParticipantType.AO) {
+            header.setStyle(STYLE_BACKGROUND_AO_COLOR + STYLE_TEXT_FILL + STYLE_BACKGROUND_RADIUS);
+        }
+
+        return header;
+    }
+
+    private Label getScoreLabel(Participant participant, ScoreType scoreType) {
+        Label scoreLabel = new Label();
+        scoreLabel.textProperty().bind(Bindings.createStringBinding(() -> scoreType + ": " + scoreService.getScoreProperty(participant.getParticipantType(), scoreType).get(), scoreService.getScoreProperty(participant.getParticipantType(), scoreType)));
+
+        return scoreLabel;
     }
 
     public void initializeUI() {
-        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Ensure CSS is loaded
+        addCSSStyling();
+        setupMainLayout();
+        introduceScene();
+        introduceWindowCloseEvent();
+    }
 
+    private void addCSSStyling() {
+        root.getStylesheets().add(Objects.requireNonNull(getClass().getResource(STYLE_CSS)).toExternalForm());
+    }
+
+    private void setupMainLayout() {
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(10));
-
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
         VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
-
-        HBox.setHgrow(participantAO, Priority.ALWAYS);
-        HBox.setHgrow(timerPanel, Priority.ALWAYS);
-        HBox.setHgrow(participantAKA, Priority.ALWAYS);
-
+        configureLayoutHGrow(participantAO, timerPanel, participantAKA);
         mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setCenter(mainLayout);
-
-        Scene scene = new Scene(root, 1920, 1080);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm()); // Ensure CSS is loaded for Scene
-        stage.setScene(scene);
-        stage.setTitle("Karate Match Scoreboard");
-        stage.setMaximized(true);
-        stage.show();
-
-        // Handle window close event (for the window close button)
-        stage.setOnCloseRequest(e -> {
-            closeAllStages();
-        });
-
-        Button closeModeButton = new Button("Close " + modeName + " Mode");
+        Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
         closeModeButton.setAlignment(Pos.CENTER);
         timerPanel.getChildren().add(closeModeButton);
+    }
 
+    private void configureLayoutHGrow(Node... nodes) {
+        for (Node node : nodes)
+            HBox.setHgrow(node, Priority.ALWAYS);
+    }
+
+    private void introduceScene() {
+        Scene scene = new Scene(root, 1920, 1080);
+        scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Karate Match Scoreboard");
+        stage.setMaximized(true);
+        stage.show();
+    }
+
+    private void introduceWindowCloseEvent() {
+        stage.setOnCloseRequest(e -> closeAllStages());
     }
 
     private void closeAllStages() {
@@ -121,53 +135,6 @@ public class EditView {
             stage.close();
         }
     }
-
-    private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
-        VBox panel = new VBox(10);
-        panel.setPadding(new Insets(15));
-        panel.getStyleClass().add("participant-panel");
-
-        Label header = new Label();
-        header.textProperty().bind(Bindings.createStringBinding(() -> participantName + " - Total Points: " + scoreService.getTotalScoreProperty(participantName).get(), scoreService.getTotalScoreProperty(participantName)));
-        header.getStyleClass().add("header");
-        panel.setAlignment(Pos.CENTER);
-
-        if (participant.getParticipantType() == ParticipantType.AKA) {
-            header.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 10px;");
-        } else if (participant.getParticipantType() == ParticipantType.AO) {
-            header.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 10;-fx-background-radius: 10px;");
-        }
-
-        Label scoreYuko = new Label();
-        scoreYuko.textProperty().bind(Bindings.createStringBinding(() -> "Yuko: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO)));
-
-        Label scoreWazaAri = new Label();
-        scoreWazaAri.textProperty().bind(Bindings.createStringBinding(() -> "Waza-ari: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)));
-
-        Label scoreIppon = new Label();
-        scoreIppon.textProperty().bind(Bindings.createStringBinding(() -> "Ippon: " + scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON).get(), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)));
-
-        HBox scoreControls = new HBox(10, scoreYuko, scoreWazaAri, scoreIppon);
-        scoreControls.setAlignment(Pos.CENTER);
-
-        Button toggleSenshuButton = new Button("Senshu");
-        toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
-        toggleSenshuButton.setStyle("-fx-font-size: 15px;");
-
-        Label senshuLabel = new Label("● Senshu");
-        senshuLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: orange;");
-        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
-
-        HBox senshuBox = new HBox(10, toggleSenshuButton, senshuLabel);
-        senshuBox.setAlignment(Pos.CENTER);
-        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
-
-        panel.getChildren().addAll(header, scoreControls, senshuBox);
-        addButtonControls(panel, participant);
-        panel.getChildren().add(penaltyComponent.getComponent());
-        return panel;
-    }
-
     private void addButtonControls(VBox panel, Participant participant) {
         setupScoreControl(panel, participant, ScoreType.YUKO);
         setupScoreControl(panel, participant, ScoreType.WAZARI);
@@ -186,6 +153,54 @@ public class EditView {
         panel.getChildren().add(scoreControls);
     }
 
+    private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
+        VBox panel = new VBox(10);
+        panel.setPadding(new Insets(15));
+        panel.getStyleClass().add("participant-panel");
+
+
+        HBox scoreControls = new HBox(10, getScoreLabel(participant, ScoreType.YUKO), getScoreLabel(participant, ScoreType.WAZARI), getScoreLabel(participant, ScoreType.IPPON));
+        scoreControls.setAlignment(Pos.CENTER);
+
+        Button toggleSenshuButton = new Button("Senshu");
+        toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
+        toggleSenshuButton.setStyle("-fx-font-size: 15px;");
+
+        Label senshuLabel = new Label("● Senshu");
+        senshuLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: orange;");
+        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
+
+        HBox senshuBox = new HBox(10, toggleSenshuButton, senshuLabel);
+        senshuBox.setAlignment(Pos.CENTER);
+        PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
+
+        panel.getChildren().addAll(getParticipantHeader(participant, participantName), scoreControls, senshuBox);
+        addButtonControls(panel, participant);
+        panel.getChildren().add(penaltyComponent.getComponent());
+        return panel;
+    }
+
+    private static void handleTimeSet(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        try {
+            int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+            int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+            if (mins < 0 || secs < 0 || secs >= 60) {
+                throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+            }
+            timerService.setUpTimer(mins, secs);
+        } catch (NumberFormatException ex) {
+            minutesInput.setText("");
+            secondsInput.setText("");
+            minutesInput.setPromptText("Invalid input! Enter a number.");
+            secondsInput.setPromptText("Invalid input! Enter a number.");
+        }
+    }
+
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        Button setTimeButton = new Button("Set");
+        setTimeButton.setOnAction(e -> handleTimeSet(minutesInput, secondsInput, timerService));
+        return setTimeButton;
+    }
     private VBox createTimerPanel() {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
@@ -270,6 +285,5 @@ public class EditView {
 
         return timerPanel;
     }
-
 
 }
