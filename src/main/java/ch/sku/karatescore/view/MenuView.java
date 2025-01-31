@@ -1,10 +1,7 @@
 package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.model.Participant;
-import ch.sku.karatescore.services.PenaltyService;
-import ch.sku.karatescore.services.ScoreService;
-import ch.sku.karatescore.services.SenshuService;
-import ch.sku.karatescore.services.TimerService;
+import ch.sku.karatescore.services.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,19 +23,21 @@ public class MenuView {
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
     private final SenshuService senshuService;
+    private final CategoryService categoryService;
     @Getter
     private final Stage stage;
     private final BorderPane root = new BorderPane();
     private Stage currentModeStage;
     private Stage editViewStage;
 
-    private MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
+    private MenuView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
         this.scoreService = scoreService;
         this.penaltyService = penaltyService;
         this.senshuService = senshuService;
+        this.categoryService = categoryService;
         this.stage = new Stage();
 
         initializeUI();
@@ -48,9 +47,9 @@ public class MenuView {
         });
     }
 
-    public static MenuView getInstance(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService) {
+    public static MenuView getInstance(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService) {
         if (instance == null) {
-            instance = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService);
+            instance = new MenuView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService);
         }
         return instance;
     }
@@ -59,7 +58,7 @@ public class MenuView {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
         Button btnOpenWKF = new Button("WKF");
-        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService).getStage(), "WKF"));
+        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService).getStage(), "WKF"));
 
         Button btnOpenPromoKumite = new Button("Promokumite");
         btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite"));
@@ -101,7 +100,7 @@ public class MenuView {
         }
 
         // Create and show EditView
-        EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, specificModeStage, modeName);
+        EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService,specificModeStage, modeName);
         editViewStage = editView.getStage();
         editViewStage.show();
 

@@ -4,10 +4,7 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.model.Participant;
-import ch.sku.karatescore.services.PenaltyService;
-import ch.sku.karatescore.services.ScoreService;
-import ch.sku.karatescore.services.SenshuService;
-import ch.sku.karatescore.services.TimerService;
+import ch.sku.karatescore.services.*;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,10 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lombok.Getter;
 
@@ -41,22 +35,45 @@ public class EditView {
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
     private final SenshuService senshuService;
+    private final CategoryService categoryService;
     private final String modeName;
     private Stage currentModeStage; // Reference to the current mode stage
 
-    public EditView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, Stage currentModeStage, String modeName) {
+    public EditView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService, Stage currentModeStage, String modeName) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
         this.scoreService = scoreService;
         this.penaltyService = penaltyService;
         this.senshuService = senshuService;
+        this.categoryService = categoryService;
         this.stage = new Stage();
         this.currentModeStage = currentModeStage; // Set the current mode stage
         this.modeName = modeName; // Set the name of the clicked button
         initializeUI();
     }
 
+    private static void handleTimeSet(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        try {
+            int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
+            int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
+            if (mins < 0 || secs < 0 || secs >= 60) {
+                throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
+            }
+            timerService.setUpTimer(mins, secs);
+        } catch (NumberFormatException ex) {
+            minutesInput.setText("");
+            secondsInput.setText("");
+            minutesInput.setPromptText("Invalid input! Enter a number.");
+            secondsInput.setPromptText("Invalid input! Enter a number.");
+        }
+    }
+
+    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
+        Button setTimeButton = new Button("Set");
+        setTimeButton.setOnAction(e -> handleTimeSet(minutesInput, secondsInput, timerService));
+        return setTimeButton;
+    }
 
     private Label getParticipantHeader(Participant participant, ParticipantType participantName) {
         Label header = new Label();
@@ -90,6 +107,43 @@ public class EditView {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource(STYLE_CSS)).toExternalForm());
     }
 
+    private HBox createCategoryPanel() {
+        HBox categoryPanel = createCategoryPanelLayout();
+        Label categoryLabel = createCategoryLabel();
+        HBox.setHgrow(categoryLabel, Priority.ALWAYS);
+        categoryLabel.setMaxWidth(Double.MAX_VALUE);
+        TextField categoryText = new TextField();
+        categoryText.setPromptText("Enter category name");
+        HBox.setHgrow(categoryText, Priority.ALWAYS);
+        categoryText.setMaxWidth(Double.MAX_VALUE);
+        Button setCategoryButton = createSetCategoryButton(categoryText);
+        categoryPanel.getChildren().addAll(categoryLabel, categoryText, setCategoryButton);
+        return categoryPanel;
+    }
+
+    private HBox createCategoryPanelLayout() {
+        HBox categoryPanel = new HBox(10);
+        categoryPanel.setPadding(new Insets(20));
+        categoryPanel.getStyleClass().add("category-panel");
+        return categoryPanel;
+    }
+
+    private Label createCategoryLabel() {
+
+        Label categoryLabel = new Label();
+        categoryLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+            String categoryInfo = categoryService.getCategoryInfo();
+            return categoryInfo.isEmpty() ? "Enter category name" : categoryInfo;
+        }, categoryService.categoryInfoProperty())); // Assuming categoryInfoProperty() returns a property
+        return categoryLabel;
+    }
+
+    private Button createSetCategoryButton(TextField categoryText) {
+        Button setCategoryButton = new Button("Set");
+        setCategoryButton.setOnAction(e -> categoryService.setCategoryInfo(categoryText.getText()));
+        return setCategoryButton;
+    }
+
     private void setupMainLayout() {
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
@@ -98,8 +152,10 @@ public class EditView {
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
         VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
+        HBox categoryPanel = createCategoryPanel();
         configureLayoutHGrow(participantAO, timerPanel, participantAKA);
-        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll( participantAO, timerPanel, participantAKA);
+        root.setTop(categoryPanel);
         root.setCenter(mainLayout);
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
@@ -135,6 +191,7 @@ public class EditView {
             stage.close();
         }
     }
+
     private void addButtonControls(VBox panel, Participant participant) {
         setupScoreControl(panel, participant, ScoreType.YUKO);
         setupScoreControl(panel, participant, ScoreType.WAZARI);
@@ -180,27 +237,6 @@ public class EditView {
         return panel;
     }
 
-    private static void handleTimeSet(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        try {
-            int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-            int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-            if (mins < 0 || secs < 0 || secs >= 60) {
-                throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-            }
-            timerService.setUpTimer(mins, secs);
-        } catch (NumberFormatException ex) {
-            minutesInput.setText("");
-            secondsInput.setText("");
-            minutesInput.setPromptText("Invalid input! Enter a number.");
-            secondsInput.setPromptText("Invalid input! Enter a number.");
-        }
-    }
-
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set");
-        setTimeButton.setOnAction(e -> handleTimeSet(minutesInput, secondsInput, timerService));
-        return setTimeButton;
-    }
     private VBox createTimerPanel() {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
@@ -270,6 +306,8 @@ public class EditView {
             scoreService.resetScores();
             penaltyService.resetPenalties();
             senshuService.resetSenshus();
+            categoryService.resetCategoryInfo();
+
         });
         resetMiddle.setAlignment(Pos.CENTER);
         resetMiddle.getChildren().add(resetAll);

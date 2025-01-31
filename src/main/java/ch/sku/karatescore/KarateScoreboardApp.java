@@ -2,10 +2,7 @@ package ch.sku.karatescore;
 
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.model.Participant;
-import ch.sku.karatescore.services.PenaltyService;
-import ch.sku.karatescore.services.ScoreService;
-import ch.sku.karatescore.services.SenshuService;
-import ch.sku.karatescore.services.TimerService;
+import ch.sku.karatescore.services.*;
 import ch.sku.karatescore.view.MenuView;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,6 +16,7 @@ public class KarateScoreboardApp extends Application {
     private final ScoreService scoreService = new ScoreService();
     private final PenaltyService penaltyService = new PenaltyService();
     private final SenshuService senshuService = new SenshuService();
+    private final CategoryService categoryService = new CategoryService();
 
     public static void main(String[] args) {
         launch(args);
@@ -26,7 +24,7 @@ public class KarateScoreboardApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        MenuView menuView = MenuView.getInstance(aka, ao, timerService, scoreService, penaltyService, senshuService);
+        MenuView menuView = MenuView.getInstance(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService);
         menuView.show();
 
         // Set up a close request handler for the MenuView stage to ensure the application exits
