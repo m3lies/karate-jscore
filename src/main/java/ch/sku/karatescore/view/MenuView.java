@@ -65,7 +65,7 @@ public class MenuView {
                 openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite")
         );
 
-        Button btnOpenFourFifteen = new Button("4 x 15 ");
+        Button btnOpenFourFifteen = new Button("4 x 15");
         btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService).getStage(), "4 x 15"));
 
         HBox mainLayout = new HBox(10);

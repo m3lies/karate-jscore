@@ -162,7 +162,7 @@ public class EditView {
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
-        closeModeButton.setAlignment(Pos.CENTER);
+        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
         timerPanel.getChildren().add(closeModeButton);
     }
 
@@ -263,31 +263,9 @@ public class EditView {
         Button stopTimerButton = new Button("Stop");
         stopTimerButton.setOnAction(e -> timerService.stop());
 
-        // Interval control buttons
-        Button startIntervalButton = new Button("4x15 Start");
-        startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
-        Button stopIntervalButton = new Button("4x15 stop");
-        stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
-        Button resetTimerIntervalButton = new Button("4 x 15 Reset");
-        resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
-
-        Label timerIntervalLabel1 = new Label();
-        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.intervalMillisecondsProperty1()));
-
-        Label timerIntervalLabel2 = new Label();
-        timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty2(), timerService.intervalMillisecondsProperty2()));
-
-        Label timerIntervalLabel3 = new Label();
-        timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty3(), timerService.intervalMillisecondsProperty3()));
-
-        Label timerIntervalLabel4 = new Label();
-        timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty4(), timerService.intervalMillisecondsProperty4()));
-
         // Organizing buttons into rows
         HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
         startStopButtons.setAlignment(Pos.CENTER);
-        HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
-        HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
 
         HBox inputFieldsSetTimeButton = new HBox(5, minutesInput, secondsInput, setTimeButton);
         inputFieldsSetTimeButton.setAlignment(Pos.CENTER);
@@ -312,14 +290,7 @@ public class EditView {
         resetMiddle.setAlignment(Pos.CENTER);
         resetMiddle.getChildren().add(resetAll);
 
-        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
-        intervalTimersBottom.setPadding(new Insets(20));
-        intervalTimersBottom.setAlignment(Pos.BOTTOM_CENTER);
-
-        // Make the interval timers take the remaining space at the bottom
-        VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
-
-        timerPanel.getChildren().addAll(timerTop, resetMiddle, intervalTimersBottom);
+        timerPanel.getChildren().addAll(timerTop, resetMiddle);
 
         return timerPanel;
     }

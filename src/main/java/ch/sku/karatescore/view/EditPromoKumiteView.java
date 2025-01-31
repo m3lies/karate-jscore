@@ -130,8 +130,9 @@ public class EditPromoKumiteView {
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
         HBox categoryPanel = createCategoryPanel();
-        configureLayoutHGrow(participantAO, participantAKA);
-        mainLayout.getChildren().addAll(participantAO, participantAKA);
+        VBox middlePanel = createTimerPanel();
+        configureLayoutHGrow(participantAO, middlePanel, participantAKA);
+        mainLayout.getChildren().addAll(participantAO, middlePanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
@@ -139,7 +140,8 @@ public class EditPromoKumiteView {
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
-        closeModeButton.setAlignment(Pos.CENTER);
+        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
+        middlePanel.getChildren().addAll(closeModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -171,7 +173,6 @@ public class EditPromoKumiteView {
     private void addButtonControls(VBox panel, Participant participant) {
         setupScoreControl(panel, participant, ScoreType.YUKO);
         setupScoreControl(panel, participant, ScoreType.WAZARI);
-        setupScoreControl(panel, participant, ScoreType.IPPON);
     }
 
     private void setupScoreControl(VBox panel, Participant participant, ScoreType scoreType) {
@@ -192,7 +193,7 @@ public class EditPromoKumiteView {
         panel.getStyleClass().add("participant-panel");
 
 
-        HBox scoreControls = new HBox(10, getScoreLabel(participant, ScoreType.YUKO), getScoreLabel(participant, ScoreType.WAZARI), getScoreLabel(participant, ScoreType.IPPON));
+        HBox scoreControls = new HBox(10, getScoreLabel(participant, ScoreType.YUKO), getScoreLabel(participant, ScoreType.WAZARI));
         scoreControls.setAlignment(Pos.CENTER);
 
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
@@ -201,6 +202,29 @@ public class EditPromoKumiteView {
         addButtonControls(panel, participant);
         panel.getChildren().add(penaltyComponent.getComponent());
         return panel;
+    }
+    private VBox createTimerPanel() {
+        VBox timerPanel = new VBox(10);
+        timerPanel.setPadding(new Insets(20));
+        timerPanel.getStyleClass().add("timer-panel");
+     // User input fields for minutes and seconds
+
+
+        VBox resetMiddle = new VBox(10);
+        Button resetAll = new Button("Reset ALL");
+        resetAll.setStyle("-fx-text-fill: orange");
+        resetAll.setOnAction(e -> {
+            scoreService.resetScores();
+            penaltyService.resetPenalties();
+            categoryService.resetCategoryInfo();
+
+        });
+        resetMiddle.setAlignment(Pos.CENTER);
+        resetMiddle.getChildren().add(resetAll);
+
+        timerPanel.getChildren().addAll(resetMiddle);
+
+        return timerPanel;
     }
 
 }

@@ -202,27 +202,6 @@ public class EditFourFifteenView {
         timerPanel.setPadding(new Insets(20));
         timerPanel.getStyleClass().add("timer-panel");
 
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty(), timerService.millisecondsProperty()));
-
-        // User input fields for minutes and seconds
-        TextField minutesInput = new TextField();
-        TextField secondsInput = new TextField();
-        minutesInput.setPromptText("min");
-        secondsInput.setPromptText("sec");
-        // Setting preferred size for text fields
-        minutesInput.setPrefWidth(80);
-        secondsInput.setPrefWidth(80);
-
-        // Timer control buttons
-        Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
-
-        // Start and Stop buttons
-        Button startTimerButton = new Button("Start");
-        startTimerButton.setOnAction(e -> timerService.start());
-        Button stopTimerButton = new Button("Stop");
-        stopTimerButton.setOnAction(e -> timerService.stop());
-
         // Interval control buttons
         Button startIntervalButton = new Button("4x15 Start");
         startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
@@ -244,18 +223,8 @@ public class EditFourFifteenView {
         timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty4(), timerService.intervalMillisecondsProperty4()));
 
         // Organizing buttons into rows
-        HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
-        startStopButtons.setAlignment(Pos.CENTER);
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
-
-        HBox inputFieldsSetTimeButton = new HBox(5, minutesInput, secondsInput, setTimeButton);
-        inputFieldsSetTimeButton.setAlignment(Pos.CENTER);
-
-        // Container for interval timers, top and bottom
-        VBox timerTop = new VBox(10, inputFieldsSetTimeButton, timerLabel, startStopButtons);
-        timerTop.setAlignment(Pos.CENTER);
-        timerTop.setPadding(new Insets(20));
 
         VBox resetMiddle = new VBox(10);
         Button resetAll = new Button("Reset ALL");
@@ -277,7 +246,7 @@ public class EditFourFifteenView {
         // Make the interval timers take the remaining space at the bottom
         VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
 
-        timerPanel.getChildren().addAll(timerTop, resetMiddle, intervalTimersBottom);
+        timerPanel.getChildren().addAll(resetMiddle, intervalTimersBottom);
 
         return timerPanel;
     }
