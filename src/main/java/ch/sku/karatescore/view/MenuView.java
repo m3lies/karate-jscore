@@ -61,7 +61,9 @@ public class MenuView {
         btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService).getStage(), "WKF"));
 
         Button btnOpenPromoKumite = new Button("Promokumite");
-        btnOpenPromoKumite.setOnAction(e -> openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite"));
+        btnOpenPromoKumite.setOnAction(e ->
+                openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite")
+        );
 
         Button btnOpenFourFifteen = new Button("4 x 15 ");
         btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService).getStage(), "4 x 15"));
@@ -100,10 +102,20 @@ public class MenuView {
         }
 
         // Create and show EditView
-        EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService,specificModeStage, modeName);
-        editViewStage = editView.getStage();
-        editViewStage.show();
-
+        if(modeName == "WKF") {
+            EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            editViewStage = editView.getStage();
+            editViewStage.show();
+        }
+        else if( modeName == "Promokumite"){
+            EditPromoKumiteView editPromoKumiteView = new EditPromoKumiteView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            editViewStage = editPromoKumiteView.getStage();
+            editViewStage.show();
+        }else{
+            EditFourFifteenView editFourFifteenView = new EditFourFifteenView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            editViewStage = editFourFifteenView.getStage();
+            editViewStage.show();
+        }
         // Set up and show the specific mode stage
         currentModeStage = specificModeStage;
 
