@@ -149,13 +149,16 @@ public class EditFourFifteenView {
         mainLayout.getChildren().addAll( participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
+
+        BorderPane paneForCloseModeButton = new BorderPane();
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
-        closeModeButton.setAlignment(Pos.CENTER);
-        timerPanel.getChildren().add(closeModeButton);
+        paneForCloseModeButton.setBottom(closeModeButton);
+        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
+        timerPanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -167,7 +170,7 @@ public class EditFourFifteenView {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("4 x 15 Mode");
         stage.setMaximized(true);
         stage.show();
     }
@@ -226,6 +229,14 @@ public class EditFourFifteenView {
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
         HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
 
+
+
+        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
+        intervalTimersBottom.setPadding(new Insets(20));
+        intervalTimersBottom.setAlignment(Pos.TOP_CENTER);
+
+        // Make the interval timers take the remaining space at the bottom
+        VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
         VBox resetMiddle = new VBox(10);
         Button resetAll = new Button("Reset ALL");
         resetAll.setStyle("-fx-text-fill: orange");
@@ -238,15 +249,7 @@ public class EditFourFifteenView {
         });
         resetMiddle.setAlignment(Pos.CENTER);
         resetMiddle.getChildren().add(resetAll);
-
-        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
-        intervalTimersBottom.setPadding(new Insets(20));
-        intervalTimersBottom.setAlignment(Pos.BOTTOM_CENTER);
-
-        // Make the interval timers take the remaining space at the bottom
-        VBox.setVgrow(intervalTimersBottom, Priority.ALWAYS);
-
-        timerPanel.getChildren().addAll(resetMiddle, intervalTimersBottom);
+        timerPanel.getChildren().addAll(intervalTimersBottom, resetMiddle);
 
         return timerPanel;
     }
