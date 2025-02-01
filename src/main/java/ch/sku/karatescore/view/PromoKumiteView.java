@@ -4,6 +4,7 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.CategoryService;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.ScoreService;
 import javafx.beans.binding.Bindings;
@@ -23,8 +24,10 @@ public class PromoKumiteView {
     private final Participant ao;
     private final ScoreService scoreService;
     private final PenaltyService penaltyService;
+    private final CategoryService categoryService;
 
-    public PromoKumiteView(Participant aka, Participant ao, ScoreService scoreService, PenaltyService penaltyService) {
+    public PromoKumiteView(Participant aka, Participant ao, ScoreService scoreService, PenaltyService penaltyService, CategoryService categoryService) {
+        this.categoryService = categoryService;
         this.stage = new Stage();
         this.aka = aka;
         this.ao = ao;
@@ -35,8 +38,18 @@ public class PromoKumiteView {
 
     private void initializeUI() {
         StackPane root = new StackPane();
+        StackPane mainPane = new StackPane();
 
         HBox participantsBox = new HBox(10);
+        HBox categoryBox = new HBox();
+        Label categoryLabel = new Label();
+        categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+        categoryLabel.textProperty().bind(Bindings.format("%s", categoryService.categoryInfoProperty()));
+        categoryBox.setMaxWidth(Double.MAX_VALUE);
+        categoryBox.getChildren().addAll(categoryLabel);
+        categoryBox.setAlignment(Pos.TOP_LEFT);
+        categoryBox.setPadding(new Insets(0, 50, 0, 0));
+        HBox.setHgrow(categoryBox, Priority.ALWAYS);
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
@@ -45,22 +58,25 @@ public class PromoKumiteView {
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
+
         participantsBox.getChildren().addAll(akaPanel, aoPanel);
 
-        root.getChildren().add(participantsBox);
+        root.getChildren().addAll(participantsBox);
         // Adding participant type labels
         Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
         Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
         StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
         StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
-        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
+        StackPane.setMargin(akaTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        mainPane.getChildren().addAll(categoryBox, akaTypeLabel, aoTypeLabel);
+        root.getChildren().addAll(mainPane);
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("Promo Kumite");
     }
+
     private Label createParticipantTypeLabel(ParticipantType participantType) {
         Label label = new Label(participantType.name());
         label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
@@ -68,6 +84,7 @@ public class PromoKumiteView {
     }
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
+        panel.setSpacing(100);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
@@ -79,9 +96,7 @@ public class PromoKumiteView {
         totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d     Waza-ari %d",
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d     Waza-ari %d", scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
 
         ));
         detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
@@ -90,9 +105,8 @@ public class PromoKumiteView {
         scoreBox.setAlignment(Pos.CENTER);
 
 
-
         if (participantType == ParticipantType.AKA) {
-            scoreSenshuBox.getChildren().addAll( scoreBox);
+            scoreSenshuBox.getChildren().addAll(scoreBox);
         } else {
             scoreSenshuBox.getChildren().addAll(scoreBox);
         }

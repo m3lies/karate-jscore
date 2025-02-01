@@ -3,6 +3,7 @@ package ch.sku.karatescore.view;
 import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.PenaltyType;
 import ch.sku.karatescore.model.Participant;
+import ch.sku.karatescore.services.CategoryService;
 import ch.sku.karatescore.services.PenaltyService;
 import ch.sku.karatescore.services.TimerService;
 import javafx.beans.binding.Bindings;
@@ -24,8 +25,10 @@ public class FourFifteenView {
     private final Participant ao;
     private final TimerService timerService;
     private final PenaltyService penaltyService;
+    private final CategoryService categoryService;
 
-    public FourFifteenView(Participant aka, Participant ao, TimerService timerService, PenaltyService penaltyService) {
+    public FourFifteenView(Participant aka, Participant ao, TimerService timerService, PenaltyService penaltyService, CategoryService categoryService) {
+        this.categoryService = categoryService;
         this.stage = new Stage();
         this.aka = aka;
         this.ao = ao;
@@ -36,8 +39,18 @@ public class FourFifteenView {
 
     private void initializeUI() {
         StackPane root = new StackPane();
+        StackPane mainPane = new StackPane();
 
         HBox participantsBox = new HBox(10);
+        HBox categoryBox = new HBox();
+        Label categoryLabel = new Label();
+        categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+        categoryLabel.textProperty().bind(Bindings.format("%s", categoryService.categoryInfoProperty()));
+        categoryBox.setMaxWidth(Double.MAX_VALUE);
+        categoryBox.getChildren().addAll(categoryLabel);
+        categoryBox.setAlignment(Pos.TOP_LEFT);
+        categoryBox.setPadding(new Insets(0, 50, 0, 0));
+        HBox.setHgrow(categoryBox, Priority.ALWAYS);
 
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA, timerService.intervalSecondsProperty1(), timerService.intervalSecondsProperty3());
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO, timerService.intervalSecondsProperty2(), timerService.intervalSecondsProperty4());
@@ -47,14 +60,15 @@ public class FourFifteenView {
         akaPanel.setMaxWidth(Double.MAX_VALUE);
         aoPanel.setMaxWidth(Double.MAX_VALUE);
         participantsBox.getChildren().addAll(akaPanel, aoPanel);
+
         root.getChildren().add(participantsBox);
 
         Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
         Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
         StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
         StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
-        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(akaTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
 
 /*
         // Add the "Penalties" label in the center of the root pane
@@ -64,12 +78,13 @@ public class FourFifteenView {
         StackPane.setMargin(penaltiesLabel, new Insets(400, 0, 0, 0)); // Adjust margin to position it appropriately
         root.getChildren().addAll(akaTypeLabel, aoTypeLabel, penaltiesLabel);*/
 
-        root.getChildren().addAll(akaTypeLabel, aoTypeLabel);
+        mainPane.getChildren().addAll(categoryBox, akaTypeLabel, aoTypeLabel);
+        root.getChildren().addAll(mainPane);
 
         Scene scene = new Scene(root, 1920, 1080);
         stage.setScene(scene);
         setFullScreen();
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("4 x 15");
     }
 
     private Label createParticipantTypeLabel(ParticipantType participantType) {
@@ -80,6 +95,7 @@ public class FourFifteenView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType type, IntegerProperty interval1, IntegerProperty interval2) {
         VBox panel = new VBox(20);
+        panel.setSpacing(100);
         Label participantTypeName = new Label(type.getType());
         participantTypeName.setAlignment(type == ParticipantType.AKA ? Pos.TOP_LEFT : Pos.TOP_RIGHT);
         panel.setStyle("-fx-background-color: " + (type == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");

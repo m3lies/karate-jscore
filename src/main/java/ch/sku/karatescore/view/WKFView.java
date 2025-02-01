@@ -52,6 +52,7 @@ public class WKFView {
         categoryBox.setAlignment(Pos.TOP_LEFT);
         categoryBox.setPadding(new Insets(0, 50, 0, 0));
         HBox.setHgrow(categoryBox, Priority.ALWAYS);
+
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
 
