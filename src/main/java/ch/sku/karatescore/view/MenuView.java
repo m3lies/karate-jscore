@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class MenuView {
+    private static final String WKF = "WKF";
+    private static final String PROMO_KUMITE = "Promo Kumite";
+    private static final String FOUR_FIFTEEN = "4 x 15";
     private static MenuView instance;
     private final Participant aka;
     private final Participant ao;
@@ -57,16 +60,16 @@ public class MenuView {
     private void initializeUI() {
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()); // Correct reference to CSS
 
-        Button btnOpenWKF = new Button("WKF");
-        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService).getStage(), "WKF"));
+        Button btnOpenWKF = new Button(WKF);
+        btnOpenWKF.setOnAction(e -> openMode(new WKFView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService).getStage(), WKF));
 
-        Button btnOpenPromoKumite = new Button("Promokumite");
+        Button btnOpenPromoKumite = new Button(PROMO_KUMITE);
         btnOpenPromoKumite.setOnAction(e ->
-                openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService).getStage(), "Promokumite")
+                openMode(new PromoKumiteView(aka, ao, scoreService, penaltyService, categoryService).getStage(), PROMO_KUMITE)
         );
 
-        Button btnOpenFourFifteen = new Button("4 x 15");
-        btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService).getStage(), "4 x 15"));
+        Button btnOpenFourFifteen = new Button(FOUR_FIFTEEN);
+        btnOpenFourFifteen.setOnAction(e -> openMode(new FourFifteenView(aka, ao, timerService, penaltyService, categoryService).getStage(), FOUR_FIFTEEN));
 
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
@@ -102,12 +105,12 @@ public class MenuView {
         }
 
         // Create and show EditView
-        if(modeName == "WKF") {
+        if(modeName == WKF) {
             EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
             editViewStage = editView.getStage();
             editViewStage.show();
         }
-        else if( modeName == "Promokumite"){
+        else if( modeName == PROMO_KUMITE){
             EditPromoKumiteView editPromoKumiteView = new EditPromoKumiteView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
             editViewStage = editPromoKumiteView.getStage();
             editViewStage.show();
