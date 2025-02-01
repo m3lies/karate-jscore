@@ -157,13 +157,15 @@ public class EditView {
         mainLayout.getChildren().addAll( participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
+        BorderPane paneForCloseModeButton = new BorderPane();
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
+        paneForCloseModeButton.setBottom(closeModeButton);
         closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
-        timerPanel.getChildren().add(closeModeButton);
+        timerPanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -175,7 +177,7 @@ public class EditView {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("WKF Mode");
         stage.setMaximized(true);
         stage.show();
     }

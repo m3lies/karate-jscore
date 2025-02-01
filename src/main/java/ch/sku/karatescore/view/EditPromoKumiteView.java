@@ -135,13 +135,16 @@ public class EditPromoKumiteView {
         mainLayout.getChildren().addAll(participantAO, middlePanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
+
+        BorderPane paneForCloseModeButton = new BorderPane();
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
         closeModeButton.setOnAction(e -> {
             closeAllStages();
         });
+        paneForCloseModeButton.setBottom(closeModeButton);
         closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
-        middlePanel.getChildren().addAll(closeModeButton);
+        middlePanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -153,7 +156,7 @@ public class EditPromoKumiteView {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
-        stage.setTitle("Karate Match Scoreboard");
+        stage.setTitle("Promo kumite Mode");
         stage.setMaximized(true);
         stage.show();
     }
