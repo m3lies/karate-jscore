@@ -50,6 +50,7 @@ public class WKFView {
         categoryBox.setMaxWidth(Double.MAX_VALUE);
         categoryBox.getChildren().addAll(categoryLabel);
         categoryBox.setAlignment(Pos.TOP_LEFT);
+        categoryBox.setPadding(new Insets(0, 50, 0, 0));
         HBox.setHgrow(categoryBox, Priority.ALWAYS);
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
@@ -75,8 +76,8 @@ public class WKFView {
         Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
         StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
         StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
-        StackPane.setMargin(akaTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        StackPane.setMargin(aoTypeLabel, new Insets(50, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(akaTypeLabel, new Insets(100, 100, 0, 50)); // Adjust margin to bring it closer to the center and down
+        StackPane.setMargin(aoTypeLabel, new Insets(100, 50, 0, 100)); // Adjust margin to bring it closer to the center and down
         mainPane.getChildren().addAll(categoryBox, akaTypeLabel, aoTypeLabel);
         root.getChildren().addAll(mainPane);
 
@@ -95,6 +96,7 @@ public class WKFView {
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
+        panel.setSpacing(100);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
