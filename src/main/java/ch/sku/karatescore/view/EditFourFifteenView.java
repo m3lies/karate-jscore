@@ -13,6 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -39,8 +42,9 @@ public class EditFourFifteenView {
     private final CategoryService categoryService;
     private final String modeName;
     private Stage currentModeStage; // Reference to the current mode stage
+    private boolean timerRunning = false;
 
-    public EditFourFifteenView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService, Stage currentModeStage, String modeName) {
+    public EditFourFifteenView(Participant aka, Participant ao, TimerService timerService, PenaltyService penaltyService, CategoryService categoryService, Stage currentModeStage, String modeName) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
@@ -90,8 +94,8 @@ public class EditFourFifteenView {
 
     public void initializeUI() {
         addCSSStyling();
-        setupMainLayout();
-        introduceScene();
+        Scene scene = introduceScene();
+        setupMainLayout(scene);
         introduceWindowCloseEvent();
     }
 
@@ -136,13 +140,13 @@ public class EditFourFifteenView {
         return setCategoryButton;
     }
 
-    private void setupMainLayout() {
+    private void setupMainLayout(Scene scene) {
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(10));
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
-        VBox timerPanel = createTimerPanel();
+        VBox timerPanel = createTimerPanel(scene);
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
         HBox categoryPanel = createCategoryPanel();
 
@@ -159,13 +163,14 @@ public class EditFourFifteenView {
             HBox.setHgrow(node, Priority.ALWAYS);
     }
 
-    private void introduceScene() {
+    private Scene introduceScene() {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
         stage.setTitle("4 x 15 Mode");
         stage.setMaximized(true);
         stage.show();
+        return scene;
     }
 
     private void introduceWindowCloseEvent() {
@@ -193,7 +198,7 @@ public class EditFourFifteenView {
         return panel;
     }
 
-    private VBox createTimerPanel() {
+    private VBox createTimerPanel(Scene scene) {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
         timerPanel.getStyleClass().add("timer-panel");
@@ -246,6 +251,21 @@ public class EditFourFifteenView {
         HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
         bottomButtons.setAlignment(Pos.CENTER);
 
+// --- Scene Key Handler (Space for Start/Stop) ---
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // ⛔ Do nothing if user is typing in a TextField
+            if (scene.getFocusOwner() instanceof TextInputControl) return;
+
+            if (event.getCode() == KeyCode.SPACE) {
+                if (timerRunning) {
+                    timerService.stopAllIntervalTimers();
+                } else {
+                    timerService.startIntervalTimer(timerService.periodProperty().get());
+                }
+                timerRunning = !timerRunning;
+                event.consume(); // prevent accidental button triggers
+            }
+        });
         // Final layout
         timerPanel.getChildren().addAll(intervalTimersBottom, bottomButtons);
 
