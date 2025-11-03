@@ -104,10 +104,10 @@ public class MenuView {
             editViewStage.close();
         }
 
-        // Create and show EditView
+        // Create and show EditWKFView
         if(modeName == WKF) {
-            EditView editView = new EditView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
-            editViewStage = editView.getStage();
+            EditWKFView editWKFView = new EditWKFView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            editViewStage = editWKFView.getStage();
             editViewStage.show();
         }
         else if( modeName == PROMO_KUMITE){

@@ -9,7 +9,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="trying to reduce size penalty button" />
+    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="changing Beep">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/CategoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/CategoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditFourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditFourFifteenView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditPromoKumiteView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditPromoKumiteView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditWKFView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/MenuView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/MenuView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/WKFView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/WKFView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,9 +40,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
   </component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -39,53 +50,36 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 3
-}</component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 3
+}]]></component>
   <component name="ProjectId" id="2eh75EPTIsp4j2p3krMRpsd0LUu" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.KarateScorboardApp.executor&quot;: &quot;Run&quot;,
-    &quot;Application.KarateScoreboardApp.executor&quot;: &quot;Run&quot;,
-    &quot;Application.PackagedJFX.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ScoreApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
-    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
-    &quot;Maven.karate-score [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.karate-score [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.karate-score [deploy].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.karate-score [install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.karate-score [package].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.karate-score [validate].executor&quot;: &quot;Run&quot;,
-    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.3537415&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.annotationProcessors&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.KarateScoreboardApp.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ch.sku.karatescore" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Users\Vanhi\Documents\Programmation\karate-jscore\src\main\resources\sounds" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Users\Vanhi\Documents\Programmation\karate-jscore\src\main\resources\sounds" />
@@ -94,6 +88,7 @@
   </component>
   <component name="RunManager" selected="Application.KarateScoreboardApp">
     <configuration name="KarateScoreboardApp" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="jbr-17" />
       <option name="MAIN_CLASS_NAME" value="ch.sku.karatescore.KarateScoreboardApp" />
       <module name="karate-score" />
       <option name="PROGRAM_PARAMETERS" value="--module-path &quot;C:/Program Files/Java/javafx-sdk-17.0.11/lib&quot; --add-modules javafx.controls,javafx.fxml " />
@@ -153,31 +148,15 @@
       <workItem from="1717203714591" duration="43000" />
       <workItem from="1717423990722" duration="17000" />
       <workItem from="1718278651173" duration="1000" />
-      <workItem from="1727447474944" duration="4273000" />
-    </task>
-    <task id="LOCAL-00001" summary="creating the new score app">
-      <option name="closed" value="true" />
-      <created>1712511147481</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1712511147481</updated>
-    </task>
-    <task id="LOCAL-00002" summary="adding timer">
-      <option name="closed" value="true" />
-      <created>1712519462210</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1712519462210</updated>
-    </task>
-    <task id="LOCAL-00003" summary="change name to enum">
-      <option name="closed" value="true" />
-      <created>1712519477925</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1712519477926</updated>
+      <workItem from="1727447474944" duration="9591000" />
+      <workItem from="1737405376215" duration="1224000" />
+      <workItem from="1738099975753" duration="9396000" />
+      <workItem from="1738220967934" duration="12369000" />
+      <workItem from="1738379619659" duration="6982000" />
+      <workItem from="1758752554234" duration="601000" />
+      <workItem from="1758859014805" duration="1375000" />
+      <workItem from="1758906017647" duration="833000" />
+      <workItem from="1762063773700" duration="9312000" />
     </task>
     <task id="LOCAL-00004" summary="added shared view between components">
       <option name="closed" value="true" />
@@ -411,7 +390,167 @@
       <option name="project" value="LOCAL" />
       <updated>1727452301090</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="trying to reduce size penalty button">
+      <option name="closed" value="true" />
+      <created>1727453963649</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1727453963649</updated>
+    </task>
+    <task id="LOCAL-00034" summary="trying to reduce size penalty button">
+      <option name="closed" value="true" />
+      <created>1727454101700</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1727454101700</updated>
+    </task>
+    <task id="LOCAL-00035" summary="modify text">
+      <option name="closed" value="true" />
+      <created>1727454169692</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1727454169692</updated>
+    </task>
+    <task id="LOCAL-00036" summary="close edit window and view window at the same time">
+      <option name="closed" value="true" />
+      <created>1727473202084</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1727473202084</updated>
+    </task>
+    <task id="LOCAL-00037" summary="removed label for same type of screen">
+      <option name="closed" value="true" />
+      <created>1727473244588</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1727473244588</updated>
+    </task>
+    <task id="LOCAL-00038" summary="explicit values">
+      <option name="closed" value="true" />
+      <created>1727473267728</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1727473267728</updated>
+    </task>
+    <task id="LOCAL-00039" summary="smaller font">
+      <option name="closed" value="true" />
+      <created>1727473276864</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1727473276864</updated>
+    </task>
+    <task id="LOCAL-00040" summary="smaller font">
+      <option name="closed" value="true" />
+      <created>1727473857570</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1727473857570</updated>
+    </task>
+    <task id="LOCAL-00041" summary="smaller font">
+      <option name="closed" value="true" />
+      <created>1727474011656</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1727474011656</updated>
+    </task>
+    <task id="LOCAL-00042" summary="closing windows">
+      <option name="closed" value="true" />
+      <created>1738104318727</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1738104318727</updated>
+    </task>
+    <task id="LOCAL-00043" summary="refactor code">
+      <option name="closed" value="true" />
+      <created>1738107020269</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1738107020269</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Fixed moving penalty labels">
+      <option name="closed" value="true" />
+      <created>1738108274728</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1738108274728</updated>
+    </task>
+    <task id="LOCAL-00045" summary="adding Category to the app">
+      <option name="closed" value="true" />
+      <created>1738306698065</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1738306698065</updated>
+    </task>
+    <task id="LOCAL-00046" summary="adapting view">
+      <option name="closed" value="true" />
+      <created>1738306754884</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1738306754884</updated>
+    </task>
+    <task id="LOCAL-00047" summary="adding spacing">
+      <option name="closed" value="true" />
+      <created>1738381892050</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1738381892050</updated>
+    </task>
+    <task id="LOCAL-00048" summary="adding category label to all views">
+      <option name="closed" value="true" />
+      <created>1738383262785</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1738383262785</updated>
+    </task>
+    <task id="LOCAL-00049" summary="adding category label to all views">
+      <option name="closed" value="true" />
+      <created>1738383274071</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1738383274071</updated>
+    </task>
+    <task id="LOCAL-00050" summary="close is at the center">
+      <option name="closed" value="true" />
+      <created>1738384832919</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1738384832919</updated>
+    </task>
+    <task id="LOCAL-00051" summary="adjusting buttons close">
+      <option name="closed" value="true" />
+      <created>1738385059487</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1738385059487</updated>
+    </task>
+    <task id="LOCAL-00052" summary="changing Beep">
+      <option name="closed" value="true" />
+      <created>1758860145247</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1758860145247</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -441,21 +580,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="adding timer" />
-    <MESSAGE value="change name to enum" />
-    <MESSAGE value="added shared view between components" />
-    <MESSAGE value="added timer and penalty component" />
-    <MESSAGE value="changed PenaltyComponent" />
-    <MESSAGE value="workspace.xml" />
-    <MESSAGE value="Fixed PenaltyComponent" />
-    <MESSAGE value="added views" />
-    <MESSAGE value="New logic" />
-    <MESSAGE value="changed logic again." />
-    <MESSAGE value="refactor Participant.java" />
-    <MESSAGE value="added interval timer" />
-    <MESSAGE value="added 4x15 mode in scoreboard app" />
-    <MESSAGE value="improved counter 4x15" />
-    <MESSAGE value="better colors" />
     <MESSAGE value="timer fixed again" />
     <MESSAGE value="fixed score and promo kumite again" />
     <MESSAGE value="added line, changed labels, added milisecs" />
@@ -466,7 +590,22 @@
     <MESSAGE value="added aka ao, fixed typo" />
     <MESSAGE value="fix beep" />
     <MESSAGE value="trying to reduce size penalty button" />
-    <option name="LAST_COMMIT_MESSAGE" value="trying to reduce size penalty button" />
+    <MESSAGE value="modify text" />
+    <MESSAGE value="close edit window and view window at the same time" />
+    <MESSAGE value="removed label for same type of screen" />
+    <MESSAGE value="explicit values" />
+    <MESSAGE value="smaller font" />
+    <MESSAGE value="closing windows" />
+    <MESSAGE value="refactor code" />
+    <MESSAGE value="Fixed moving penalty labels" />
+    <MESSAGE value="adding Category to the app" />
+    <MESSAGE value="adapting view" />
+    <MESSAGE value="adding spacing" />
+    <MESSAGE value="adding category label to all views" />
+    <MESSAGE value="close is at the center" />
+    <MESSAGE value="adjusting buttons close" />
+    <MESSAGE value="changing Beep" />
+    <option name="LAST_COMMIT_MESSAGE" value="changing Beep" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

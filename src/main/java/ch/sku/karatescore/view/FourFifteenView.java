@@ -44,8 +44,16 @@ public class FourFifteenView {
         HBox participantsBox = new HBox(10);
         HBox categoryBox = new HBox();
         Label categoryLabel = new Label();
-        categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
-        categoryLabel.textProperty().bind(Bindings.format("%s", categoryService.categoryInfoProperty()));
+        categoryService.categoryInfoProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+                categoryLabel.setText(newValue);
+            } else {
+                // Optionally handle empty case
+                categoryLabel.setStyle("");
+                categoryLabel.setText("");
+            }
+        });
         categoryBox.setMaxWidth(Double.MAX_VALUE);
         categoryBox.getChildren().addAll(categoryLabel);
         categoryBox.setAlignment(Pos.TOP_LEFT);
@@ -69,14 +77,6 @@ public class FourFifteenView {
         StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
         StackPane.setMargin(akaTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
         StackPane.setMargin(aoTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-
-/*
-        // Add the "Penalties" label in the center of the root pane
-        //Label penaltiesLabel = new Label("Penalties");
-        penaltiesLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
-        StackPane.setAlignment(penaltiesLabel, Pos.CENTER);
-        StackPane.setMargin(penaltiesLabel, new Insets(400, 0, 0, 0)); // Adjust margin to position it appropriately
-        root.getChildren().addAll(akaTypeLabel, aoTypeLabel, penaltiesLabel);*/
 
         mainPane.getChildren().addAll(categoryBox, akaTypeLabel, aoTypeLabel);
         root.getChildren().addAll(mainPane);

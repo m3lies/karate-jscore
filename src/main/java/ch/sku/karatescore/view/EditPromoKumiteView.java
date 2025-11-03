@@ -136,15 +136,6 @@ public class EditPromoKumiteView {
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
 
-        BorderPane paneForCloseModeButton = new BorderPane();
-        Button closeModeButton = new Button(CLOSE_MODE + modeName);
-        closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
-        closeModeButton.setOnAction(e -> {
-            closeAllStages();
-        });
-        paneForCloseModeButton.setBottom(closeModeButton);
-        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
-        middlePanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -209,6 +200,7 @@ public class EditPromoKumiteView {
     private VBox createTimerPanel() {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
+        timerPanel.setAlignment(Pos.BOTTOM_CENTER);
         timerPanel.getStyleClass().add("timer-panel");
      // User input fields for minutes and seconds
 
@@ -224,8 +216,16 @@ public class EditPromoKumiteView {
         });
         resetMiddle.setAlignment(Pos.CENTER);
         resetMiddle.getChildren().add(resetAll);
+        Button closeModeButton = new Button(CLOSE_MODE + modeName);
+        closeModeButton.setVisible(currentModeStage != null);
 
-        timerPanel.getChildren().addAll(resetMiddle);
+        closeModeButton.setOnAction(e -> closeAllStages());
+
+        HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
+        bottomButtons.setAlignment(Pos.CENTER);
+
+        // Final layout
+        timerPanel.getChildren().addAll(bottomButtons);
 
         return timerPanel;
     }

@@ -1,3 +1,8 @@
+/* Make all text bold across the app */
+.root, .label, .button, .text-field {
+    -fx-font-weight: bold;
+}
+
 .timer-label {
     -fx-font-size:30px;
     -fx-text-fill: black;

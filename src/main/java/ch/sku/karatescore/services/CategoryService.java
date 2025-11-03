@@ -10,7 +10,6 @@ public class CategoryService {
     }
 
     public String getCategoryInfo() {
-        System.out.println("getCat");
         return this.categoryInfoProperty().get();
     }
 

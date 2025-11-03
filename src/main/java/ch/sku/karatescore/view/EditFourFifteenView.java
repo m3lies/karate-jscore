@@ -145,20 +145,13 @@ public class EditFourFifteenView {
         VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
         HBox categoryPanel = createCategoryPanel();
+
+
         configureLayoutHGrow(participantAO, timerPanel, participantAKA);
         mainLayout.getChildren().addAll( participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
 
-        BorderPane paneForCloseModeButton = new BorderPane();
-        Button closeModeButton = new Button(CLOSE_MODE + modeName);
-        closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
-        closeModeButton.setOnAction(e -> {
-            closeAllStages();
-        });
-        paneForCloseModeButton.setBottom(closeModeButton);
-        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
-        timerPanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -210,8 +203,6 @@ public class EditFourFifteenView {
         startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
         Button stopIntervalButton = new Button("4x15 stop");
         stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
-        Button resetTimerIntervalButton = new Button("4 x 15 Reset");
-        resetTimerIntervalButton.setOnAction(e -> timerService.resetInterval());
 
         Label timerIntervalLabel1 = new Label();
         timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.intervalMillisecondsProperty1()));
@@ -227,11 +218,10 @@ public class EditFourFifteenView {
 
         // Organizing buttons into rows
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
-        HBox resetIntervalButtons = new HBox(10, resetTimerIntervalButton);
+        startStopIntervalButtons.setAlignment(Pos.CENTER);
 
 
-
-        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons, resetIntervalButtons);
+        VBox intervalTimersBottom = new VBox(10, timerIntervalLabel1, timerIntervalLabel2, timerIntervalLabel3, timerIntervalLabel4, startStopIntervalButtons);
         intervalTimersBottom.setPadding(new Insets(20));
         intervalTimersBottom.setAlignment(Pos.TOP_CENTER);
 
@@ -249,7 +239,16 @@ public class EditFourFifteenView {
         });
         resetMiddle.setAlignment(Pos.CENTER);
         resetMiddle.getChildren().add(resetAll);
-        timerPanel.getChildren().addAll(intervalTimersBottom, resetMiddle);
+        Button closeModeButton = new Button(CLOSE_MODE + modeName);
+        closeModeButton.setVisible(currentModeStage != null);
+
+        closeModeButton.setOnAction(e -> closeAllStages());
+
+        HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
+        bottomButtons.setAlignment(Pos.CENTER);
+
+        // Final layout
+        timerPanel.getChildren().addAll(intervalTimersBottom, bottomButtons);
 
         return timerPanel;
     }

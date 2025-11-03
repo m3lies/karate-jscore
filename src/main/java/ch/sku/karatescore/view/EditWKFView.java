@@ -13,13 +13,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lombok.Getter;
 
 import java.util.Objects;
 
-public class EditView {
+public class EditWKFView {
     private static final String CLOSE_MODE = "Close mode ";
     private static final String STYLE_CSS = "/style.css";
     private static final String STYLE_BACKGROUND_RADIUS = "-fx-background-radius: 10px;";
@@ -37,9 +38,11 @@ public class EditView {
     private final SenshuService senshuService;
     private final CategoryService categoryService;
     private final String modeName;
-    private Stage currentModeStage; // Reference to the current mode stage
+    private Stage currentModeStage;// Reference to the current mode stage
 
-    public EditView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService, Stage currentModeStage, String modeName) {
+    private boolean timerRunning = false;
+
+    public EditWKFView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService, Stage currentModeStage, String modeName) {
         this.aka = aka;
         this.ao = ao;
         this.timerService = timerService;
@@ -98,8 +101,8 @@ public class EditView {
 
     public void initializeUI() {
         addCSSStyling();
-        setupMainLayout();
-        introduceScene();
+        Scene scene = introduceScene();
+        setupMainLayout(scene);
         introduceWindowCloseEvent();
     }
 
@@ -144,28 +147,19 @@ public class EditView {
         return setCategoryButton;
     }
 
-    private void setupMainLayout() {
+    private void setupMainLayout(Scene scene) {
         HBox mainLayout = new HBox(10);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(10));
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
-        VBox timerPanel = createTimerPanel();
+        VBox timerPanel = createTimerPanel(scene);
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
         HBox categoryPanel = createCategoryPanel();
         configureLayoutHGrow(participantAO, timerPanel, participantAKA);
-        mainLayout.getChildren().addAll( participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
-        BorderPane paneForCloseModeButton = new BorderPane();
-        Button closeModeButton = new Button(CLOSE_MODE + modeName);
-        closeModeButton.setVisible(currentModeStage != null); // Set initial visibility
-        closeModeButton.setOnAction(e -> {
-            closeAllStages();
-        });
-        paneForCloseModeButton.setBottom(closeModeButton);
-        closeModeButton.setAlignment(Pos.BOTTOM_CENTER);
-        timerPanel.getChildren().add(paneForCloseModeButton);
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -173,13 +167,14 @@ public class EditView {
             HBox.setHgrow(node, Priority.ALWAYS);
     }
 
-    private void introduceScene() {
+    private Scene introduceScene() {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
         stage.setTitle("WKF Mode");
         stage.setMaximized(true);
         stage.show();
+        return scene;
     }
 
     private void introduceWindowCloseEvent() {
@@ -213,17 +208,29 @@ public class EditView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
-        VBox panel = new VBox(10);
+        VBox panel = new VBox(15);
         panel.setPadding(new Insets(15));
+        panel.setAlignment(Pos.TOP_CENTER);
         panel.getStyleClass().add("participant-panel");
 
+        // --- Header (AO / AKA + Total Points)
+        Label header = getParticipantHeader(participant, participantName);
 
-        HBox scoreControls = new HBox(10, getScoreLabel(participant, ScoreType.YUKO), getScoreLabel(participant, ScoreType.WAZARI), getScoreLabel(participant, ScoreType.IPPON));
+        // --- Score labels row (Yuko, Wazari, Ippon)
+        HBox scoreControls = new HBox(30,
+                getScoreLabel(participant, ScoreType.YUKO),
+                getScoreLabel(participant, ScoreType.WAZARI),
+                getScoreLabel(participant, ScoreType.IPPON)
+        );
         scoreControls.setAlignment(Pos.CENTER);
 
+        // --- Senshu button + indicator
         Button toggleSenshuButton = new Button("Senshu");
-        toggleSenshuButton.setOnAction(e -> senshuService.getSenshuProperty(participant.getParticipantType()).set(!senshuService.getSenshuProperty(participant.getParticipantType()).get()));
-        toggleSenshuButton.setStyle("-fx-font-size: 15px;");
+        toggleSenshuButton.setOnAction(e ->
+                senshuService.getSenshuProperty(participant.getParticipantType())
+                        .set(!senshuService.getSenshuProperty(participant.getParticipantType()).get())
+        );
+        toggleSenshuButton.setStyle("-fx-font-size: 15px; -fx-pref-width: 100px;");
 
         Label senshuLabel = new Label("● Senshu");
         senshuLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: orange;");
@@ -231,55 +238,77 @@ public class EditView {
 
         HBox senshuBox = new HBox(10, toggleSenshuButton, senshuLabel);
         senshuBox.setAlignment(Pos.CENTER);
+
+        // --- Score control buttons (+/- Yuko, Wazari, Ippon)
+        VBox scoreButtonsBox = new VBox(10);
+        scoreButtonsBox.setAlignment(Pos.CENTER);
+        addButtonControls(scoreButtonsBox, participant);
+
+        // --- Penalty section
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
 
-        panel.getChildren().addAll(getParticipantHeader(participant, participantName), scoreControls, senshuBox);
-        addButtonControls(panel, participant);
-        panel.getChildren().add(penaltyComponent.getComponent());
+        // --- Combine everything neatly
+        panel.getChildren().addAll(
+                header,
+                scoreControls,
+                senshuBox,
+                scoreButtonsBox,
+                penaltyComponent.getComponent()
+        );
+
         return panel;
     }
 
-    private VBox createTimerPanel() {
+    private VBox createTimerPanel(Scene scene) {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
+        timerPanel.setAlignment(Pos.CENTER);
         timerPanel.getStyleClass().add("timer-panel");
 
+        // Timer label
         Label timerLabel = new Label();
         timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty(), timerService.millisecondsProperty()));
 
-        // User input fields for minutes and seconds
+        // Input fields
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
         minutesInput.setPromptText("min");
         secondsInput.setPromptText("sec");
-        // Setting preferred size for text fields
-        minutesInput.setPrefWidth(80);
-        secondsInput.setPrefWidth(80);
+        minutesInput.setPrefWidth(60);
+        secondsInput.setPrefWidth(60);
 
-        // Timer control buttons
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
 
-        // Start and Stop buttons
+        // Start/Stop
         Button startTimerButton = new Button("Start");
-        startTimerButton.setOnAction(e -> timerService.start());
+        startTimerButton.setOnAction(e -> {
+            timerService.start();
+            timerRunning = true;
+        });
+
         Button stopTimerButton = new Button("Stop");
-        stopTimerButton.setOnAction(e -> timerService.stop());
+        stopTimerButton.setOnAction(e -> {
+            timerService.stop();
+            timerRunning = false;
+        });
 
-        // Organizing buttons into rows
-        HBox startStopButtons = new HBox(10, startTimerButton, stopTimerButton);
-        startStopButtons.setAlignment(Pos.CENTER);
+        // Arrange inputs and controls
+        HBox inputRow = new HBox(10, minutesInput, secondsInput, setTimeButton);
+        inputRow.setAlignment(Pos.CENTER);
 
-        HBox inputFieldsSetTimeButton = new HBox(5, minutesInput, secondsInput, setTimeButton);
-        inputFieldsSetTimeButton.setAlignment(Pos.CENTER);
+        HBox startStopRow = new HBox(15, startTimerButton, stopTimerButton);
+        startStopRow.setAlignment(Pos.CENTER);
 
-        // Container for interval timers, top and bottom
-        VBox timerTop = new VBox(10, inputFieldsSetTimeButton, timerLabel, startStopButtons);
-        timerTop.setAlignment(Pos.CENTER);
-        timerTop.setPadding(new Insets(20));
+        VBox controlsBox = new VBox(15, inputRow, timerLabel, startStopRow);
+        controlsBox.setAlignment(Pos.CENTER);
 
-        VBox resetMiddle = new VBox(10);
+        // Spacer to push bottom buttons down
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        // Reset and Close buttons (bottom bar)
         Button resetAll = new Button("Reset ALL");
-        resetAll.setStyle("-fx-text-fill: orange");
+        resetAll.setStyle("-fx-text-fill: orange;");
         resetAll.setOnAction(e -> {
             timerService.resetInterval();
             timerService.reset();
@@ -287,14 +316,34 @@ public class EditView {
             penaltyService.resetPenalties();
             senshuService.resetSenshus();
             categoryService.resetCategoryInfo();
-
         });
-        resetMiddle.setAlignment(Pos.CENTER);
-        resetMiddle.getChildren().add(resetAll);
 
-        timerPanel.getChildren().addAll(timerTop, resetMiddle);
+        Button closeModeButton = new Button(CLOSE_MODE + modeName);
+        closeModeButton.setVisible(currentModeStage != null);
+
+        closeModeButton.setOnAction(e -> closeAllStages());
+
+        HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
+        bottomButtons.setAlignment(Pos.CENTER);
+
+        // Final layout
+        timerPanel.getChildren().addAll(controlsBox, spacer, bottomButtons);
+
+        scene.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                if (timerRunning) {
+                    timerService.stop();
+                } else {
+                    timerService.start();
+                }
+                timerRunning = !timerRunning;
+                event.consume(); // optional — stops space from clicking buttons
+            }
+        });
+
 
         return timerPanel;
     }
+
 
 }
