@@ -115,7 +115,7 @@ public class MenuView {
             editViewStage = editPromoKumiteView.getStage();
             editViewStage.show();
         }else{
-            EditFourFifteenView editFourFifteenView = new EditFourFifteenView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            EditFourFifteenView editFourFifteenView = new EditFourFifteenView(aka, ao, timerService, penaltyService, categoryService, specificModeStage, modeName);
             editViewStage = editFourFifteenView.getStage();
             editViewStage.show();
         }
