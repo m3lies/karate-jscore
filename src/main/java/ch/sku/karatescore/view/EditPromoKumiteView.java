@@ -211,9 +211,8 @@ public class EditPromoKumiteView {
         // --- Score columns
         VBox yukoBox = createScoreColumn(participant, ScoreType.YUKO);
         VBox wazariBox = createScoreColumn(participant, ScoreType.WAZARI);
-        VBox ipponBox = createScoreColumn(participant, ScoreType.IPPON);
 
-        HBox scoreGrid = new HBox(10, yukoBox, wazariBox, ipponBox);
+        HBox scoreGrid = new HBox(10, yukoBox, wazariBox);
         scoreGrid.setAlignment(Pos.CENTER);
 
         // --- Penalties
