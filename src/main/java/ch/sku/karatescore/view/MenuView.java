@@ -111,7 +111,7 @@ public class MenuView {
             editViewStage.show();
         }
         else if( modeName == PROMO_KUMITE){
-            EditPromoKumiteView editPromoKumiteView = new EditPromoKumiteView(aka, ao, timerService, scoreService, penaltyService, senshuService, categoryService, specificModeStage, modeName);
+            EditPromoKumiteView editPromoKumiteView = new EditPromoKumiteView(aka, ao, scoreService, penaltyService, categoryService, specificModeStage, modeName);
             editViewStage = editPromoKumiteView.getStage();
             editViewStage.show();
         }else{

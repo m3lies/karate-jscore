@@ -9,16 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="changing Beep">
+    <list default="true" id="d77bc4be-79c2-402b-90ad-86b71a203f14" name="Changes" comment="Making UI cleaner by adding grid and non collapsible buttons">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/NewBeepNov.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/NewLongBeepNov.mp3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/CategoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/CategoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditFourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditFourFifteenView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/TimerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/services/TimerService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditPromoKumiteView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditPromoKumiteView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditWKFView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/FourFifteenView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditWKFView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/EditWKFView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/MenuView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/MenuView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/PromoKumiteView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/WKFView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sku/karatescore/view/WKFView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sounds/long-beep.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sounds/short-beep.mp3" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -156,15 +156,7 @@
       <workItem from="1758752554234" duration="601000" />
       <workItem from="1758859014805" duration="1375000" />
       <workItem from="1758906017647" duration="833000" />
-      <workItem from="1762063773700" duration="9312000" />
-    </task>
-    <task id="LOCAL-00004" summary="added shared view between components">
-      <option name="closed" value="true" />
-      <created>1712525465832</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1712525465832</updated>
+      <workItem from="1762063773700" duration="15557000" />
     </task>
     <task id="LOCAL-00005" summary="added timer and penalty component">
       <option name="closed" value="true" />
@@ -550,7 +542,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758860145247</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Adjustments to UI">
+      <option name="closed" value="true" />
+      <created>1762193053591</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1762193053592</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -580,8 +580,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="timer fixed again" />
-    <MESSAGE value="fixed score and promo kumite again" />
     <MESSAGE value="added line, changed labels, added milisecs" />
     <MESSAGE value="improved design" />
     <MESSAGE value="added miliseconds for interval" />
@@ -605,7 +603,9 @@
     <MESSAGE value="close is at the center" />
     <MESSAGE value="adjusting buttons close" />
     <MESSAGE value="changing Beep" />
-    <option name="LAST_COMMIT_MESSAGE" value="changing Beep" />
+    <MESSAGE value="Adjustments to UI" />
+    <MESSAGE value="Making UI cleaner by adding grid and non collapsible buttons" />
+    <option name="LAST_COMMIT_MESSAGE" value="Making UI cleaner by adding grid and non collapsible buttons" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

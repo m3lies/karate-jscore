@@ -4,7 +4,9 @@ import ch.sku.karatescore.commons.ParticipantType;
 import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.model.Participant;
-import ch.sku.karatescore.services.*;
+import ch.sku.karatescore.services.CategoryService;
+import ch.sku.karatescore.services.PenaltyService;
+import ch.sku.karatescore.services.ScoreService;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,10 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lombok.Getter;
 
@@ -41,7 +42,7 @@ public class EditPromoKumiteView {
     private final String modeName;
     private Stage currentModeStage; // Reference to the current mode stage
 
-    public EditPromoKumiteView(Participant aka, Participant ao, TimerService timerService, ScoreService scoreService, PenaltyService penaltyService, SenshuService senshuService, CategoryService categoryService, Stage currentModeStage, String modeName) {
+    public EditPromoKumiteView(Participant aka, Participant ao, ScoreService scoreService, PenaltyService penaltyService, CategoryService categoryService, Stage currentModeStage, String modeName) {
         this.aka = aka;
         this.ao = ao;
         this.scoreService = scoreService;
@@ -76,8 +77,9 @@ public class EditPromoKumiteView {
 
     public void initializeUI() {
         addCSSStyling();
-        setupMainLayout();
+
         introduceScene();
+        setupMainLayout();
         introduceWindowCloseEvent();
     }
 
@@ -90,10 +92,19 @@ public class EditPromoKumiteView {
         Label categoryLabel = createCategoryLabel();
         HBox.setHgrow(categoryLabel, Priority.ALWAYS);
         categoryLabel.setMaxWidth(Double.MAX_VALUE);
+
         TextField categoryText = new TextField();
         categoryText.setPromptText("Enter category name");
         HBox.setHgrow(categoryText, Priority.ALWAYS);
         categoryText.setMaxWidth(Double.MAX_VALUE);
+
+        // ⛔ Prevent SPACE from starting/stopping timer while typing
+        categoryText.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                event.consume();
+            }
+        });
+
         Button setCategoryButton = createSetCategoryButton(categoryText);
         categoryPanel.getChildren().addAll(categoryLabel, categoryText, setCategoryButton);
         return categoryPanel;
@@ -127,15 +138,21 @@ public class EditPromoKumiteView {
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(10));
+        mainLayout.setFillHeight(true); // <— Important!
+
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO);
+        VBox timerPanel = createTimerPanel();
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA);
         HBox categoryPanel = createCategoryPanel();
-        VBox middlePanel = createTimerPanel();
-        configureLayoutHGrow(participantAO, middlePanel, participantAKA);
-        mainLayout.getChildren().addAll(participantAO, middlePanel, participantAKA);
+
+        participantAO.setMinHeight(0);
+        participantAKA.setMinHeight(0);
+        timerPanel.setMinHeight(0);
+
+        configureLayoutHGrow(participantAO, timerPanel, participantAKA);
+        mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
-
     }
 
     private void configureLayoutHGrow(Node... nodes) {
@@ -143,13 +160,14 @@ public class EditPromoKumiteView {
             HBox.setHgrow(node, Priority.ALWAYS);
     }
 
-    private void introduceScene() {
+    private Scene introduceScene() {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource(STYLE_CSS).toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Promo kumite Mode");
         stage.setMaximized(true);
         stage.show();
+        return scene;
     }
 
     private void introduceWindowCloseEvent() {
@@ -182,31 +200,72 @@ public class EditPromoKumiteView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName) {
-        VBox panel = new VBox(10);
-        panel.setPadding(new Insets(15));
+        VBox panel = new VBox(25);
+        panel.setPadding(new Insets(10));
+        panel.setAlignment(Pos.TOP_CENTER);
         panel.getStyleClass().add("participant-panel");
 
+        // --- Header (AKA / AO - Total Points)
+        Label header = getParticipantHeader(participant, participantName);
 
-        HBox scoreControls = new HBox(10, getScoreLabel(participant, ScoreType.YUKO), getScoreLabel(participant, ScoreType.WAZARI));
-        scoreControls.setAlignment(Pos.CENTER);
+        // --- Score columns
+        VBox yukoBox = createScoreColumn(participant, ScoreType.YUKO);
+        VBox wazariBox = createScoreColumn(participant, ScoreType.WAZARI);
+        VBox ipponBox = createScoreColumn(participant, ScoreType.IPPON);
 
+        HBox scoreGrid = new HBox(10, yukoBox, wazariBox, ipponBox);
+        scoreGrid.setAlignment(Pos.CENTER);
+
+        // --- Penalties
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
 
-        panel.getChildren().addAll(getParticipantHeader(participant, participantName), scoreControls);
-        addButtonControls(panel, participant);
-        panel.getChildren().add(penaltyComponent.getComponent());
+        // --- Combine all
+        panel.getChildren().addAll(header, scoreGrid, penaltyComponent.getComponent());
         return panel;
     }
+
+    /**
+     * Creates one vertical column for a score type: label on top, +/- buttons below.
+     */
+    private VBox createScoreColumn(Participant participant, ScoreType type) {
+        Label scoreLabel = getScoreLabel(participant, type);
+        scoreLabel.setAlignment(Pos.CENTER);
+
+        Button btnAdd = new Button("+ " + type.getStringValue());
+        Button btnRemove = new Button("- " + type.getStringValue());
+
+        // ❌ remove: btnAdd.setPrefWidth(140); btnRemove.setPrefWidth(140);
+
+        // ✅ let buttons size to text and never shrink below it
+        btnAdd.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        btnRemove.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        btnAdd.setMinWidth(Region.USE_PREF_SIZE);
+        btnRemove.setMinWidth(Region.USE_PREF_SIZE);
+
+        // (optional) allow wrap instead of ellipsis if parent width ever gets tight
+        // btnAdd.setWrapText(true);
+        // btnRemove.setWrapText(true);
+
+        btnAdd.setOnAction(e -> scoreService.addScore(participant.getParticipantType(), type));
+        btnRemove.setOnAction(e -> scoreService.subtractScore(participant.getParticipantType(), type));
+
+        VBox box = new VBox(5, scoreLabel, btnAdd, btnRemove);
+        box.setAlignment(Pos.CENTER);
+        return box;
+    }
+
     private VBox createTimerPanel() {
         VBox timerPanel = new VBox(10);
         timerPanel.setPadding(new Insets(20));
         timerPanel.setAlignment(Pos.BOTTOM_CENTER);
         timerPanel.getStyleClass().add("timer-panel");
-     // User input fields for minutes and seconds
+        // User input fields for minutes and seconds
 
 
         VBox resetMiddle = new VBox(10);
         Button resetAll = new Button("Reset ALL");
+        resetAll.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        resetAll.setMinWidth(Region.USE_PREF_SIZE);
         resetAll.setStyle("-fx-text-fill: orange");
         resetAll.setOnAction(e -> {
             scoreService.resetScores();
@@ -218,8 +277,9 @@ public class EditPromoKumiteView {
         resetMiddle.getChildren().add(resetAll);
         Button closeModeButton = new Button(CLOSE_MODE + modeName);
         closeModeButton.setVisible(currentModeStage != null);
-
         closeModeButton.setOnAction(e -> closeAllStages());
+        closeModeButton.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        closeModeButton.setMinWidth(Region.USE_PREF_SIZE);
 
         HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
         bottomButtons.setAlignment(Pos.CENTER);

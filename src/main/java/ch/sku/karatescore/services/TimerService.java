@@ -44,8 +44,8 @@ public class TimerService {
         intervalTimeline = new Timeline(new KeyFrame(Duration.millis(10), e -> decrementIntervalTime()));
         intervalTimeline.setCycleCount(Timeline.INDEFINITE);
 
-        shortBeep = new AudioClip(getClass().getResource("/sounds/NewBeep.mp3").toString());
-        longBeep = new AudioClip(getClass().getResource("/sounds/NewLongBeep.mp3").toString());
+        shortBeep = new AudioClip(getClass().getResource("/sounds/NewBeepNov.mp3").toString());
+        longBeep = new AudioClip(getClass().getResource("/sounds/NewLongBeepNov.mp3").toString());
     }
 
     public void start() {

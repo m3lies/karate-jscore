@@ -13,7 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -115,14 +117,24 @@ public class EditWKFView {
         Label categoryLabel = createCategoryLabel();
         HBox.setHgrow(categoryLabel, Priority.ALWAYS);
         categoryLabel.setMaxWidth(Double.MAX_VALUE);
+
         TextField categoryText = new TextField();
         categoryText.setPromptText("Enter category name");
         HBox.setHgrow(categoryText, Priority.ALWAYS);
         categoryText.setMaxWidth(Double.MAX_VALUE);
+
+        // ⛔ Prevent SPACE from starting/stopping timer while typing
+        categoryText.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                event.consume();
+            }
+        });
+
         Button setCategoryButton = createSetCategoryButton(categoryText);
         categoryPanel.getChildren().addAll(categoryLabel, categoryText, setCategoryButton);
         return categoryPanel;
     }
+
 
     private HBox createCategoryPanelLayout() {
         HBox categoryPanel = new HBox(10);
@@ -152,15 +164,23 @@ public class EditWKFView {
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(10));
+        mainLayout.setFillHeight(true); // <— Important!
+
         VBox participantAO = createParticipantPanel(ao, ParticipantType.AO, senshuService);
         VBox timerPanel = createTimerPanel(scene);
         VBox participantAKA = createParticipantPanel(aka, ParticipantType.AKA, senshuService);
         HBox categoryPanel = createCategoryPanel();
+
+        participantAO.setMinHeight(0);
+        participantAKA.setMinHeight(0);
+        timerPanel.setMinHeight(0);
+
         configureLayoutHGrow(participantAO, timerPanel, participantAKA);
         mainLayout.getChildren().addAll(participantAO, timerPanel, participantAKA);
         root.setTop(categoryPanel);
         root.setCenter(mainLayout);
     }
+
 
     private void configureLayoutHGrow(Node... nodes) {
         for (Node node : nodes)
@@ -208,108 +228,145 @@ public class EditWKFView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantName, SenshuService senshuService) {
-        VBox panel = new VBox(15);
-        panel.setPadding(new Insets(15));
+        VBox panel = new VBox(25);
+        panel.setPadding(new Insets(10));
         panel.setAlignment(Pos.TOP_CENTER);
         panel.getStyleClass().add("participant-panel");
 
-        // --- Header (AO / AKA + Total Points)
+        // --- Header (AKA / AO - Total Points)
         Label header = getParticipantHeader(participant, participantName);
 
-        // --- Score labels row (Yuko, Wazari, Ippon)
-        HBox scoreControls = new HBox(30,
-                getScoreLabel(participant, ScoreType.YUKO),
-                getScoreLabel(participant, ScoreType.WAZARI),
-                getScoreLabel(participant, ScoreType.IPPON)
-        );
-        scoreControls.setAlignment(Pos.CENTER);
+        // --- Senshu indicator (light above button)
+        Label senshuLabel = new Label("●");
+        senshuLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: orange;");
+        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
 
-        // --- Senshu button + indicator
         Button toggleSenshuButton = new Button("Senshu");
         toggleSenshuButton.setOnAction(e ->
                 senshuService.getSenshuProperty(participant.getParticipantType())
                         .set(!senshuService.getSenshuProperty(participant.getParticipantType()).get())
         );
-        toggleSenshuButton.setStyle("-fx-font-size: 15px; -fx-pref-width: 100px;");
+        toggleSenshuButton.setStyle("-fx-font-size: 16px; -fx-pref-width: 120px;");
 
-        Label senshuLabel = new Label("● Senshu");
-        senshuLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: orange;");
-        senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
-
-        HBox senshuBox = new HBox(10, toggleSenshuButton, senshuLabel);
+        VBox senshuBox = new VBox(5, senshuLabel, toggleSenshuButton);
         senshuBox.setAlignment(Pos.CENTER);
 
-        // --- Score control buttons (+/- Yuko, Wazari, Ippon)
-        VBox scoreButtonsBox = new VBox(10);
-        scoreButtonsBox.setAlignment(Pos.CENTER);
-        addButtonControls(scoreButtonsBox, participant);
+        // --- Score columns
+        VBox yukoBox = createScoreColumn(participant, ScoreType.YUKO);
+        VBox wazariBox = createScoreColumn(participant, ScoreType.WAZARI);
+        VBox ipponBox = createScoreColumn(participant, ScoreType.IPPON);
 
-        // --- Penalty section
+        HBox scoreGrid = new HBox(10, yukoBox, wazariBox, ipponBox);
+        scoreGrid.setAlignment(Pos.CENTER);
+
+        // --- Penalties
         PenaltyComponent penaltyComponent = new PenaltyComponent(participant, penaltyService, true);
 
-        // --- Combine everything neatly
-        panel.getChildren().addAll(
-                header,
-                scoreControls,
-                senshuBox,
-                scoreButtonsBox,
-                penaltyComponent.getComponent()
-        );
-
+        // --- Combine all
+        panel.getChildren().addAll(header, senshuBox, scoreGrid, penaltyComponent.getComponent());
         return panel;
     }
 
+
+    /**
+     * Creates one vertical column for a score type: label on top, +/- buttons below.
+     */
+    private VBox createScoreColumn(Participant participant, ScoreType type) {
+        Label scoreLabel = getScoreLabel(participant, type);
+        scoreLabel.setAlignment(Pos.CENTER);
+
+        Button btnAdd = new Button("+ " + type.getStringValue());
+        Button btnRemove = new Button("- " + type.getStringValue());
+
+        // ❌ remove: btnAdd.setPrefWidth(140); btnRemove.setPrefWidth(140);
+
+        // ✅ let buttons size to text and never shrink below it
+        btnAdd.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        btnRemove.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        btnAdd.setMinWidth(Region.USE_PREF_SIZE);
+        btnRemove.setMinWidth(Region.USE_PREF_SIZE);
+
+        // (optional) allow wrap instead of ellipsis if parent width ever gets tight
+        // btnAdd.setWrapText(true);
+        // btnRemove.setWrapText(true);
+
+        btnAdd.setOnAction(e -> scoreService.addScore(participant.getParticipantType(), type));
+        btnRemove.setOnAction(e -> scoreService.subtractScore(participant.getParticipantType(), type));
+
+        VBox box = new VBox(5, scoreLabel, btnAdd, btnRemove);
+        box.setAlignment(Pos.CENTER);
+        return box;
+    }
+
+
+
     private VBox createTimerPanel(Scene scene) {
-        VBox timerPanel = new VBox(10);
-        timerPanel.setPadding(new Insets(20));
-        timerPanel.setAlignment(Pos.CENTER);
-        timerPanel.getStyleClass().add("timer-panel");
+        VBox wrapper = new VBox();
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPadding(new Insets(10));
+        wrapper.getStyleClass().add("timer-panel");
 
-        // Timer label
-        Label timerLabel = new Label();
-        timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d", timerService.minutesProperty(), timerService.secondsProperty(), timerService.millisecondsProperty()));
+        // Use BorderPane for safe scaling
+        BorderPane timerPane = new BorderPane();
+        timerPane.setPadding(new Insets(20, 20, 40, 20)); // extra bottom padding for DPI
+        timerPane.setMinHeight(0);
+        timerPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        timerPane.setMaxHeight(Double.MAX_VALUE);
 
-        // Input fields
+        // --- Top controls ---
         TextField minutesInput = new TextField();
         TextField secondsInput = new TextField();
         minutesInput.setPromptText("min");
         secondsInput.setPromptText("sec");
         minutesInput.setPrefWidth(60);
         secondsInput.setPrefWidth(60);
-
         Button setTimeButton = getSetTimeButton(minutesInput, secondsInput, timerService);
 
+        HBox inputRow = new HBox(10, minutesInput, secondsInput, setTimeButton);
+        inputRow.setAlignment(Pos.CENTER);
+
+        // Timer label
+        Label timerLabel = new Label();
+        timerLabel.textProperty().bind(Bindings.format("%02d:%02d:%02d",
+                timerService.minutesProperty(),
+                timerService.secondsProperty(),
+                timerService.millisecondsProperty()));
+        timerLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
         // Start/Stop
-        Button startTimerButton = new Button("Start");
-        startTimerButton.setOnAction(e -> {
+        Button startButton = new Button("Start");
+        Button stopButton = new Button("Stop");
+        startButton.setOnAction(e -> {
             timerService.start();
             timerRunning = true;
         });
-
-        Button stopTimerButton = new Button("Stop");
-        stopTimerButton.setOnAction(e -> {
+        stopButton.setOnAction(e -> {
             timerService.stop();
             timerRunning = false;
         });
 
-        // Arrange inputs and controls
-        HBox inputRow = new HBox(10, minutesInput, secondsInput, setTimeButton);
-        inputRow.setAlignment(Pos.CENTER);
-
-        HBox startStopRow = new HBox(15, startTimerButton, stopTimerButton);
+        HBox startStopRow = new HBox(10, startButton, stopButton);
         startStopRow.setAlignment(Pos.CENTER);
 
-        VBox controlsBox = new VBox(15, inputRow, timerLabel, startStopRow);
-        controlsBox.setAlignment(Pos.CENTER);
+        // Center VBox
+        VBox centerControls = new VBox(15, inputRow, timerLabel, startStopRow);
+        centerControls.setAlignment(Pos.CENTER);
+        centerControls.setMinHeight(0);
+        VBox.setVgrow(centerControls, Priority.ALWAYS);
+        timerPane.setCenter(centerControls);
 
-        // Spacer to push bottom buttons down
-        Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
+        // --- Bottom buttons ---
+        Button closeButton = new Button(CLOSE_MODE + " " + modeName);
+        closeButton.setVisible(currentModeStage != null);
+        closeButton.setOnAction(e -> closeAllStages());
+        closeButton.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        closeButton.setMinWidth(Region.USE_PREF_SIZE);
 
-        // Reset and Close buttons (bottom bar)
-        Button resetAll = new Button("Reset ALL");
-        resetAll.setStyle("-fx-text-fill: orange;");
-        resetAll.setOnAction(e -> {
+        Button resetButton = new Button("Reset ALL");
+        resetButton.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        resetButton.setMinWidth(Region.USE_PREF_SIZE);
+        resetButton.setStyle("-fx-text-fill: orange;");
+        resetButton.setOnAction(e -> {
             timerService.resetInterval();
             timerService.reset();
             scoreService.resetScores();
@@ -318,32 +375,37 @@ public class EditWKFView {
             categoryService.resetCategoryInfo();
         });
 
-        Button closeModeButton = new Button(CLOSE_MODE + modeName);
-        closeModeButton.setVisible(currentModeStage != null);
+        HBox bottomBar = new HBox(10, closeButton, resetButton);
+        bottomBar.setAlignment(Pos.CENTER);
+        bottomBar.setPadding(new Insets(15));
+        bottomBar.setMinHeight(Region.USE_PREF_SIZE);
+        timerPane.setBottom(bottomBar);
 
-        closeModeButton.setOnAction(e -> closeAllStages());
+        // Make sure the bottom bar never gets cut off
+        BorderPane.setMargin(bottomBar, new Insets(10, 10, 10, 10));
 
-        HBox bottomButtons = new HBox(15, closeModeButton, resetAll);
-        bottomButtons.setAlignment(Pos.CENTER);
+        // --- Scene Key Handler (Space for Start/Stop) ---
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // Do nothing if typing in a text input
+            if (scene.getFocusOwner() instanceof TextInputControl) return;
 
-        // Final layout
-        timerPanel.getChildren().addAll(controlsBox, spacer, bottomButtons);
-
-        scene.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.SPACE) {
-                if (timerRunning) {
-                    timerService.stop();
-                } else {
-                    timerService.start();
-                }
+                if (timerRunning) timerService.stop();
+                else timerService.start();
                 timerRunning = !timerRunning;
-                event.consume(); // optional — stops space from clicking buttons
+                event.consume();
             }
         });
 
+        // Add everything
+        wrapper.getChildren().add(timerPane);
+        VBox.setVgrow(timerPane, Priority.ALWAYS);
 
-        return timerPanel;
+        return wrapper;
     }
+
+
+
 
 
 }
