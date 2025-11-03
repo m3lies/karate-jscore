@@ -269,7 +269,6 @@ public class EditPromoKumiteView {
         resetAll.setOnAction(e -> {
             scoreService.resetScores();
             penaltyService.resetPenalties();
-            categoryService.resetCategoryInfo();
 
         });
         resetMiddle.setAlignment(Pos.CENTER);

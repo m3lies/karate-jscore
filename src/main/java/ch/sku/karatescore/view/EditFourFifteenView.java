@@ -234,7 +234,6 @@ public class EditFourFifteenView {
             timerService.resetInterval();
             timerService.reset();
             penaltyService.resetPenalties();
-            categoryService.resetCategoryInfo();
 
         });
         resetMiddle.setAlignment(Pos.CENTER);

@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 public class PromoKumiteView {
+
     @Getter
     private final Stage stage;
     private final Participant aka;
@@ -26,86 +27,72 @@ public class PromoKumiteView {
     private final PenaltyService penaltyService;
     private final CategoryService categoryService;
 
-    public PromoKumiteView(Participant aka, Participant ao, ScoreService scoreService, PenaltyService penaltyService, CategoryService categoryService) {
-        this.categoryService = categoryService;
-        this.stage = new Stage();
+    public PromoKumiteView(
+            Participant aka,
+            Participant ao,
+            ScoreService scoreService,
+            PenaltyService penaltyService,
+            CategoryService categoryService
+    ) {
         this.aka = aka;
         this.ao = ao;
         this.scoreService = scoreService;
         this.penaltyService = penaltyService;
+        this.categoryService = categoryService;
+        this.stage = new Stage();
         initializeUI();
     }
 
     private void initializeUI() {
         StackPane root = new StackPane();
-        StackPane mainPane = new StackPane();
 
-        HBox participantsBox = new HBox(10);
+        // === Category ===
         HBox categoryBox = new HBox();
-        Label categoryLabel = new Label();
-        categoryService.categoryInfoProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) {
-                categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
-                categoryLabel.setText(newValue);
-            } else {
-                // Optionally handle empty case
-                categoryLabel.setStyle("");
-                categoryLabel.setText("");
-            }
-        });
-        categoryBox.setMaxWidth(Double.MAX_VALUE);
-        categoryBox.getChildren().addAll(categoryLabel);
         categoryBox.setAlignment(Pos.TOP_LEFT);
-        categoryBox.setPadding(new Insets(0, 50, 0, 0));
-        HBox.setHgrow(categoryBox, Priority.ALWAYS);
+        categoryBox.setPadding(new Insets(20, 50, 0, 50));
 
+        Label categoryLabel = new Label();
+        categoryLabel.textProperty().bind(categoryService.categoryInfoProperty());
+        categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+        categoryBox.getChildren().add(categoryLabel);
+
+        // === Participants panels ===
         VBox akaPanel = createParticipantPanel(aka, ParticipantType.AKA);
         VBox aoPanel = createParticipantPanel(ao, ParticipantType.AO);
 
+        HBox participantsBox = new HBox(10, akaPanel, aoPanel);
+        participantsBox.setAlignment(Pos.CENTER);
         HBox.setHgrow(akaPanel, Priority.ALWAYS);
         HBox.setHgrow(aoPanel, Priority.ALWAYS);
-        akaPanel.setMaxWidth(Double.MAX_VALUE);
-        aoPanel.setMaxWidth(Double.MAX_VALUE);
 
-        participantsBox.getChildren().addAll(akaPanel, aoPanel);
+        // === Layout ===
+        root.getChildren().addAll(participantsBox, categoryBox);
+        StackPane.setAlignment(categoryBox, Pos.TOP_LEFT);
 
-        root.getChildren().addAll(participantsBox);
-        // Adding participant type labels
-        Label akaTypeLabel = createParticipantTypeLabel(ParticipantType.AKA);
-        Label aoTypeLabel = createParticipantTypeLabel(ParticipantType.AO);
-        StackPane.setAlignment(akaTypeLabel, Pos.TOP_LEFT);
-        StackPane.setAlignment(aoTypeLabel, Pos.TOP_RIGHT);
-        StackPane.setMargin(akaTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        StackPane.setMargin(aoTypeLabel, new Insets(100, 50, 0, 50)); // Adjust margin to bring it closer to the center and down
-        mainPane.getChildren().addAll(categoryBox, akaTypeLabel, aoTypeLabel);
-        root.getChildren().addAll(mainPane);
         Scene scene = new Scene(root, 1920, 1080);
+        scene.setFill(javafx.scene.paint.Color.BLACK);
         stage.setScene(scene);
-        setFullScreen();
         stage.setTitle("Promo Kumite");
+        setFullScreen();
     }
 
-    private Label createParticipantTypeLabel(ParticipantType participantType) {
-        Label label = new Label(participantType.name());
-        label.setStyle("-fx-font-size: 50px; -fx-text-fill: white;-fx-font-weight: bold ; -fx-padding: 5px;");
-        return label;
-    }
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
         VBox panel = new VBox(20);
         panel.setSpacing(100);
         panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
         panel.setAlignment(Pos.CENTER);
 
-        HBox scoreSenshuBox = new HBox(10);
-        scoreSenshuBox.setAlignment(Pos.CENTER);
+
 
         Label totalScoreLabel = new Label();
         totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
         totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
 
         Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d     Waza-ari %d", scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO), scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI)
-
+        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
+                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
         ));
         detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
 
@@ -113,12 +100,9 @@ public class PromoKumiteView {
         scoreBox.setAlignment(Pos.CENTER);
 
 
-        if (participantType == ParticipantType.AKA) {
-            scoreSenshuBox.getChildren().addAll(scoreBox);
-        } else {
-            scoreSenshuBox.getChildren().addAll(scoreBox);
-        }
-        panel.getChildren().addAll(scoreSenshuBox);
+
+
+        panel.getChildren().addAll(scoreBox);
         addPenaltyLabels(participant, panel);
         return panel;
     }
@@ -147,6 +131,7 @@ public class PromoKumiteView {
             penaltyNameLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participant.getParticipantType(), penaltyType));
             penaltyNameLabel.managedProperty().bind(penaltyNameLabel.visibleProperty());
             penaltyNameLabel.setAlignment(Pos.CENTER);
+
             // Create a Region to reserve space for the label
             Region labelPlaceholder = new Region();
             labelPlaceholder.setMinSize(80, 80); // Ensure the same size as the label
@@ -161,6 +146,7 @@ public class PromoKumiteView {
 
         panel.getChildren().add(penaltyContainer);
     }
+
 
     private void setFullScreen() {
         Screen screen = Screen.getPrimary();

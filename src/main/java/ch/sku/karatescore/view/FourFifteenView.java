@@ -44,16 +44,8 @@ public class FourFifteenView {
         HBox participantsBox = new HBox(10);
         HBox categoryBox = new HBox();
         Label categoryLabel = new Label();
-        categoryService.categoryInfoProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) {
-                categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
-                categoryLabel.setText(newValue);
-            } else {
-                // Optionally handle empty case
-                categoryLabel.setStyle("");
-                categoryLabel.setText("");
-            }
-        });
+        categoryLabel.textProperty().bind(categoryService.categoryInfoProperty());
+        categoryLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
         categoryBox.setMaxWidth(Double.MAX_VALUE);
         categoryBox.getChildren().addAll(categoryLabel);
         categoryBox.setAlignment(Pos.TOP_LEFT);

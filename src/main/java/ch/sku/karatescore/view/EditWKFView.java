@@ -372,7 +372,6 @@ public class EditWKFView {
             scoreService.resetScores();
             penaltyService.resetPenalties();
             senshuService.resetSenshus();
-            categoryService.resetCategoryInfo();
         });
 
         HBox bottomBar = new HBox(10, closeButton, resetButton);
