@@ -115,7 +115,7 @@ public class WKFView {
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
                 scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
         ));
-        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-font-weight: bold;");
 
         VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
         scoreBox.setAlignment(Pos.CENTER);
@@ -144,7 +144,7 @@ public class WKFView {
             penaltyBox.setAlignment(Pos.CENTER);
 
             Label penaltyNameLabel = new Label(penaltyType.getName());
-            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px; -fx-font-weight: bold;");
             penaltyNameLabel.setMinSize(80, 80); // Ensure fixed size based on the preferred size
             penaltyNameLabel.setMaxSize(80, 80); // Ensure fixed size based on the preferred size
 

@@ -122,11 +122,11 @@ public class FourFifteenView {
     private StringBinding createStyleBinding(IntegerProperty intervalProperty, int periodNumber) {
         return Bindings.createStringBinding(() -> {
             if (timerService.periodProperty().get() == periodNumber) {
-                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.5);-fx-background-radius: 10px;";
+                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.5);-fx-background-radius: 10px; -fx-font-weight: bold;";
             } else if (intervalProperty.get() == 0) {
-                return "-fx-font-size: 100px; -fx-text-fill: grey;";
+                return "-fx-font-size: 100px; -fx-text-fill: grey; -fx-font-weight: bold;";
             } else {
-                return "-fx-font-size: 100px; -fx-text-fill: white;";
+                return "-fx-font-size: 100px; -fx-text-fill: white; -fx-font-weight: bold;";
             }
         }, intervalProperty, timerService.periodProperty());
     }
@@ -140,7 +140,7 @@ public class FourFifteenView {
             penaltyBox.setAlignment(Pos.CENTER);
 
             Label penaltyNameLabel = new Label(penaltyType.getName());
-            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px;");
+            penaltyNameLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-padding: 10px; -fx-background-radius: 15px; -fx-border-radius: 15px; -fx-font-weight: bold;");
             penaltyNameLabel.setMinSize(80, 80); // Ensure fixed size based on the preferred size
             penaltyNameLabel.setMaxSize(80, 80); // Ensure fixed size based on the preferred size
 
