@@ -1,5 +1,6 @@
 package ch.sku.karatescore.services;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
@@ -39,13 +40,13 @@ public class TimerService {
 
     public TimerService() {
         timeline = new Timeline(new KeyFrame(Duration.millis(10), e -> decrementTime()));
-        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.setCycleCount(Animation.INDEFINITE);
 
         intervalTimeline = new Timeline(new KeyFrame(Duration.millis(10), e -> decrementIntervalTime()));
-        intervalTimeline.setCycleCount(Timeline.INDEFINITE);
+        intervalTimeline.setCycleCount(Animation.INDEFINITE);
 
         shortBeep = new AudioClip(getClass().getResource("/sounds/NewBeepNov.mp3").toString());
-        longBeep = new AudioClip(getClass().getResource("/sounds/NewLongBeepNov.mp3").toString());
+        longBeep = new AudioClip(getClass().getResource("/sounds/NewLongBeepNov2.mp3").toString());
     }
 
     public void start() {
@@ -256,30 +257,6 @@ public class TimerService {
         period.set(1);
     }
 
-    public void resetIntervalForPeriod(int period) {
-        switch (period) {
-            case 1:
-                intervalMinutes1.set(0);
-                intervalSeconds1.set(15);
-                intervalMilliseconds1.set(0);
-                break;
-            case 2:
-                intervalMinutes2.set(0);
-                intervalSeconds2.set(15);
-                intervalMilliseconds2.set(0);
-                break;
-            case 3:
-                intervalMinutes3.set(0);
-                intervalSeconds3.set(15);
-                intervalMilliseconds3.set(0);
-                break;
-            case 4:
-                intervalMinutes4.set(0);
-                intervalSeconds4.set(15);
-                intervalMilliseconds4.set(0);
-                break;
-        }
-    }
 
     public void nextPeriod() {
         int currentPeriod = period.get();
