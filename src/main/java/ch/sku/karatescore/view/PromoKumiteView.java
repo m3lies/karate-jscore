@@ -101,17 +101,17 @@ public class PromoKumiteView {
         HBox breakdown = new HBox(30, yukoBox, wazariBox);
         breakdown.setAlignment(Pos.CENTER);
 
-        VBox scoreBlock = new VBox(25, totalScoreLabel, breakdown);
+        VBox scoreBlock = new VBox(5, totalScoreLabel, breakdown);
         scoreBlock.setAlignment(Pos.CENTER);
 
 // === Penalties ===
-        VBox penaltyBox = new VBox(10);
+        VBox penaltyBox = new VBox(5);
         penaltyBox.setAlignment(Pos.CENTER);
         penaltyBox.setPadding(new Insets(10, 0, 0, 0));
         addPenaltyLabels(participant, penaltyBox);
 
 // ↓ Adjust vertical spacing (closer alignment between breakdown & penalties)
-        VBox centerColumn = new VBox(45, scoreBlock, penaltyBox);
+        VBox centerColumn = new VBox(10, scoreBlock, penaltyBox);
         centerColumn.setAlignment(Pos.CENTER);
 
 

@@ -138,16 +138,16 @@ public class WKFView {
         HBox breakdown = new HBox(30, yukoBox, wazariBox, ipponBox);
         breakdown.setAlignment(Pos.CENTER);
 
-        VBox scoreBlock = new VBox(25, scoreRow, breakdown);
+        VBox scoreBlock = new VBox(5, scoreRow, breakdown);
         scoreBlock.setAlignment(Pos.CENTER);
 
         // === Penalties ===
-        VBox penaltyBox = new VBox(10);
+        VBox penaltyBox = new VBox(5);
         penaltyBox.setAlignment(Pos.CENTER);
         penaltyBox.setPadding(new Insets(10, 0, 0, 0));
         addPenaltyLabels(participant, penaltyBox);
 
-        VBox centerColumn = new VBox(45, scoreBlock, penaltyBox);
+        VBox centerColumn = new VBox(10, scoreBlock, penaltyBox);
         centerColumn.setAlignment(Pos.CENTER);
 
         side.getChildren().add(centerColumn);
