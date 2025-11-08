@@ -9,16 +9,15 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 
 public class PenaltyComponent {
-    @Getter
-    private HBox component;
     private final Participant participant;
     private final PenaltyService penaltyService;
     private final boolean includeButtons;
+    @Getter
+    private HBox component;
 
     public PenaltyComponent(Participant participant, PenaltyService penaltyService, boolean includeButtons) {
         this.participant = participant;
@@ -43,22 +42,21 @@ public class PenaltyComponent {
 
         Label penaltyLabel = new Label(penalty.getName());
         penaltyLabel.getStyleClass().add("penalty-label");
-
         penaltyLabel.visibleProperty().bind(penaltyService.getPenaltyProperty(participantType, penalty));
         penaltyLabel.managedProperty().set(true);
         penaltyLabel.setAlignment(Pos.CENTER);
-
-        Pane penaltyLabelContainer = new Pane();
-        penaltyLabelContainer.getChildren().add(penaltyLabel);
-
-        penaltyBox.getChildren().add(penaltyLabelContainer);
+        penaltyLabel.setMaxWidth(Double.MAX_VALUE); // allow it to grow
 
         if (includeButtons) {
             Button penaltyButton = new Button(penalty.getName());
             penaltyButton.setOnAction(e -> penaltyService.togglePenalty(participantType, penalty));
-            penaltyBox.getChildren().add(penaltyButton);
+
+            // keep label and button the same width
+            penaltyLabel.prefWidthProperty().bind(penaltyButton.widthProperty());
+            penaltyBox.getChildren().addAll(penaltyLabel, penaltyButton);
+        } else {
+            penaltyBox.getChildren().add(penaltyLabel);
         }
         return penaltyBox;
     }
-
 }
