@@ -97,43 +97,86 @@ public class WKFView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
-        VBox panel = new VBox(20);
-        panel.setSpacing(100);
-        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
-        panel.setAlignment(Pos.CENTER);
+        // === Background for each side ===
+        StackPane side = new StackPane();
+        side.setStyle("-fx-background-color: " +
+                (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") +
+                "; -fx-text-fill: white;");
+        side.setPadding(new Insets(0));
 
-        HBox scoreSenshuBox = new HBox(10);
-        scoreSenshuBox.setAlignment(Pos.CENTER);
-
+        // === TOTAL SCORE ===
         Label totalScoreLabel = new Label();
-        totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
-        totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
+        totalScoreLabel.textProperty().bind(
+                Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType()))
+        );
+        totalScoreLabel.setStyle("-fx-font-size: 320px; -fx-text-fill: white; -fx-font-weight: bold;");
+        totalScoreLabel.setAlignment(Pos.CENTER);
+        totalScoreLabel.setPrefWidth(400); // adjust width to your layout
 
-        Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
-        ));
-        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-font-weight: bold;");
-
-        VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
-        scoreBox.setAlignment(Pos.CENTER);
-
+        // === SENSU LABEL ===
         Label senshuLabel = new Label("●");
         senshuLabel.setStyle("-fx-font-size: 100px; -fx-text-fill: yellow;");
         senshuLabel.visibleProperty().bind(senshuService.getSenshuProperty(participant.getParticipantType()));
 
+        // ✅ Put score and senshu in an HBox
+        HBox scoreRow = new HBox(20);
+        scoreRow.setAlignment(Pos.CENTER);
+
         if (participantType == ParticipantType.AKA) {
-            scoreSenshuBox.getChildren().addAll(senshuLabel, scoreBox);
+            // Senshu (yellow dot) on the LEFT side for AKA
+            scoreRow.getChildren().addAll(senshuLabel, totalScoreLabel);
         } else {
-            scoreSenshuBox.getChildren().addAll(scoreBox, senshuLabel);
+            // Senshu (yellow dot) on the RIGHT side for AO
+            scoreRow.getChildren().addAll(totalScoreLabel, senshuLabel);
         }
 
-        panel.getChildren().addAll(scoreSenshuBox);
-        addPenaltyLabels(participant, panel);
-        return panel;
+        // === Breakdown (Yuko, Waza-ari, Ippon) ===
+        VBox yukoBox   = createScoreBox("Yuko",     scoreService.getScoreProperty(participantType, ScoreType.YUKO));
+        VBox wazariBox = createScoreBox("Waza-ari", scoreService.getScoreProperty(participantType, ScoreType.WAZARI));
+        VBox ipponBox  = createScoreBox("Ippon",    scoreService.getScoreProperty(participantType, ScoreType.IPPON));
+
+        HBox breakdown = new HBox(30, yukoBox, wazariBox, ipponBox);
+        breakdown.setAlignment(Pos.CENTER);
+
+        VBox scoreBlock = new VBox(25, scoreRow, breakdown);
+        scoreBlock.setAlignment(Pos.CENTER);
+
+        // === Penalties ===
+        VBox penaltyBox = new VBox(10);
+        penaltyBox.setAlignment(Pos.CENTER);
+        penaltyBox.setPadding(new Insets(10, 0, 0, 0));
+        addPenaltyLabels(participant, penaltyBox);
+
+        VBox centerColumn = new VBox(45, scoreBlock, penaltyBox);
+        centerColumn.setAlignment(Pos.CENTER);
+
+        side.getChildren().add(centerColumn);
+        StackPane.setAlignment(centerColumn, Pos.CENTER);
+
+        VBox wrapper = new VBox(side);
+        VBox.setVgrow(side, Priority.ALWAYS);
+        wrapper.setFillWidth(true);
+        return wrapper;
     }
+
+
+
+    /**
+     * Helper to create one vertical column for a score type.
+     */
+    private VBox createScoreBox(String label, javafx.beans.property.IntegerProperty scoreProperty) {
+        Label typeLabel = new Label(label);
+        typeLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        Label valueLabel = new Label();
+        valueLabel.textProperty().bind(Bindings.format("%d", scoreProperty));
+        valueLabel.setStyle("-fx-font-size: 60px; -fx-text-fill: white;");
+
+        VBox box = new VBox(10, typeLabel, valueLabel);
+        box.setAlignment(Pos.CENTER);
+        return box;
+    }
+
 
     private void addPenaltyLabels(Participant participant, VBox panel) {
         HBox penaltyContainer = new HBox(10);

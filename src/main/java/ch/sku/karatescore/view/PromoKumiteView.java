@@ -77,34 +77,66 @@ public class PromoKumiteView {
     }
 
     private VBox createParticipantPanel(Participant participant, ParticipantType participantType) {
-        VBox panel = new VBox(20);
-        panel.setSpacing(100);
-        panel.setStyle("-fx-background-color: " + (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") + "; -fx-text-fill: white;");
-        panel.setAlignment(Pos.CENTER);
+        // Background for each side
+        StackPane side = new StackPane();
+        side.setStyle("-fx-background-color: " +
+                (participantType == ParticipantType.AKA ? "#dc3545" : "#007bff") +
+                "; -fx-text-fill: white;");
+        side.setPadding(new Insets(0));
 
-
-
+        // === TOTAL SCORE ===
         Label totalScoreLabel = new Label();
-        totalScoreLabel.textProperty().bind(Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType())));
-        totalScoreLabel.setStyle("-fx-font-size: 300px; -fx-text-fill: white;");
+        totalScoreLabel.textProperty().bind(
+                Bindings.format("%d", scoreService.getTotalScoreProperty(participant.getParticipantType()))
+        );
+        totalScoreLabel.setStyle("-fx-font-size: 320px; -fx-text-fill: white; -fx-font-weight: bold;");
+        totalScoreLabel.setAlignment(Pos.CENTER);
 
-        Label detailedScoreLabel = new Label();
-        detailedScoreLabel.textProperty().bind(Bindings.format("Yuko %d    Waza-ari %d    Ippon %d",
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.YUKO),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.WAZARI),
-                scoreService.getScoreProperty(participant.getParticipantType(), ScoreType.IPPON)
-        ));
-        detailedScoreLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-font-weight: bold;");
-
-        VBox scoreBox = new VBox(10, totalScoreLabel, detailedScoreLabel);
-        scoreBox.setAlignment(Pos.CENTER);
+// === Breakdown (Yuko, Waza-ari, Ippon) ===
+        VBox yukoBox   = createScoreBox("Yuko",     scoreService.getScoreProperty(participantType, ScoreType.YUKO));
+        VBox wazariBox = createScoreBox("Waza-ari", scoreService.getScoreProperty(participantType, ScoreType.WAZARI));
 
 
+// ↓ Reduce spacing from 80 → 30 (aligns better with penalty width)
+        HBox breakdown = new HBox(30, yukoBox, wazariBox);
+        breakdown.setAlignment(Pos.CENTER);
+
+        VBox scoreBlock = new VBox(25, totalScoreLabel, breakdown);
+        scoreBlock.setAlignment(Pos.CENTER);
+
+// === Penalties ===
+        VBox penaltyBox = new VBox(10);
+        penaltyBox.setAlignment(Pos.CENTER);
+        penaltyBox.setPadding(new Insets(10, 0, 0, 0));
+        addPenaltyLabels(participant, penaltyBox);
+
+// ↓ Adjust vertical spacing (closer alignment between breakdown & penalties)
+        VBox centerColumn = new VBox(45, scoreBlock, penaltyBox);
+        centerColumn.setAlignment(Pos.CENTER);
 
 
-        panel.getChildren().addAll(scoreBox);
-        addPenaltyLabels(participant, panel);
-        return panel;
+        // === Stack layout ===
+        side.getChildren().add(centerColumn);
+        StackPane.setAlignment(centerColumn, Pos.CENTER);
+
+        // Wrapper for consistency
+        VBox wrapper = new VBox(side);
+        VBox.setVgrow(side, Priority.ALWAYS);
+        wrapper.setFillWidth(true);
+        return wrapper;
+    }
+
+    private VBox createScoreBox(String label, javafx.beans.property.IntegerProperty scoreProperty) {
+        Label typeLabel = new Label(label);
+        typeLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        Label valueLabel = new Label();
+        valueLabel.textProperty().bind(Bindings.format("%d", scoreProperty));
+        valueLabel.setStyle("-fx-font-size: 60px; -fx-text-fill: white;");
+
+        VBox box = new VBox(10, typeLabel, valueLabel);
+        box.setAlignment(Pos.CENTER);
+        return box;
     }
 
     private void addPenaltyLabels(Participant participant, VBox panel) {
