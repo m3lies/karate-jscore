@@ -1,7 +1,6 @@
 package ch.sku.karatescore.view;
 
 import ch.sku.karatescore.commons.ParticipantType;
-import ch.sku.karatescore.commons.ScoreType;
 import ch.sku.karatescore.components.PenaltyComponent;
 import ch.sku.karatescore.model.Participant;
 import ch.sku.karatescore.services.*;
@@ -32,6 +31,7 @@ public class EditFourFifteenView {
     private static final String STYLE_TEXT_FILL = "-fx-text-fill: white; -fx-padding: 10;";
     private static final String STYLE_BACKGROUND_AO_COLOR = "-fx-background-color: #007bff; ";
     private static final String STYLE_BACKGROUND_AKA_COLOR = "-fx-background-color: #dc3545; ";
+    private static final String BINDING_FORMAT = "00:%02d:%02d";
     @Getter
     private final Stage stage;
     private final BorderPane root = new BorderPane();
@@ -54,28 +54,6 @@ public class EditFourFifteenView {
         this.currentModeStage = currentModeStage; // Set the current mode stage
         this.modeName = modeName; // Set the name of the clicked button
         initializeUI();
-    }
-
-    private static void handleTimeSet(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        try {
-            int mins = minutesInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(minutesInput.getText().trim());
-            int secs = secondsInput.getText().trim().isEmpty() ? 0 : Integer.parseInt(secondsInput.getText().trim());
-            if (mins < 0 || secs < 0 || secs >= 60) {
-                throw new IllegalArgumentException("Minutes should be non-negative and seconds should be between 0 and 59.");
-            }
-            timerService.setUpTimer(mins, secs);
-        } catch (NumberFormatException ex) {
-            minutesInput.setText("");
-            secondsInput.setText("");
-            minutesInput.setPromptText("Invalid input! Enter a number.");
-            secondsInput.setPromptText("Invalid input! Enter a number.");
-        }
-    }
-
-    private static Button getSetTimeButton(TextField minutesInput, TextField secondsInput, TimerService timerService) {
-        Button setTimeButton = new Button("Set");
-        setTimeButton.setOnAction(e -> handleTimeSet(minutesInput, secondsInput, timerService));
-        return setTimeButton;
     }
 
     private Label getParticipantHeader(Participant participant, ParticipantType participantName) {
@@ -208,18 +186,17 @@ public class EditFourFifteenView {
         startIntervalButton.setOnAction(e -> timerService.startIntervalTimer(timerService.periodProperty().get()));
         Button stopIntervalButton = new Button("4x15 stop");
         stopIntervalButton.setOnAction(e -> timerService.stopAllIntervalTimers());
-
         Label timerIntervalLabel1 = new Label();
-        timerIntervalLabel1.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty1(), timerService.intervalMillisecondsProperty1()));
+        timerIntervalLabel1.textProperty().bind(Bindings.format(BINDING_FORMAT, timerService.intervalSecondsProperty1(), timerService.intervalMillisecondsProperty1()));
 
         Label timerIntervalLabel2 = new Label();
-        timerIntervalLabel2.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty2(), timerService.intervalMillisecondsProperty2()));
+        timerIntervalLabel2.textProperty().bind(Bindings.format(BINDING_FORMAT, timerService.intervalSecondsProperty2(), timerService.intervalMillisecondsProperty2()));
 
         Label timerIntervalLabel3 = new Label();
-        timerIntervalLabel3.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty3(), timerService.intervalMillisecondsProperty3()));
+        timerIntervalLabel3.textProperty().bind(Bindings.format(BINDING_FORMAT, timerService.intervalSecondsProperty3(), timerService.intervalMillisecondsProperty3()));
 
         Label timerIntervalLabel4 = new Label();
-        timerIntervalLabel4.textProperty().bind(Bindings.format("00:%02d:%02d", timerService.intervalSecondsProperty4(), timerService.intervalMillisecondsProperty4()));
+        timerIntervalLabel4.textProperty().bind(Bindings.format(BINDING_FORMAT, timerService.intervalSecondsProperty4(), timerService.intervalMillisecondsProperty4()));
 
         // Organizing buttons into rows
         HBox startStopIntervalButtons = new HBox(10, startIntervalButton, stopIntervalButton);
